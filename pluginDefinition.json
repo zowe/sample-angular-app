@@ -1,0 +1,33 @@
+{
+  "identifier": "com.rs.mvd.myplugin",
+  "apiVersion": "1.0.0",
+  "pluginVersion": "0.9.0",
+  "pluginType": "application",
+  "webContent": {
+    "framework": "angular2",
+    "launchDefinition": {
+      "pluginShortNameKey": "helloWorldTitle",
+      "pluginShortNameDefault": "Hello World",
+      "imageSrc": "assets/icon.png"
+    },
+    "descriptionKey": "MyPluginDescription",
+    "descriptionDefault": "Base MVD plugin template",
+    "isSingleWindowApp": true,
+    "defaultWindowStyle": {
+      "x": 0,
+      "y": 0,
+      "width": 400,
+      "height": 300
+    }
+  },
+  "dataServices": [
+    {
+      "type": "router",
+      "name": "hello",
+      "filename": "helloWorld.js",
+      "routerFactory": "helloWorldRouter",
+      "dependenciesIncluded": true,
+      "initializerLookupMethod": "external"
+    }
+  ]
+}
