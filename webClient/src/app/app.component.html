@@ -63,13 +63,17 @@
       <span class="bigger-bold-text">Dataservice Request Test</span>
     </div>
     <div>
-      <input placeholder="Message" [(ngModel)]="helloText"
+      <input placeholder="Message" 
+             i18n-placeholder="message|indicates that the user will enter a message@@appComponentMessage" [(ngModel)]="helloText"
       (keyup.enter)="sayHello()"/>
-      <button (click)="sayHello()">Run</button>
+      <button (click)="sayHello()"
+              i18n="run|Run the application@@appComponentRun">Run</button>
     </div>
     <div>
-      <label>Response</label>
-      <textarea class="server-response" placeholder="Response">{{serverResponseMessage}}</textarea>
+      <label i18n="response|the area where the response from the server will appear@@appComponentResponse">Response</label>
+      <label>{{dateObj | date: 'full'}}</label>
+      <textarea class="server-response" placeholder="Response" 
+                i18n-placeholder="@@appComponentResponse" >{{serverResponseMessage}}</textarea>
     </div>
   </div>
 </div>
