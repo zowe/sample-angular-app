@@ -34,6 +34,7 @@ export class AppComponent {
   targetMode: string = "PluginCreate";
   helloText: string;
   serverResponseMessage: string;
+  dateObj: Date = new Date();
 
   constructor(
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
