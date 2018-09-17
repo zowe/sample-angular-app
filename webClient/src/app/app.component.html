@@ -10,11 +10,58 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="app-component">
-  <h1>
-    Welcome to {{title}}!
-  </h1>
-  <div>
+<div class="app-component test-panel-container">
+  <div class="test-panel plugin-test-panel">
+    <div class="bottom-10">
+      <span class="bigger-bold-text">Plug-in Request Test</span>
+      <!-- Tests the sending of requests to other plugins. Defaults to send a message
+           to itself (and responding) to show more parts of the API-->
+      <button class="iframe-button shadowed" type="button" (click)="sendAppRequest()">Send App Request</button>
+    </div>
+    <span class="bold-text">Application Identifier: </span>
+    <div>
+      <div class="div-input">
+        <input class="iframe-input input-height input-corner input-text shadowed" type="text" [(ngModel)]="targetAppId"/>
+      </div>
+      <div>
+        <!-- Action types are used to determine what sort of Action is being taken on whatever App instance is the target. Launch simply creates a new instance with the context you provide, but Message can be used to communicate with an already open Instance to drive some action -->
+        
+        <label class="bold-text">Action Type: </label>
+        <input type="radio" [(ngModel)]="actionType" value="Launch">
+        <label for="actionLaunch">Launch</label>
+
+        <input type="radio" [(ngModel)]="actionType" value="Message">
+        <label for="actionMessage">Message</label>
+      </div>
+      <!-- App target modes are used to determine which instance of an App should be communicated with. You can create a new instance to send the Action to, or you could reuse an existing instance that is open. -->
+      <div>
+        <label class="bold-text">App Target Mode: </label>
+        <input type="radio" [(ngModel)]="targetMode" value="PluginCreate">
+        <label for="targetCreate">Create New</label>
+
+        <input type="radio" [(ngModel)]="targetMode" value="PluginFindAnyOrCreate">
+        <label for="targetReuse">Reuse Any Open</label>
+      </div>      
+      <span class="bold-text hide-it">Target App Window Title (this will become the title for the target window)</span>
+      <div class="div-input hide-it">
+        <input class="iframe-input input-height input-corner input-text shadowed" type="text" name="appWindowTitle" id="appWindowTitle" placeholder="app window title" value="My New Title"/>
+      </div>
+      <span class="div-input bold-text">Parameters:</span>
+      <div class="div-textarea-input">
+        <!-- The text here is merely an example which provides some connection details for the terminal app. It could be anything so long as the receiving App supports it.
+             In this example App, the contents here will be put inside of a JSON with the contents as the "data" attribute. -->
+        <textarea class="iframe-input input-corner input-text shadowed" rows="10" cols="50" [(ngModel)]="requestText" ></textarea>
+      </div>
+      <div style="width: 100%">
+        <span>App Status or Message:</span>
+        <p class="display-text shadowed disable-effect" id="status">{{callStatus}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="test-panel dataservice-test-panel">
+    <div class="bottom-10">
+      <span class="bigger-bold-text">Dataservice Request Test</span>
+    </div>
     <div>
       <input placeholder="Message" [(ngModel)]="helloText"
       (keyup.enter)="sayHello()"/>
