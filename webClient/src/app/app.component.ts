@@ -33,7 +33,7 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,   
     private helloService: HelloService) {
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
-    this.helloService.setDestination(RocketMVD.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
+    this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
   }
 
   sayHello() {
