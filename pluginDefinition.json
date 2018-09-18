@@ -1,23 +1,23 @@
 {
-  "identifier": "com.rs.mvd.myplugin",
+  "identifier": "org.zowe.zlux.sample.angular",
   "apiVersion": "1.0.0",
-  "pluginVersion": "0.9.0",
+  "pluginVersion": "1.0.0",
   "pluginType": "application",
   "webContent": {
     "framework": "angular2",
     "launchDefinition": {
-      "pluginShortNameKey": "helloWorldTitle",
-      "pluginShortNameDefault": "Hello World",
+      "pluginShortNameKey": "sampleangular",
+      "pluginShortNameDefault": "Angular Sample",
       "imageSrc": "assets/icon.png"
     },
-    "descriptionKey": "MyPluginDescription",
-    "descriptionDefault": "Base MVD plugin template",
+    "descriptionKey": "Sample App Showcasing Angular Adapter",
+    "descriptionDefault": "Sample App Showcasing Angular Adapter",
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
-      "x": 0,
-      "y": 0,
-      "width": 400,
-      "height": 300
+      "width": 800,
+      "height": 450,
+      "x": 200,
+      "y": 50
     }
   },
   "dataServices": [

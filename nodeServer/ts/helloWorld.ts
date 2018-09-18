@@ -31,7 +31,7 @@ class HelloWorldDataservice{
     router.post('/',function(req: Request,res: Response) {
       let messageFromClient = req.body ? req.body.messageFromClient : "<No/Empty Message Received from Client>"
       let responseBody = {
-        "_docType": "com.rs.mvd.sampleapp.hello",
+        "_docType": "org.zowe.zlux.sample.service.hello",
         "_metaDataVersion": "1.0.0",
         "requestBody": req.body,
         "requestURL": req.originalUrl,

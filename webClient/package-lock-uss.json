@@ -1,5 +1,5 @@
 {
-  "name": "mvd-plugin-name",
+  "name": "org.zowe.zlux.sample.angular.webclient",
   "version": "1.0.0",
   "lockfileVersion": 1,
   "requires": true,
