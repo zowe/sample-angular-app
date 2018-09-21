@@ -2,19 +2,34 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
-      <trans-unit id="appComponentPrimaryTitle" datatype="html">
-        <source>
-    Welcome to <x id="INTERPOLATION" equiv-text="{{title}}"/>!
-        </source>
-        <target>
-    Bienvenue à <x id="INTERPOLATION" equiv-text="{{title}}"/>!
-        </target>
+      <trans-unit id="app-request-test" datatype="html">
+        <source>App Request Test</source>
+        <target>Test de Demande à l'App</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">17</context>
         </context-group>
-        <note priority="1" from="description">The primary title of the whole application, welcoming the user to the application</note>
-        <note priority="1" from="meaning">Title</note>
+        <note priority="1" from="description">A set of widgets to test sending request to other apps on the desktop</note>
+        <note priority="1" from="meaning">test for plugin requests</note>
+      </trans-unit>
+      <trans-unit id="send-app-request" datatype="html">
+        <source>Send App Request</source>
+        <target>Envoyer la Demande à l'App</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">Send a request to another application on the desktop</note>
+        <note priority="1" from="meaning">send request to application</note>
+      </trans-unit>
+      <trans-unit id="dataservice-request-test" datatype="html">
+        <source>Dataservice Request Test</source>
+        <target>Test de Demande au Dataservice</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <note priority="1" from="description">test of dataservice requests</note>
       </trans-unit>
       <trans-unit id="appComponentMessage" datatype="html">
         <source>Message</source>
