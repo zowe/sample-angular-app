@@ -15,12 +15,13 @@ import { Component, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 import { HelloService } from './services/hello.service';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [HelloService]
+  providers: [HelloService, SettingsService]
 })
 
 export class AppComponent {
@@ -51,9 +52,11 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
-    private helloService: HelloService) {
+    private helloService: HelloService,
+    private settingsService: SettingsService) {
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
+    this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
@@ -109,6 +112,52 @@ export class AppComponent {
     }
   }
 
+  getDefaultsFromServer() {
+    this.settingsService.getDefaultsFromServer().subscribe(res => {
+      if (res.status != 200) {
+        this.log.warn(`Get defaults from server failed. Data missing or request invalid. Status=${res.status}`);
+      }
+      try {
+        let responseJson = res.json();
+        this.log.info(`JSON=${JSON.stringify(responseJson)}`);
+        if (res.status == 200) {
+          if (responseJson.contents.appid && responseJson.contents.parameters) {
+            let paramData = responseJson.contents.parameters.data;
+            this.parameters = paramData.parameters;
+            this.actionType = paramData.actionType;
+            this.targetMode = paramData.appTarget;
+            this.targetAppId = responseJson.contents.appid.data.appId;
+          } else {
+            this.log.warn(`Incomplete data. AppID or Parameters missing.`);
+          }
+        }        
+      } catch (e) {
+        this.log.warn(`Response was not JSON`);
+      }
+    }, e => {
+      this.log.warn(`Error on getting defaults, e=${e}`);
+      this.callStatus = 'Error getting defaults';
+    });
+  }
+
+  saveToServer() {
+    this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters).subscribe(res => {
+      this.log.info(`Saved parameters with HTTP status=${res.status}`);
+      if (res.status == 200 || res.status == 201) {
+        this.settingsService.saveAppId(this.targetAppId).subscribe(res=> {
+          this.log.info(`Saved App ID with HTTP status=${res.status}`);
+        }, e=> {
+          this.log.warn(`Error on saving App ID, e=${e}`);
+          this.callStatus = 'Error saving App ID';
+        });
+      } else {
+        this.log.warn(`Error on saving parameters, response status=${res.status}`);
+      }
+    }, e => {
+      this.log.warn(`Error on saving parameters, e=${e}`);
+      this.callStatus = 'Error saving parameters';
+    });
+  }  
   
   sayHello() {
     this.helloService.sayHello(this.helloText)

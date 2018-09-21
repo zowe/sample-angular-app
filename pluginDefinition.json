@@ -29,5 +29,17 @@
       "dependenciesIncluded": true,
       "initializerLookupMethod": "external"
     }
-  ]
+  ],
+  "configurationData": {
+    "resources": {
+      "requests": {
+        "aggregationPolicy": "override",
+        "subResources": {
+          "app": {
+            "aggregationPolicy": "override"
+          }
+        }
+      }
+    }
+  }
 }
