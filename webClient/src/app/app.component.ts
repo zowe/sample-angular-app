@@ -26,7 +26,7 @@ import { HelloService } from './services/hello.service';
 export class AppComponent {
   targetAppId: string = "TODO";
   callStatus: string = "Status will appear here.";
-  requestText: string =
+  parameters: string =
 `TODO`;
 
   //filled in via radio buttons
