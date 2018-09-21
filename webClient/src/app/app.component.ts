@@ -15,18 +15,19 @@ import { Component, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 import { HelloService } from './services/hello.service';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [HelloService]
+  providers: [HelloService, SettingsService]
 })
 
 export class AppComponent {
   targetAppId: string = "com.rs.mvd.tn3270";
   callStatus: string = "Status will appear here.";
-  requestText: string =
+  parameters: string =
 `{"type":"connect",
   "connectionSettings":{
     "host":"localhost",
@@ -50,12 +51,114 @@ export class AppComponent {
   constructor(
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
-    //@Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
-    private helloService: HelloService) {
+    @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
+    private helloService: HelloService,
+    private settingsService: SettingsService) {
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
+    this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
+    if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
+      this.handleLaunchOrMessageObject(this.launchMetadata.data);
+    }
   }
 
+  handleLaunchOrMessageObject(data: any) {
+    switch (data.type) {
+    case 'setAppRequest':
+      let actionType = data.actionType;
+      let msg:string;
+      if (actionType == 'Launch' || actionType == 'Message') {
+        let mode = data.targetMode;
+        if (mode == 'PluginCreate' || mode == 'PluginFindAnyOrCreate') {
+          this.actionType = actionType;
+          this.targetMode = mode;
+          this.targetAppId = data.targetAppId;
+          this.parameters = data.requestText;
+        } else {
+          msg = `Invalid target mode given (${mode})`;
+          this.log.warn(msg);
+          this.callStatus = msg;
+        }
+      } else {
+        msg = `Invalid action type given (${actionType})`;
+        this.log.warn(msg);
+        this.callStatus = msg;
+      }
+      break;
+    default:
+      this.log.warn(`Unknown command (${data.type}) given in launch metadata.`);
+    }
+  }
+
+  /* I expect a JSON here*/
+  zluxOnMessage(eventContext: any): Promise<any> {
+    return new Promise((resolve,reject)=> {
+      if (eventContext != null && eventContext.data != null && eventContext.data.type != null) {
+        resolve(this.handleLaunchOrMessageObject(eventContext.data));
+      } else {
+        let msg = 'Event context missing or malformed';
+        this.log.warn('onMessage '+msg);
+        return reject(msg);
+      }
+    });
+  }
+
+  
+  provideZLUXDispatcherCallbacks(): ZLUX.ApplicationCallbacks {
+    return {
+      onMessage: (eventContext: any): Promise<any> => {
+        return this.zluxOnMessage(eventContext);
+      }      
+    }
+  }
+
+  getDefaultsFromServer() {
+    this.settingsService.getDefaultsFromServer().subscribe(res => {
+      if (res.status != 200) {
+        this.log.warn(`Get defaults from server failed. Data missing or request invalid. Status=${res.status}`);
+      }
+      try {
+        let responseJson = res.json();
+        this.log.info(`JSON=${JSON.stringify(responseJson)}`);
+        if (res.status == 200) {
+          if (responseJson.contents.appid && responseJson.contents.parameters) {
+            let paramData = responseJson.contents.parameters.data;
+            this.parameters = paramData.parameters;
+            this.actionType = paramData.actionType;
+            this.targetMode = paramData.appTarget;
+            this.targetAppId = responseJson.contents.appid.data.appId;
+          } else {
+            this.log.warn(`Incomplete data. AppID or Parameters missing.`);
+          }
+        }        
+      } catch (e) {
+        this.log.warn(`Response was not JSON`);
+      }
+    }, e => {
+      this.log.warn(`Error on getting defaults, e=${e}`);
+      this.callStatus = 'Error getting defaults';
+    });
+  }
+
+  saveToServer() {
+    this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters).subscribe(res => {
+      this.log.info(`Saved parameters with HTTP status=${res.status}`);
+      if (res.status == 200 || res.status == 201) {
+        this.settingsService.saveAppId(this.targetAppId).subscribe(res=> {
+          this.log.info(`Saved App ID with HTTP status=${res.status}`);
+        }, e=> {
+          this.log.warn(`Error on saving App ID, e=${e}`);
+          this.callStatus = 'Error saving App ID';
+        });
+      } else {
+        this.log.warn(`Error on saving parameters, response status=${res.status}`);
+      }
+    }, e => {
+      this.log.warn(`Error on saving parameters, e=${e}`);
+      this.callStatus = 'Error saving parameters';
+    });
+  }  
+  
   sayHello() {
     this.helloService.sayHello(this.helloText)
     .subscribe(res => {
@@ -76,11 +179,11 @@ export class AppComponent {
     var parameters = null;
     /*Parameters for Actions could be a number, string, or object. The actual event context of an Action that an App recieves will be an object with attributes filled in via these parameters*/
     try {
-      if (this.requestText !== undefined && this.requestText.trim() !== "") {
-        parameters = JSON.parse(this.requestText);
+      if (this.parameters !== undefined && this.parameters.trim() !== "") {
+        parameters = JSON.parse(this.parameters);
       }
     } catch (e) {
-      //this.requestText was not JSON
+      //this.parameters was not JSON
     }
     if (this.targetAppId) {
       let message = '';
@@ -106,7 +209,7 @@ export class AppComponent {
             Actions are also typically associated with Recognizers, which execute an Action when a certain pattern is seen in the running App.
           */
           let action = dispatcher.makeAction(actionID, actionTitle, mode,type,this.targetAppId,argumentFormatter);
-          let argumentData = {'data':(parameters ? parameters : this.requestText)};
+          let argumentData = {'data':(parameters ? parameters : this.parameters)};
           this.log.info((message = 'App request succeeded'));
           this.callStatus = message;
           /*Just because the Action is invoked does not mean the target App will accept it. We've made an Action on the fly,
