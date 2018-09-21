@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+import { ZluxPopupManagerService, ZluxPopupManagerModule } from '@zlux/widgets';
 
 import { AppComponent } from './app.component';
 import {HelloService} from './services/hello.service';
@@ -25,9 +26,10 @@ import {HelloService} from './services/hello.service';
   imports: [
     // BrowserModule, /* remove this for within-MVD development */
     CommonModule,
-    FormsModule
+    FormsModule,
+    ZluxPopupManagerModule
   ],
-  providers: [HelloService],
+  providers: [HelloService, ZluxPopupManagerService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

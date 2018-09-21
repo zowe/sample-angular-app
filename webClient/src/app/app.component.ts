@@ -14,6 +14,8 @@ import { Component, Inject } from '@angular/core';
 
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
+import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
+
 import { HelloService } from './services/hello.service';
 
 @Component({
@@ -51,9 +53,11 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
+    private popupManager: ZluxPopupManagerService,
     private helloService: HelloService) {
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
+    this.popupManager.setLogger(log);
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
@@ -128,6 +132,10 @@ export class AppComponent {
 
   sendAppRequest() {
     var parameters = null;
+    const popupOptions = {
+      blocking: true
+    };
+
     /*Parameters for Actions could be a number, string, or object. The actual event context of an Action that an App recieves will be an object with attributes filled in via these parameters*/
     try {
       if (this.parameters !== undefined && this.parameters.trim() !== "") {
@@ -170,7 +178,10 @@ export class AppComponent {
           this.log.warn((message = 'Invalid target mode or action type specified'));        
         }
       } else {
-        this.log.warn((message = 'Could not find App with ID provided'));
+        this.popupManager.reportError(
+          ZluxErrorSeverity.WARNING,
+          'Invalid Plugin Identifier',
+          `No Plugin found for identifier ${this.targetAppId}`, popupOptions);
       }
       
       this.callStatus = message;
