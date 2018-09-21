@@ -32,7 +32,7 @@ export class SettingsService {
       "_objectType": "org.zowe.zlux.sample.setting.request.app.parameters",
       "_metaDataVersion": "1.0.0",
       "actionType": actionType,
-      "targetMode": targetMode,
+      "appTarget": targetMode,
       "parameters": parameters
     }
     return this.http.put(ZoweZLUX.uriBroker.pluginConfigUri(this.plugin, 'requests/app', 'parameters'), requestBody);
