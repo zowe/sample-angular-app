@@ -135,7 +135,6 @@ export class AppComponent {
     const popupOptions = {
       blocking: true
     };
-
     /*Parameters for Actions could be a number, string, or object. The actual event context of an Action that an App recieves will be an object with attributes filled in via these parameters*/
     try {
       if (this.parameters !== undefined && this.parameters.trim() !== "") {
