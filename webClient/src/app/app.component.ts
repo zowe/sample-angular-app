@@ -32,9 +32,9 @@ export class AppComponent {
   //filled in via radio buttons
   actionType: string = "Launch";
   targetMode: string = "PluginCreate";
+  items = ['a', 'b', 'c', 'd']
   helloText: string;
   serverResponseMessage: string;
-  dateObj: Date = new Date();
 
   constructor(
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
@@ -65,7 +65,6 @@ export class AppComponent {
     this.log.warn((message = 'Unimplemented!'));
     this.callStatus = message;
   }
-  
 }
 
 
