@@ -520,7 +520,7 @@ Incidentally, because a **dataservice** also exists in this plugin, we'll need t
 
 OK, after the first execution of the transpilation and packaging concludes, you should have `sample-angular-app/web` populated with files that can be served by the Zowe App Server for the UI, and incidentally also `sample-angular-app/lib` for the server-side logic for the dataservice we have just built.
 
-### Adding Your App to the Desktop
+## Adding Your App to the Desktop
 At this point, your sample-angular-app folder contains files for an App that could be added to a Zowe instance. We'll add this to our own Zowe instance. First, ensure that the Zowe App server is not running. Then, navigate to the instance's root folder, `/zlux-example-server`.
 
 Within, you'll see a folder, **plugins**. Take a look at one of the files within the folder. You can see that these are JSON files with the attributes **identifier** and **pluginLocation**. These files are what we call **Plugin Locators**, since they point to a Plugin to be included into the server.
