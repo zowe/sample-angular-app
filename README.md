@@ -24,6 +24,7 @@ So, let's get started!
 1. [Constructing an App Skeleton](#constructing-an-app-skeleton)
 1. [Defining your first Plugin](#defining-your-first-plugin)
 1. [Constructing a Simple Angular UI](#constructing-a-simple-angular-ui)
+    1. [Why Typescript?](#why-typescript)
 1. [Packaging Your Web App](#packaging-your-web-app)
 1. [Adding Your App to the Desktop](#adding-your-app-to-the-desktop)
     
@@ -379,6 +380,7 @@ export class AppComponent {
 }
 ```
 
+### Why Typescript?
 If you're new to web programming, typescript, javascript, or Angular, you can interpret this file in different ways.
 Traditionally, javascript was the language for scripting logic within browsers. However, javascript is an interpreted language which was initially not class based, nor typed, leading to unmaintainable code at scale.
 Browser vendors and standards groups have attempted to fix this by adding features to javascript, but have done so slowly and inconsistently between browsers, so trying to make use of new features can sometimes cause more trouble than it solves.
