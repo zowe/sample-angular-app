@@ -25,6 +25,7 @@ So, let's get started!
 1. [Defining your first Plugin](#defining-your-first-plugin)
 1. [Constructing a Simple Angular UI](#constructing-a-simple-angular-ui)
     1. [Why Typescript?](#why-typescript)
+    1. [Introducing Zowe UI Resources](#introducing-zowe-ui-resources)
 1. [Packaging Your Web App](#packaging-your-web-app)
 1. [Adding Your App to the Desktop](#adding-your-app-to-the-desktop)
     
@@ -395,16 +396,22 @@ and a Service we will make shortly.
 We've imported some Angular code, and the Service, and the methods on the class share the names seen in the HTML template, as well as that the instance variables are being used to control attributes in the template too.
 
 However, in the constructor you will see some of the first Zowe-specific objects.
-```
+
+### Introducing Zowe UI Resources
+
+```typescript
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
 ```
+
 These two are objects that a Component can request for inclusion, and are provided by ZLUX - the Zowe UI framework, as contextual objects. The Plugin definition retrieved is specific to this Plugin - essentially the same as the **pluginDefinition.json** file from earlier, and the logger retrieved is part of a framework-wide logger that allows you to easily trace your code since the logger the Component is given has the same ID as the plugin - so it's unique to your code. Both the plugin definition and logger are shared for all the instances of the Plugin you have.
 
 The second interesting Zowe-specific object type you see is here:
-```
+
+```typescript
 this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
 ```
+
 ZoweZLUX is a global object: it can be accessed anywhere in the code as it does not pertain to any specific plugin or instance, but helps you do routine tasks easily. This one takes the plugin definition to accomplish a task specific to your plugin - returning a URI that can be used for a network request without having to hardcode it.
 
 
