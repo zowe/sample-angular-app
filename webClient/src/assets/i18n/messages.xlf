@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="app-request-test" datatype="html">
+        <source>App Request Test</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">
+      A set of widgets to test sending requests to other applications on the desktop
+      </note>
+        <note priority="1" from="meaning">test application requests</note>
+      </trans-unit>
+      <trans-unit id="send-app-request" datatype="html">
+        <source>Send App Request</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">Send a request to another application on the desktop</note>
+        <note priority="1" from="meaning">send request to application</note>
+      </trans-unit>
+      <trans-unit id="action-type" datatype="html">
+        <source>Action Type: </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <note priority="1" from="description">choose a type of action to perform</note>
+        <note priority="1" from="meaning">type of action</note>
+      </trans-unit>
+      <trans-unit id="launch" datatype="html">
+        <source>Launch</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <note priority="1" from="description">launch another app</note>
+      </trans-unit>
+      <trans-unit id="message" datatype="html">
+        <source>Message</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <note priority="1" from="description">send a message to another app</note>
+      </trans-unit>
+      <trans-unit id="app-target-mode" datatype="html">
+        <source>App Target Mode: </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <note priority="1" from="description">how to handle launch depending on whether target app has already been launched</note>
+        <note priority="1" from="meaning">action mode</note>
+      </trans-unit>
+      <trans-unit id="create-new" datatype="html">
+        <source>Create New</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <note priority="1" from="description">create new instance</note>
+      </trans-unit>
+      <trans-unit id="reuse-any-open" datatype="html">
+        <source>Reuse Any Open</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <note priority="1" from="description">reuse any open app</note>
+      </trans-unit>
+      <trans-unit id="target-app-window-title" datatype="html">
+        <source>
+        Target App Window Title (this will become the title for the target window)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <note priority="1" from="description">window title for target app</note>
+      </trans-unit>
+      <trans-unit id="parameters" datatype="html">
+        <source>Parameters:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <note priority="1" from="description">parameters</note>
+      </trans-unit>
+      <trans-unit id="app-status" datatype="html">
+        <source>App Status or Message:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <note priority="1" from="description">status of app or message from app</note>
+      </trans-unit>
+      <trans-unit id="dataservice-request-test" datatype="html">
+        <source>Dataservice Request Test</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <note priority="1" from="description">test of dataservice requests</note>
+      </trans-unit>
+      <trans-unit id="appComponentMessage" datatype="html">
+        <source>Message</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <note priority="1" from="description">indicates that the user will enter a message</note>
+        <note priority="1" from="meaning">message</note>
+      </trans-unit>
+      <trans-unit id="appComponentRun" datatype="html">
+        <source>Run</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <note priority="1" from="description">Run the application</note>
+        <note priority="1" from="meaning">run</note>
+      </trans-unit>
+      <trans-unit id="appComponentResponse" datatype="html">
+        <source>Response</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <note priority="1" from="description">the area where the response from the server will appear</note>
+        <note priority="1" from="meaning">response</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
