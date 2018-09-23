@@ -6,9 +6,27 @@ SPDX-License-Identifier: EPL-2.0
 
 Copyright Contributors to the Zowe Project.
 # Internationalization in Angular Templates in Zowe ZLUX
+This branch acts as a tutorial, intended as a workshop session, which will teach you how to add internationalization of templates to an Angular App. The code here is the completed version, and serves as a reference. To complete this tutorial, you should either build off of a sandbox you have been using to complete the prior tutorials in sequential order, or, you can just [clone the previous tutorial branch here](https://github.com/zowe/sample-app/tree/lab/step-1-hello-world-complete) and work from that.
+
 This branch introduces you to internationalizing Angular templates, and shows facilities in Zowe ZLUX that support this.
 
-Angular has a built-in facility for internationalizing Angular templates, documented here: https://angular.io/guide/i18n. That link goes into a lot more detail than will be covered in this tutorial. This tutorial gives a quick introduction to template translation in general, but focuses on how ZLUX interacts with the base Angular translation tools.
+Angular has a built-in facility for internationalizing Angular templates, documented here: https://angular.io/guide/i18n. That link goes into a lot more detail than will be covered in this tutorial. This tutorial gives a quick introduction to template translation in general, but focuses on how ZLUX provides access to the base Angular translation tools.
+
+By the end of this tutorial you will:
+1. Know how to set up an application in preparation for template translation
+2. Know how to add translation tags to your templates
+3. Know how to run the extraction tool to create translation files
+4. Know how to add translations to those files
+5. See those translations applied to your loaded application
+
+Topics
+1. [Brief Introduction to i18n Support in Angular Templates](#brief-introduction-to-i18n-support-in-angular-templates)
+1. [Adding Angular Template Translation in ZLUX](#adding-angular-template-translation-in-zlux)
+   1. [Supporting Scripts and Configurations](#supporting-scripts-and-configurations)
+   1. [Add i18n Tags to the Template](#add-i18n-tags-to-the-template)
+   1. [Run the i18n Script](#run-the-i18n-script)
+   1. [Make a French Translation File and Add Translations](#make-a-french-translation-file-and-add-translations)
+   1. [Deploy the Translation Files](#deploy-the-translation-files)
 
 ***SIDE NOTE*** You don't need to understand this note now, but if you read the Angular i18n documentation listed above, it talks about how to "[Merge the completed translation file into the app](https://angular.io/guide/i18n#merge-the-completed-translation-file-into-the-app)". The ZLUX integration with Angular i18n handles that merging for you using the the techniques in "[Merge with the JIT compiler](https://angular.io/guide/i18n#merge-with-the-jit-compiler)" 
 
@@ -68,7 +86,7 @@ There are some subtleties about ZLUX support of template translation support tha
    ```
    The "include" and "outDir" are necessary to pick up the source files and to ensure that the output goes where ZLUX knows to find it. The the cli support is managed by the .json in the "extends" attribute, and the details are not important here.
    
-   You will notice that the outDir is in the src tree. The reason for this is so that you can commit and track translations. The "npm run build" script will copy the translation files to the web/i18n directory to make them available to ZLUX at runtime.
+   You will notice that the outDir is in the src tree. The reason for this is so that you can commit and track translations. The "npm run build" script will copy the translation files to the web/assets/i18n directory to make them available to ZLUX at runtime.
 2. ***Add Entries to package.json***. 
    1. Import new packages (and adjust versions of other packages due to temporary package version requirements)
    ```
@@ -92,14 +110,15 @@ In webClient/src/app/app.component.html add i18n tags
       <button class="iframe-button shadowed" type="button" (click)="sendAppRequest()"
       i18n="send request to application|Send a request to another application on the desktop@@send-app-request">Send App Request</button>
 ```
-### Run the i18n script
+### Run the i18n Script
 Extract the translation strings into a translation source file:
 ```
 npm run i18n
 ```
-### Make a French Translation File
+### Make a French Translation File and Add Translations
 In webClient/src/assets/i18n, copy messages.xlf to messages.fr.xlf
-### Add Translations
+***NOTE*** Angular follows the Unicode LDML convention that uses stable identifiers (Unicode locale identifiers) based on the norm [BCP47](http://www.rfc-editor.org/rfc/bcp/bcp47.txt). For further discussion, see [Setting up the locale of your app](https://angular.io/guide/i18n#setting-up-the-locale-of-your-app)
+
 In messages.fr.xlf, add "target" tags
 ```
         <source>App Request Test</source>
