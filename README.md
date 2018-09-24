@@ -31,7 +31,7 @@ Topics
 ***SIDE NOTE*** You don't need to understand this note now, but if you read the Angular i18n documentation listed above, it talks about how to "[Merge the completed translation file into the app](https://angular.io/guide/i18n#merge-the-completed-translation-file-into-the-app)". The ZLUX integration with Angular i18n handles that merging for you using the the techniques in "[Merge with the JIT compiler](https://angular.io/guide/i18n#merge-with-the-jit-compiler)" 
 
 ## Brief Introduction to i18n Support in Angular Templates
-Angular supports special attributes (i18n* ) within templates so that developers can express transation needs directly where they are working, instead of having to manually maintain a separate file. For example, say you have a simple span element with text:
+Angular supports special attributes (i18n* ) within templates so that developers can express translation needs directly where they are working, instead of having to manually maintain a separate file. For example, say you have a simple span element with text:
 ```
 <span>App Request Test</span>
 ```
