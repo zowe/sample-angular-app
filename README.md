@@ -7,8 +7,10 @@ SPDX-License-Identifier: EPL-2.0
 Copyright Contributors to the Zowe Project.
 # Using the Widget Library
 
-This branch acts as a tutorial, intended as a workshop session, which will teach you how to add App to App communication to a Angular App. 
+This branch acts as a tutorial, intended as a workshop session, which will teach you how to add widgets from the widget library, @zlux/widgets, to an Angular App. 
 The code here is the completed version, and serves as a reference. To complete this tutorial, you should either build off of a sandbox you have been using to complete the prior tutorials in sequential order, or, you can just [clone the previous tutorial branch here](https://github.com/zowe/sample-app/tree/lab/step-3-app2app-complete) and work from that.
+
+***NOTE:*** The widget library is still under review, so many details may change. This tutorial is intended to show how the widget library will be able to be used once it has stabilized.
 
 By the end of this tutorial you will:
 1. Know how to install and import the widget library into your application
@@ -25,6 +27,10 @@ Topics
       1. [Connect Your Logger to the ZluxPopupManagerService](#connect-your-logger-to-the-zluxpopupmanagerservice)
       1. [Add the popup-manager Tag](#add-the-popup-manager-tag)
       1. [Invoke the reportError Method](#invoke-the-reporterror-method)
+1. [Use zlux-button](#use-zlux-button)
+   1. [Import ZluxButtonModule into Your Module](#import-zluxbuttonmodule-into-your-module)
+   1. [Change your button Tags to zlux-button Tags](#change-your-button-tags-to-zlux-button-tags)
+   1. [Test Your Changes](#test-your-changes)
 
 ## Install the Widget Library
 Run the following npm install script
@@ -105,6 +111,45 @@ Reload your desktop page, and try entering an invalid application identifier. Yo
 ```
 [2018-09-23 17:30:15.321 org.zowe.zlux.sample.angular WARNING] - No Plugin found for identifier com.rs.mvd.tn3270s
 ```
+# Use zlux-button
+To share a look-an-feel with other applications in the desktop, you can use common widgets from the library, such as zlux-button.
+## Import ZluxButtonModule into Your Module
+You have already installed @zlux-widgets in the preceding step ([Install the Widget Library](#install-the-widget-library)), so you only need to add the ZluxButtonModule to the imports in app.module.ts.
+Change
+```
+import { ZluxPopupManagerModule } from '@zlux/widgets';
+```
+To
+```
+import { ZluxButtonModule, ZluxPopupManagerModule } from '@zlux/widgets';
+```
+Add to the imports section of the @NgModule:
+```
+    ZluxButtonModule,
+```
+## Change your button Tags to zlux-button Tags
+Change
+```
+      <button class="iframe-button shadowed" type="button" (click)="sendAppRequest()"
+      i18n="send request to application|Send a request to another application on the desktop@@send-app-request">Send App Request</button>
+...
+      <button (click)="sayHello()"
+              i18n="run|Run the application@@appComponentRun">Run</button>
+```
+To
+```
+      <zlux-button class="iframe-button shadowed" type="button" (click)="sendAppRequest()"
+      i18n="send request to application|Send a request to another application on the desktop@@send-app-request">Send App Request</zlux-button>
+...
+      <zlux-button (click)="sayHello()"
+              i18n="run|Run the application@@appComponentRun">Run</zlux-button>
+```
+## Test Your Changes
+Build
+```
+npm run build
+```
+Reload your desktop page. The buttons should now have the same look-and-feel as the buttons in the zlux-workflow plugin
 
 This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v2.0 which accompanies
