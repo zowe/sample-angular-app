@@ -10,19 +10,20 @@
   "private": true,
   "dependencies": {},
   "devDependencies": {
+    "@angular-devkit/build-angular": "~0.6.8",
     "@angular/animations": "~6.0.9",
     "@angular/cli": "~6.1.5",
-    "@angular/compiler-cli": "~6.0.9",
     "@angular/common": "~6.0.9",
     "@angular/compiler": "~6.0.9",
+    "@angular/compiler-cli": "~6.0.9",
     "@angular/core": "~6.0.9",
     "@angular/forms": "~6.0.9",
     "@angular/http": "~6.0.9",
+    "@angular/language-service": "~6.0.9",
     "@angular/platform-browser": "~6.0.9",
     "@angular/platform-browser-dynamic": "~6.0.9",
-    "@angular/language-service": "~6.0.9",
     "@angular/router": "~6.0.9",
-    "@zlux/widgets": "git+ssh://git@github.com:zowe/zlux-widgets.git",
+    "@zlux/widgets": "git+ssh://git@github.com/zowe/zlux-widgets.git",
     "angular2-template-loader": "~0.6.2",
     "codelyzer": "~4.4.2",
     "copy-webpack-plugin": "~4.5.2",
@@ -40,7 +41,6 @@
     "webpack": "~4.4.0",
     "webpack-cli": "~3.0.0",
     "webpack-config": "~7.5.0",
-    "zone.js": "^0.8.26",
-    "@angular-devkit/build-angular": "~0.6.8"
+    "zone.js": "^0.8.26"
   }
 }
