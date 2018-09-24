@@ -19,9 +19,12 @@ Topics
 1. [Install the Widget Library](#install-the-widget-library)
 1. [Add Error Reporting](#add-error-reporting)
    1. [Add the Necessary Imports](#add-the-necessary-imports)
-      1. [Import Widget Module Into Your Module](#import-module-into-your-module)
-      1. [Add ZluxPopupManagerService as a Provider in Your Component](#add-zluxPopupManagerService-as-a-provider-in-your-component)
-   1. []()
+      1. [Import Widget Module Into Your Module](#import-widget-module-into-your-module)
+      1. [Add ZluxPopupManagerService as a Provider in Your Component](#add-zluxpopupmanagerservice-as-a-provider-in-your-component)
+   1. [Use the Error Reporting API](#use-the-error-reporting-api)
+      1. [Connect Your Logger to the ZluxPopupManagerService](#connect-your-logger-to-the-zluxpopupmanagerservice)
+      1. [Add the popup-manager Tag](#add-the-popup-manager-tag)
+      1. [Invoke the reportError Method](#invoke-the-reporterror-method)
 
 ## Install the Widget Library
 Run the following npm install script
@@ -34,7 +37,7 @@ Further instruction on npm install can be found [here](https://docs.npmjs.com/cl
 # Add Error Reporting
 ## Add the Necessary Imports
 To use the error reporting API you need to to do the following:
-### Import Widget Module and Into Your Module
+### Import Widget Module Into Your Module
 Add the following to app.module.ts
 ```
 import { ZluxPopupManagerModule } from '@zlux/widgets';
@@ -54,7 +57,7 @@ To
 ```
 providers: [HelloService, ZluxPopupManagerService]
 ```
-***NOTE***: Because you may want to use different loggers in different components (see [Connect Your Logger to the ZluxPopupManagerService](#connect-your-logger-to-the-zluxpopupmanagerservice)), you should usually add this provider declaration at the component level, and not the module level.
+***NOTE***: Because you may want to use different loggers in different components (see [Connect Your Logger to the ZluxPopupManagerService](#connect-your-logger-to-the-zluxpopupmanagerservice)), you should usually add this particular provider declaration at the component level, and not the module level.
 
 Now inject the service into your component instance by adding this to the constructor parameters:
 ```
@@ -67,13 +70,20 @@ The ZluxPopupManagerService integrates with the Logger API such that it will iss
     this.popupManager.setLogger(log);
 ```
 ### Add the popup-manager Tag
-In order for the error popup to become visisble when needed, you need to add the popup-manager tag to the template at the end:
+In order for the error popup to become visisble when needed, you need to add the popup-manager tag to the template, for example, at the end:
 ```
 <zlux-popup-manager>
 </zlux-popup-manager>
 ```
-### Invoke the Error Reporting API
-When an error condition is detected, you can request to show an error dialog. For example, if the identifier in the "Application Identifier" field is not valid, it would be nice to tell the user
+### Invoke the reportError Method
+When an error condition is detected, you can request to show an error dialog. For example, if the identifier in the "Application Identifier" field is not valid, it would be nice to tell the user.
+First, set the options:
+```
+    const popupOptions = {
+      blocking: true
+    };
+```
+Now invoke the reportError method
 ```
       let plugin = pluginManager.getPlugin(this.targetAppId);
       if (plugin) {
