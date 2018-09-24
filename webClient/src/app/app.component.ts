@@ -22,7 +22,7 @@ import { HelloService } from './services/hello.service';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [HelloService]
+  providers: [HelloService, ZluxPopupManagerService]
 })
 
 export class AppComponent {
