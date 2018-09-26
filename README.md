@@ -102,13 +102,23 @@ There are some subtleties about ZLUX support of template translation support tha
 ### Add i18n Tags to the Template
 In webClient/src/app/app.component.html add i18n tags
 ```
-      <span class="bigger-bold-text"
-      i18n="test application requests|
-      A set of widgets to test sending requests to other applications on the desktop
-      @@app-request-test">App Request Test</span>
-...
-      <button class="iframe-button shadowed" type="button" (click)="sendAppRequest()"
-      i18n="send request to application|Send a request to another application on the desktop@@send-app-request">Send App Request</button>
+  <div class="test-panel dataservice-test-panel">
+    <div class="bottom-10">
+      <span class="bigger-bold-text" i18n="test of dataservice requests@@dataservice-request-test">Dataservice Request Test</span>
+    </div>
+    <div>
+      <input placeholder="Message" 
+             i18n-placeholder="message|indicates that the user will enter a message@@appComponentMessage" [(ngModel)]="helloText"
+      (keyup.enter)="sayHello()"/>
+      <button (click)="sayHello()"
+              i18n="run|Run the application@@appComponentRun">Run</button>
+    </div>
+    <div>
+      <label i18n="response|the area where the response from the server will appear@@appComponentResponse">Response</label>
+      <textarea class="server-response" placeholder="Response" 
+                i18n-placeholder="@@appComponentResponse" >{{serverResponseMessage}}</textarea>
+    </div>
+  </div>
 ```
 ### Run the i18n Script
 Extract the translation strings into a translation source file:
@@ -121,11 +131,17 @@ In webClient/src/assets/i18n, copy messages.xlf to messages.fr.xlf
 
 In messages.fr.xlf, add "target" tags
 ```
-        <source>App Request Test</source>
-        <target>Test de Demande à l'App</target>
+        <source>Dataservice Request Test</source>
+        <target>Test de Demande au Dataservice</target>
 ...
-        <source>Send App Request</source>
-        <target>Envoyer la Demande à l'App</target>
+        <source>Message</source>
+        <target>Message</target>
+...
+        <source>Run</source>
+        <target>Exécuter</target>
+...
+        <source>Response</source>
+        <target>Réponse</target>
 ```
 ### Deploy the Translation Files
 ```
