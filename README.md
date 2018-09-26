@@ -21,6 +21,7 @@ By the end of this tutorial you will:
 
 Topics
 1. [Brief Introduction to i18n Support in Angular Templates](#brief-introduction-to-i18n-support-in-angular-templates)
+1. [Setting Up for Rapid Development](#setting-up-for-rapid-development)
 1. [Adding Angular Template Translation in ZLUX](#adding-angular-template-translation-in-zlux)
    1. [Supporting Scripts and Configurations](#supporting-scripts-and-configurations)
    1. [Add i18n Tags to the Template](#add-i18n-tags-to-the-template)
@@ -65,6 +66,17 @@ Here is an example showing the full syntax
 ### Best Practice Recommendation
 *Always provide the stable unique identifier (item 4)*
 This way you can minimize translation effort when you revise your application, and you will also be able to reuse translation strings in different parts of your application. If you do not include an identifier, Angular will generate one automatically, and, if you edit the template and re-run ng-xi18n, many of the translated strings will get new automatic identifiers, and it will be hard for the translators to identify strings they have translated in previous versions.
+
+## Setting Up for Rapid Development
+
+Before we get to implementing new features into this App, you should set up your environment to quickly build any changes you put in.
+When building web content for ZLUX, Apps are packaged via Webpack, which can automatically scan for file changes on code to quickly repackage only what has changed.
+To do this, you would simply run `npm run start`, but you may need to do a few tasks prior:
+
+1. Open up a command prompt to `sample-angular-app/webClient`
+1. Set the environment variable MVD_DESKTOP_DIR to the location of `zlux-app-manager/virtual-desktop`. Such as `set MVD_DESKTOP_DIR=../../zlux-app-manager/virtual-desktop`. This is needed whenever building individual App web code due to the core configuration files being located in **virtual-desktop**
+1. Execute `npm install`. This installs all the dependencies we put into the **package.json** file.
+1. Execute `npm run start`. This can be run independent of translation work.
 
 ## Adding Angular Template Translation in ZLUX
 There are some subtleties about ZLUX support of template translation support that will be discussed later, but for now, let's go through the steps of adding translation support
