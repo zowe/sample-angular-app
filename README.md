@@ -64,7 +64,6 @@ import { ZluxPopupManagerModule } from '@zlux/widgets';
 Add the module to the "imports" list, so that your "imports" list looks like this
 ```
   imports: [
-    // BrowserModule, /* remove this for within-MVD development */
     CommonModule,
     FormsModule,
     ZluxPopupManagerModule
