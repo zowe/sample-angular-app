@@ -19,6 +19,7 @@ By the end of this tutorial you will:
 
 Topics
 1. [Install the Widget Library](#install-the-widget-library)
+1. [Setting Up for Rapid Development](#setting-up-for-rapid-development)
 1. [Add Error Reporting](#add-error-reporting)
    1. [Add the Necessary Imports](#add-the-necessary-imports)
       1. [Import Widget Module Into Your Module](#import-widget-module-into-your-module)
@@ -40,6 +41,18 @@ npm install --save-dev git+ssh://github.com/zowe/zlux-widgets.git
 If you prefer to download from git using https, then use git+https instead of git+ssh
 
 Further instruction on npm install can be found [here](https://docs.npmjs.com/cli/install). Search for the section on "npm install &lt;git remote url&gt;"
+
+## Setting Up for Rapid Development
+
+Before we get to implementing new features into this App, you should set up your environment to quickly build any changes you put in.
+When building web content for ZLUX, Apps are packaged via Webpack, which can automatically scan for file changes on code to quickly repackage only what has changed.
+To do this, you would simply run `npm run start`, but you may need to do a few tasks prior:
+
+1. Open up a command prompt to `sample-angular-app/webClient`
+1. Set the environment variable MVD_DESKTOP_DIR to the location of `zlux-app-manager/virtual-desktop`. Such as `set MVD_DESKTOP_DIR=../../zlux-app-manager/virtual-desktop`. This is needed whenever building individual App web code due to the core configuration files being located in **virtual-desktop**
+1. Execute `npm install`. This installs all the dependencies we put into the **package.json** file.
+1. Execute `npm run start`
+
 # Add Error Reporting
 ## Add the Necessary Imports
 To use the error reporting API you need to to do the following:
