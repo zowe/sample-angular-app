@@ -60,6 +60,13 @@ To use the error reporting API you need to to do the following:
 Add the following to app.module.ts
 ```
 import { ZluxPopupManagerModule } from '@zlux/widgets';
+...
+  imports: [
+    // BrowserModule, /* remove this for within-MVD development */
+    CommonModule,
+    FormsModule,
+    ZluxPopupManagerModule
+  ],
 ```
 ### Add ZluxPopupManagerService as a Provider in Your Component
 Import ZluxPopupManagerService:
