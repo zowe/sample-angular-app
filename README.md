@@ -57,10 +57,12 @@ To do this, you would simply run `npm run start`, but you may need to do a few t
 ## Add the Necessary Imports
 To use the error reporting API you need to to do the following:
 ### Import Widget Module Into Your Module
-Add the following to app.module.ts
+Add an "import" statement:
 ```
 import { ZluxPopupManagerModule } from '@zlux/widgets';
-...
+```
+Add the module to the "imports" list, so that your "imports" list looks like this
+```
   imports: [
     // BrowserModule, /* remove this for within-MVD development */
     CommonModule,
