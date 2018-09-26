@@ -139,6 +139,7 @@ npm run i18n
 ```
 ### Make a French Translation File and Add Translations
 In webClient/src/assets/i18n, copy messages.xlf to messages.fr.xlf
+***NOTE*** Do not edit the files in web/assets/i18n: they will be overriden the next time you run a build.
 ***NOTE*** Angular follows the Unicode LDML convention that uses stable identifiers (Unicode locale identifiers) based on the norm [BCP47](http://www.rfc-editor.org/rfc/bcp/bcp47.txt). For further discussion, see [Setting up the locale of your app](https://angular.io/guide/i18n#setting-up-the-locale-of-your-app)
 
 In messages.fr.xlf, add "target" tags
@@ -155,6 +156,7 @@ In messages.fr.xlf, add "target" tags
         <source>Response</source>
         <target>Réponse</target>
 ```
+***NOTE***: Every &lt;trans-unit&gt; you include in your messages.xx.xlf file must have a &lt;target&gt; tag, or there will be an error thrown when trying to render the plugin. However, you do not need to include all &lt;trans-unit&gt; tags that are in the original messages.xlf
 ### Deploy the Translation Files
 ```
 npm run build
