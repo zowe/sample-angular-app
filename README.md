@@ -51,7 +51,8 @@ The Configuration Dataservice allows for access to settings storage according to
 
 **Resources** are organized into a tree structure, where only leaf **resources** or **sub-resources** can have content stored within. Trying to access a non-leaf resource may instead allow for an aggregated action done on the subresources.
 
-Let's add a definition for the **Resources** that we want to work with, by putting a new attribute into the App's **pluginDefinition.json**. Simply, add the following into `sample-angular-app/pluginDefinition.json`:
+Let's add a definition for the **Resources** that we want to work with, by putting a new attribute into the App's **pluginDefinition.json**. Simply, add the following into `sample-angular-app/pluginDefinition.json`.
+We'll also make the window slightly larger to accomodate the extra buttons we will add in this lab, by increasing `webContent.defaultWindowStyle.width` to 850:
 
 ```json
   "configurationData": {
@@ -87,7 +88,7 @@ The full JSON should now be:
     "descriptionDefault": "Sample App Showcasing Angular Adapter",
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
-      "width": 800,
+      "width": 850,
       "height": 450,
       "x": 200,
       "y": 50
