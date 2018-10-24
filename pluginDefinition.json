@@ -10,7 +10,7 @@
       "pluginShortNameDefault": "Angular Sample",
       "imageSrc": "assets/icon.png"
     },
-    "descriptionKey": "Sample App Showcasing Angular Adapter",
+    "descriptionKey": "sampleangulardescription",
     "descriptionDefault": "Sample App Showcasing Angular Adapter",
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
