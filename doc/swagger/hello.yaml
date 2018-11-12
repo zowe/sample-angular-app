@@ -1,0 +1,50 @@
+swagger: '2.0'
+info:
+  description: This service is an example of how to create a REST API in zLUX
+  version: 1.0.0
+  title: Sample Dataservice API
+host: localhost
+basePath: /hello
+schemes:
+  - http
+  - https
+tags:
+  - name: Sample
+  - name: Hello World
+paths:
+  /:
+    post:
+      summary: Returns JSON which includes the sent message along with some metadata
+      description: Echo of sent message
+      tags:
+        - Echo
+      produces:
+        - application/json
+      consumes:
+        - text/plain      
+      parameters:
+        - name: body
+          in: body
+          description: A message to be echoed back
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Hello'
+definitions:
+  Hello:
+    type: object
+    properties:
+      _objectType:
+        type: string
+      _metadataVersion:
+        type: string
+      requestBody:
+        type: string
+      requestURL:
+        type: string
+      serverResponse:
+        type: string
