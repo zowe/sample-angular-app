@@ -107,7 +107,7 @@ Open up **sample-angular-app/webClient/src/app/app.component.ts** and change the
 Then, we'll edit two of the instance variables, `targetAppId` and `parameters` to set some defaults for some of the variables referenced. These should now look like:
 
 ```typescript
-  targetAppId: string = "com.rs.mvd.tn3270";
+  targetAppId: string = "org.zowe.terminal.tn3270";
   parameters: string =
 `{"type":"connect",
   "connectionSettings":{
