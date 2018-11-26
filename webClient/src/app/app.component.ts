@@ -26,7 +26,7 @@ import { HelloService } from './services/hello.service';
 })
 
 export class AppComponent {
-  targetAppId: string = "com.rs.mvd.tn3270";
+  targetAppId: string = "org.zowe.terminal.tn3270";
   callStatus: string = "Status will appear here.";
   parameters: string =
 `{"type":"connect",
