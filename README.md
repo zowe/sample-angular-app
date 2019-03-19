@@ -70,9 +70,22 @@ The file should contain the following:
       "filename": "helloWorld.js",
       "routerFactory": "helloWorldRouter",
       "dependenciesIncluded": true,
-      "initializerLookupMethod": "external"
+      "initializerLookupMethod": "external",
+      "version": "1.0.0"
     }
-  ]
+  ],
+  "configurationData": {
+    "resources": {
+      "requests": {
+        "aggregationPolicy": "override",
+        "subResources": {
+          "app": {
+            "aggregationPolicy": "override"
+          }
+        }
+      }
+    }
+  }
 }
 ```
 
