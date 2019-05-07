@@ -13,6 +13,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { LanguageLocaleService } from '../../../../zlux-app-manager/virtual-desktop/src/app/i18n/language-locale.service';
 
 import { ZluxButtonModule, ZluxPopupManagerModule } from '@zlux/widgets';
 
@@ -30,7 +31,7 @@ import {HelloService} from './services/hello.service';
     ZluxButtonModule,
     ZluxPopupManagerModule
   ],
-  providers: [HelloService],
+  providers: [HelloService, LanguageLocaleService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
