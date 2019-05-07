@@ -11,7 +11,6 @@
 */
 
 import { Component, Inject } from '@angular/core';
-import { LanguageLocaleService } from '../../../../zlux-app-manager/virtual-desktop/src/app/i18n/language-locale.service';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
@@ -54,7 +53,6 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
-    private languageLocaleService: LanguageLocaleService,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {    
