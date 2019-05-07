@@ -65,7 +65,6 @@ export class AppComponent {
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
-    console.log(this.languageLocaleService.getLanguage());
   }
 
   handleLaunchOrMessageObject(data: any) {
