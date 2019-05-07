@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-  <file source-language="en" datatype="plaintext" original="ng2.template">
+  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="de">
     <body>
       <trans-unit id="paginator" datatype="html">
         <source>of</source><target state="new">of</target>
@@ -13,104 +13,114 @@
           <context context-type="linenumber">56</context>
         </context-group>
         <note priority="1" from="description">of preposition in clause n-m of total</note>
-      </trans-unit><trans-unit id="app-request-test" datatype="html">
-        <source>App Request Test</source>
-        <target>Test de Demande à l'App</target>
-        
+      </trans-unit>
+      <trans-unit id="app-request-test" datatype="html">
+        <source>App Request Test</source><target state="new">Testprogramm anfordern</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
         <note priority="1" from="description">A set of widgets to test sending request to other apps on the desktop</note>
         <note priority="1" from="meaning">test for plugin requests</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">15</context></context-group></trans-unit>
+      </trans-unit>
       <trans-unit id="send-app-request" datatype="html">
-        <source>Send App Request</source>
-        <target>Envoyer la Demande à l'App</target>
-        
+        <source>Send App Request</source><target state="new">Anwendung anfragen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
         <note priority="1" from="description">Send a request to another application on the desktop</note>
         <note priority="1" from="meaning">send request to application</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit><trans-unit id="get-from-server" datatype="html">
-        <source>Get from Server</source><target state="new">Retrouver du Serveur</target>
+      </trans-unit><trans-unit id="get-from-server" datatype="html">
+        <source>Get from Server</source><target state="new">Vom Server holen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
         <note priority="1" from="description">get from server</note>
       </trans-unit><trans-unit id="save-to-server" datatype="html">
-        <source>Save to Server</source><target state="new">Sauvegarder sur le Serveur</target>
+        <source>Save to Server</source><target state="new">Auf dem Server speichern</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
         <note priority="1" from="description">save to server</note>
       </trans-unit><trans-unit id="ec1a61b744f9d2069c07347f3751e55f8aa3ea14" datatype="html">
-        <source>Application Identifier: </source><target state="new">Identité de l'Application: </target>
+        <source>Application Identifier: </source><target state="new">Anwendungs-Kennung: </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
         <note priority="1" from="description">application identifier</note>
-      </trans-unit><trans-unit id="action-type" datatype="html">
-        <source>Action Type: </source><target state="new">Type d'Action: </target>
+      </trans-unit>
+      <trans-unit id="action-type" datatype="html">
+        <source>Action Type: </source><target state="new">Art der Aktion: </target>
         
         <note priority="1" from="description">choose a type of action to perform</note>
         <note priority="1" from="meaning">type of action</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">33</context></context-group></trans-unit><trans-unit id="launch" datatype="html">
-        <source>Launch</source><target state="new">Lancer</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">33</context></context-group></trans-unit>
+      <trans-unit id="launch" datatype="html">
+        <source>Launch</source><target state="new">Starten</target>
         
         <note priority="1" from="description">launch another app</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">35</context></context-group></trans-unit><trans-unit id="message" datatype="html">
-        <source>Message</source><target state="new">Message</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">35</context></context-group></trans-unit>
+      <trans-unit id="message" datatype="html">
+        <source>Message</source><target state="new">Nachricht</target>
         
         <note priority="1" from="description">send a message to another app</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">38</context></context-group></trans-unit><trans-unit id="app-target-mode" datatype="html">
-        <source>App Target Mode: </source><target state="new">Mode d'Utilisation de l'Application: </target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">38</context></context-group></trans-unit>
+      <trans-unit id="app-target-mode" datatype="html">
+        <source>App Target Mode: </source><target state="new">Anwendungsmodus: </target>
         
         <note priority="1" from="description">how to handle launch depending on whether target app has already been launched</note>
         <note priority="1" from="meaning">action mode</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">43</context></context-group></trans-unit><trans-unit id="create-new" datatype="html">
-        <source>Create New</source><target state="new">Nouvelle Application</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">43</context></context-group></trans-unit>
+      <trans-unit id="create-new" datatype="html">
+        <source>Create New</source><target state="new">Neue Anwendung</target>
         
         <note priority="1" from="description">create new instance</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">45</context></context-group></trans-unit><trans-unit id="reuse-any-open" datatype="html">
-        <source>Reuse Any Open</source><target state="new">Réutiliser une application</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">45</context></context-group></trans-unit>
+      <trans-unit id="reuse-any-open" datatype="html">
+        <source>Reuse Any Open</source><target state="new">Offene Anwendung wiederverwenden</target>
         
         <note priority="1" from="description">reuse any open app</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">48</context></context-group></trans-unit><trans-unit id="target-app-window-title" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">48</context></context-group></trans-unit>
+      <trans-unit id="target-app-window-title" datatype="html">
         <source>
         Target App Window Title (this will become the title for the target window)</source><target state="new">
         Target App Window Title (this will become the title for the target window)</target>
         
         <note priority="1" from="description">window title for target app</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">50</context></context-group></trans-unit><trans-unit id="parameters" datatype="html">
-        <source>Parameters:</source><target state="new">Paramètres:</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">50</context></context-group></trans-unit>
+      <trans-unit id="parameters" datatype="html">
+        <source>Parameters:</source><target state="new">Parameter:</target>
         
         <note priority="1" from="description">parameters</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">55</context></context-group></trans-unit><trans-unit id="app-status" datatype="html">
-        <source>App Status or Message:</source><target state="new">Statu de l'Application ou Message:</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">55</context></context-group></trans-unit>
+      <trans-unit id="app-status" datatype="html">
+        <source>App Status or Message:</source><target state="new">Status oder Nachricht der Anwendung:</target>
         
         <note priority="1" from="description">status of app or message from app</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">62</context></context-group></trans-unit>
       <trans-unit id="dataservice-request-test" datatype="html">
-        <source>Dataservice Request Test</source>
-        <target>Test de Demande au Dataservice</target>
+        <source>Dataservice Request Test</source><target state="new">Testdaten anfordern</target>
         
         <note priority="1" from="description">test of dataservice requests</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">69</context></context-group></trans-unit>
       <trans-unit id="appComponentMessage" datatype="html">
-        <source>Message</source>
-        <target>Message</target>
+        <source>Message</source><target state="new">Nachricht</target>
         
         <note priority="1" from="description">indicates that the user will enter a message</note>
         <note priority="1" from="meaning">message</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">72</context></context-group></trans-unit>
       <trans-unit id="appComponentRun" datatype="html">
-        <source>Run</source>
-        <target>Exécuter</target>
+        <source>Run</source><target state="new">Ausführen</target>
         
         <note priority="1" from="description">Run the application</note>
         <note priority="1" from="meaning">run</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">76</context></context-group></trans-unit>
       <trans-unit id="appComponentResponse" datatype="html">
-        <source>Response</source>
-        <target>Réponse</target>
+        <source>Response</source><target state="new">Antwort</target>
         
         
         <note priority="1" from="description">the area where the response from the server will appear</note>

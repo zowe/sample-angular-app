@@ -11,7 +11,6 @@
 */
 
 import { Component, Inject } from '@angular/core';
-
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';

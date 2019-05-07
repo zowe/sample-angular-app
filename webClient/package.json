@@ -4,11 +4,12 @@
   "scripts": {
     "start": "webpack --progress --colors --watch",
     "build": "webpack --progress --colors",
-    "i18n": "ng-xi18n -p tsconfig.i18n.json --i18nFormat=xlf  --outFile=messages.xlf",
+    "i18n": "ng-xi18n -p tsconfig.i18n.json --i18nFormat=xlf  --outFile=messages.xlf && xliffmerge -p xliffmerge.json",
     "lint": "tslint -c tslint.json \"./**/*.ts\""
   },
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.8",
     "@angular/animations": "~6.0.9",
@@ -32,6 +33,7 @@
     "exports-loader": "~0.7.0",
     "file-loader": "~1.1.11",
     "html-loader": "~0.5.5",
+    "ngx-i18nsupport": "~0.17.1",
     "rxjs": "~6.2.2",
     "rxjs-compat": "~6.2.2",
     "source-map-loader": "~0.2.3",
@@ -41,6 +43,6 @@
     "webpack": "~4.4.0",
     "webpack-cli": "~3.0.0",
     "webpack-config": "~7.5.0",
-    "zone.js": "^0.8.26"
+    "zone.js": "~0.8.26"
   }
 }
