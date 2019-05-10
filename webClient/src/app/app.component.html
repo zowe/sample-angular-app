@@ -60,7 +60,8 @@
       </div>
       <div style="width: 100%">
         <span i18n="status of app or message from app@@app-status">App Status or Message:</span>
-        <p class="display-text shadowed disable-effect" id="status">{{callStatus}}</p>
+        <textarea class="display-text shadowed disable-effect" id="status" placeholder="Status will appear here."
+          i18n-placeholder="@@callStatus" readonly>{{callStatus}}</textarea>
       </div>
     </div>
   </div>

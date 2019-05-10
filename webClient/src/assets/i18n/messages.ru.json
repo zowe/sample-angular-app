@@ -1,0 +1,7 @@
+{
+    "request_succeeded" : "Запрос приложения выполнен успешно",
+    "close" : "Закрыть",
+    "invalid_plugin_identifier" : "Неверный идентификатор плагина",
+    "no_plugin_found_for_identifier" : "Не удалось найти приложение с указанным идентификатором",
+    "server_replied_with": "Сервер ответил "
+}

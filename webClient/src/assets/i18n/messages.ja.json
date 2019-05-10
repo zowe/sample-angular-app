@@ -1,0 +1,7 @@
+{
+    "request_succeeded" : "アプリケーション・リクエストが成功しました",
+    "close" : "閉じる",
+    "invalid_plugin_identifier" : "無効なプラグイン識別子",
+    "no_plugin_found_for_identifier" : "識別子のプラグインが見つかりません",
+    "server_replied_with": "サーバーが応答を返しました"
+}

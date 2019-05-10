@@ -1,0 +1,7 @@
+{
+    "request_succeeded" : "应用请求成功",
+    "close" : "关",
+    "invalid_plugin_identifier" : "无效的插件标识符",
+    "no_plugin_found_for_identifier" : "找不到该ID的插件",
+    "server_replied_with": "服务器回复"
+}
