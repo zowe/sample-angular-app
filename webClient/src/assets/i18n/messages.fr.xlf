@@ -26,7 +26,7 @@
         
         <note priority="1" from="description">Send a request to another application on the desktop</note>
         <note priority="1" from="meaning">send request to application</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit><trans-unit id="plugin-loading-failed-message" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit><trans-unit id="get-from-server" datatype="html">
         <source>Get from Server</source><target state="new">Retrouver du Serveur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
