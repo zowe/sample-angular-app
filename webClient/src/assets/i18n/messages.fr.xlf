@@ -26,7 +26,7 @@
         
         <note priority="1" from="description">Send a request to another application on the desktop</note>
         <note priority="1" from="meaning">send request to application</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit><trans-unit id="get-from-server" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit><trans-unit id="plugin-loading-failed-message" datatype="html">
         <source>Get from Server</source><target state="new">Retrouver du Serveur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -87,27 +87,33 @@
         <source>App Status or Message:</source><target state="new">Statu de l'Application ou Message:</target>
         
         <note priority="1" from="description">status of app or message from app</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">62</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">62</context></context-group></trans-unit><trans-unit id="callStatus" datatype="html">
+        <source>Status will appear here.</source><target state="new">Le statu apparait ici</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="dataservice-request-test" datatype="html">
         <source>Dataservice Request Test</source>
         <target>Test de Demande au Dataservice</target>
         
         <note priority="1" from="description">test of dataservice requests</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">69</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">70</context></context-group></trans-unit>
       <trans-unit id="appComponentMessage" datatype="html">
         <source>Message</source>
         <target>Message</target>
         
         <note priority="1" from="description">indicates that the user will enter a message</note>
         <note priority="1" from="meaning">message</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">72</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">73</context></context-group></trans-unit>
       <trans-unit id="appComponentRun" datatype="html">
         <source>Run</source>
         <target>Exécuter</target>
         
         <note priority="1" from="description">Run the application</note>
         <note priority="1" from="meaning">run</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">76</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">77</context></context-group></trans-unit>
       <trans-unit id="appComponentResponse" datatype="html">
         <source>Response</source>
         <target>Réponse</target>
@@ -115,7 +121,7 @@
         
         <note priority="1" from="description">the area where the response from the server will appear</note>
         <note priority="1" from="meaning">response</note>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">79</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">80</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">80</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">81</context></context-group></trans-unit>
     </body>
   </file>
 </xliff>
