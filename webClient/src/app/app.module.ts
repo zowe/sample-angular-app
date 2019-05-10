@@ -26,13 +26,6 @@ import { Angular2L10nConfig, Angular2InjectionTokens } from 'pluginlib/inject-re
 
 
 const l10nConfig: L10nConfig = {
-  locale: {
-      languages: [
-          { code: 'en', dir: 'ltr' },
-          { code: 'ja', dir: 'ltr' }
-      ],
-      language: 'en',
-  },
   translation: {
       providers: [],
       composedLanguage: [ISOCode.Language, ISOCode.Country],

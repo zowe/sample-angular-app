@@ -174,7 +174,7 @@ export class AppComponent {
       const responseJson: any = res.json();
       if (responseJson != null && responseJson.serverResponse != null) {
         this.serverResponseMessage = 
-        `Server replied with 
+        `${this.translation.translate('server_replied_with')}
 
         "${responseJson.serverResponse}"`;
       } else {
