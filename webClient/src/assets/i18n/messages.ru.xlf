@@ -15,7 +15,7 @@
         <note priority="1" from="description">of preposition in clause n-m of total</note>
       </trans-unit>
       <trans-unit id="app-request-test" datatype="html">
-        <source>App Request Test</source><target state="new">Тест запроса программы</target>
+        <source>App Request Test</source><target state="new">Тест запроса приложения</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">15</context>
@@ -24,7 +24,7 @@
         <note priority="1" from="meaning">test for plugin requests</note>
       </trans-unit>
       <trans-unit id="send-app-request" datatype="html">
-        <source>Send App Request</source><target state="new">Отправить запроса программы</target>
+        <source>Send App Request</source><target state="new">Отправить запрос приложения</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">19</context>
@@ -32,21 +32,21 @@
         <note priority="1" from="description">Send a request to another application on the desktop</note>
         <note priority="1" from="meaning">send request to application</note>
       </trans-unit><trans-unit id="plugin-loading-failed-message" datatype="html">
-        <source>Get from Server</source><target state="new">Получить от сервера</target>
+        <source>Get from Server</source><target state="new">Получить с сервера</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
         <note priority="1" from="description">get from server</note>
       </trans-unit><trans-unit id="save-to-server" datatype="html">
-        <source>Save to Server</source><target state="new">Сохранить в сервере</target>
+        <source>Save to Server</source><target state="new">Сохранить на сервере</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
         <note priority="1" from="description">save to server</note>
       </trans-unit><trans-unit id="ec1a61b744f9d2069c07347f3751e55f8aa3ea14" datatype="html">
-        <source>Application Identifier: </source><target state="new">Идентификатор программы: </target>
+        <source>Application Identifier: </source><target state="new">Идентификатор приложения: </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">25</context>
@@ -60,7 +60,7 @@
         <note priority="1" from="meaning">type of action</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">33</context></context-group></trans-unit>
       <trans-unit id="launch" datatype="html">
-        <source>Launch</source><target state="new">Запустить</target>
+        <source>Launch</source><target state="new">Запуск</target>
         
         <note priority="1" from="description">launch another app</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">35</context></context-group></trans-unit>
@@ -70,18 +70,18 @@
         <note priority="1" from="description">send a message to another app</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">38</context></context-group></trans-unit>
       <trans-unit id="app-target-mode" datatype="html">
-        <source>App Target Mode: </source><target state="new">Целевой режим программы: </target>
+        <source>App Target Mode: </source><target state="new">Режим целевого приложения: </target>
         
         <note priority="1" from="description">how to handle launch depending on whether target app has already been launched</note>
         <note priority="1" from="meaning">action mode</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">43</context></context-group></trans-unit>
       <trans-unit id="create-new" datatype="html">
-        <source>Create New</source><target state="new">Создать новый</target>
+        <source>Create New</source><target state="new">Создать новое</target>
         
         <note priority="1" from="description">create new instance</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">45</context></context-group></trans-unit>
       <trans-unit id="reuse-any-open" datatype="html">
-        <source>Reuse Any Open</source><target state="new">Использовать oткрытый</target>
+        <source>Reuse Any Open</source><target state="new">Использовать открытое</target>
         
         <note priority="1" from="description">reuse any open app</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">48</context></context-group></trans-unit>
@@ -98,7 +98,7 @@
         <note priority="1" from="description">parameters</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">55</context></context-group></trans-unit>
       <trans-unit id="app-status" datatype="html">
-        <source>App Status or Message:</source><target state="new">Cтатус программы или сообщение:</target>
+        <source>App Status or Message:</source><target state="new">Статус приложения или сообщение:</target>
         
         <note priority="1" from="description">status of app or message from app</note>
       <context-group purpose="location"><context context-type="sourcefile">src/app/app.component.ts</context><context context-type="linenumber">62</context></context-group></trans-unit><trans-unit id="callStatus" datatype="html">
