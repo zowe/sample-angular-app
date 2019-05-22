@@ -20,8 +20,6 @@ import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 
-import { HtmlObfuscator } from '../../../../zlux-shared/src/htmlObfuscator';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -171,10 +169,7 @@ export class AppComponent {
   }
 
   sayHello() {
-    let htmlObfuscator = new HtmlObfuscator();
-    let safeHelloText = '';
-    safeHelloText = htmlObfuscator.findAndReplaceHTMLEntities(this.helloText);
-    this.helloService.sayHello(safeHelloText)
+    this.helloService.sayHello(this.helloText)
     .subscribe(res => {
       const responseJson: any = res.json();
       if (responseJson != null && responseJson.serverResponse != null) {

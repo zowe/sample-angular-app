@@ -16,6 +16,8 @@ import { Router } from "express-serve-static-core";
 const express = require('express');
 const Promise = require('bluebird');
 
+import { HtmlObfuscator } from '../../../zlux-shared/src/htmlObfuscator'
+
 class HelloWorldDataservice{
   private context: any;
   private router: Router;
@@ -30,6 +32,8 @@ class HelloWorldDataservice{
     context.addBodyParseMiddleware(router);
     router.post('/',function(req: Request,res: Response) {
       let messageFromClient = req.body ? req.body.messageFromClient : "<No/Empty Message Received from Client>"
+      let htmlObfuscator = new HtmlObfuscator();
+      let safeMessage = htmlObfuscator.findAndReplaceHTMLEntities(messageFromClient);
       let responseBody = {
         "_objectType": "org.zowe.zlux.sample.service.hello",
         "_metaDataVersion": "1.0.0",
@@ -37,7 +41,7 @@ class HelloWorldDataservice{
         "requestURL": req.originalUrl,
         "serverResponse": `Router received
         
-        '${messageFromClient}'
+        '${safeMessage}'
         
         from client`
       }        
