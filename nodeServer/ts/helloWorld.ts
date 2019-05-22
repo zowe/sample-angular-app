@@ -16,7 +16,7 @@ import { Router } from "express-serve-static-core";
 const express = require('express');
 const Promise = require('bluebird');
 
-import { HtmlObfuscator } from '../../../zlux-shared/src/htmlObfuscator'
+import { HtmlObfuscator } from '../../../zlux-shared/src/obfuscator/htmlObfuscator'
 
 class HelloWorldDataservice{
   private context: any;
