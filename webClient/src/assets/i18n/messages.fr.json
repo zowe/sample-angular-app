@@ -1,0 +1,7 @@
+{
+    "request_succeeded" : "Demande à l’application réussie",
+    "close" : "Fermer",
+    "invalid_plugin_identifier" : "Identité de Plugin Invalide",
+    "no_plugin_found_for_identifier" : "Aucun Plugin trouvé for l'identificateur",
+    "server_replied_with": "Réponse du Serveur"
+}

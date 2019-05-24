@@ -11,13 +11,14 @@
 */
 
 import { Component, Inject } from '@angular/core';
-
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 
 import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
+
+import { LocaleService, TranslationService, Language } from 'angular-l10n';
 
 @Component({
   selector: 'app-root',
@@ -27,8 +28,10 @@ import { SettingsService } from './services/settings.service';
 })
 
 export class AppComponent {
+  @Language() lang: string;
+
   targetAppId: string = "org.zowe.terminal.tn3270";
-  callStatus: string = "Status will appear here.";
+  callStatus: string;
   parameters: string =
 `{"type":"connect",
   "connectionSettings":{
@@ -51,12 +54,14 @@ export class AppComponent {
   serverResponseMessage: string;
 
   constructor(
+    public locale: LocaleService,
+    public translation: TranslationService,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
-    private settingsService: SettingsService) {    
+    private settingsService: SettingsService) {   
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
     this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
@@ -134,7 +139,7 @@ export class AppComponent {
           } else {
             this.log.warn(`Incomplete data. AppID or Parameters missing.`);
           }
-        }        
+        }
       } catch (e) {
         this.log.warn(`Response was not JSON`);
       }
@@ -161,16 +166,16 @@ export class AppComponent {
       this.log.warn(`Error on saving parameters, e=${e}`);
       this.callStatus = 'Error saving parameters';
     });
-  }  
-  
+  }
+
   sayHello() {
     this.helloService.sayHello(this.helloText)
     .subscribe(res => {
       const responseJson: any = res.json();
       if (responseJson != null && responseJson.serverResponse != null) {
         this.serverResponseMessage = 
-        `Server replied with 
-        
+        `${this.translation.translate('server_replied_with')}
+
         "${responseJson.serverResponse}"`;
       } else {
         this.serverResponseMessage = "<Empty Reply from Server>";
@@ -182,7 +187,8 @@ export class AppComponent {
   sendAppRequest() {
     var parameters = null;
     const popupOptions = {
-      blocking: true
+      blocking: true,
+      buttons: [this.translation.translate('close')]
     };
     /*Parameters for Actions could be a number, string, or object. The actual event context of an Action that an App recieves will be an object with attributes filled in via these parameters*/
     try {
@@ -217,7 +223,7 @@ export class AppComponent {
           */
           let action = dispatcher.makeAction(actionID, actionTitle, mode,type,this.targetAppId,argumentFormatter);
           let argumentData = {'data':(parameters ? parameters : this.parameters)};
-          this.log.info((message = 'App request succeeded'));
+          this.log.info((message = this.translation.translate('request_succeeded'))); // App request succeeded
           this.callStatus = message;
           /*Just because the Action is invoked does not mean the target App will accept it. We've made an Action on the fly,
             So the data could be in any shape under the "data" attribute and it is up to the target App to take action or ignore this request*/
@@ -228,8 +234,8 @@ export class AppComponent {
       } else {
         this.popupManager.reportError(
           ZluxErrorSeverity.WARNING,
-          'Invalid Plugin Identifier',
-          `No Plugin found for identifier ${this.targetAppId}`, popupOptions);
+          this.translation.translate('invalid_plugin_identifier'), // 
+          `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
       }
       
       this.callStatus = message;
