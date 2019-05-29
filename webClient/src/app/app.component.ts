@@ -47,7 +47,7 @@ export class AppComponent {
   actionType: string = "Launch";
   targetMode: string = "PluginCreate";
   items = ['a', 'b', 'c', 'd']
-  helloText: string;
+  helloText = '';
   serverResponseMessage: string;
 
   constructor(

@@ -70,12 +70,12 @@
       <input placeholder="Message" 
              i18n-placeholder="message|indicates that the user will enter a message@@appComponentMessage" [(ngModel)]="helloText"
       (keyup.enter)="sayHello()"/>
-      <zlux-button (click)="sayHello()"
+      <zlux-button (click)="sayHello()" [disabled]="helloText === ''"
               i18n="run|Run the application@@appComponentRun">Run</zlux-button>
     </div>
     <div>
       <label i18n="response|the area where the response from the server will appear@@appComponentResponse">Response</label>
-      <textarea class="server-response" placeholder="Response" 
+      <textarea class="server-response" placeholder="Response" readonly
                 i18n-placeholder="@@appComponentResponse" >{{serverResponseMessage}}</textarea>
     </div>
   </div>
