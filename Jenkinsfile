@@ -19,14 +19,11 @@ GITHUB_SSH_KEY = "zlux-jenkins" // This is required for git+ssh npm dependencies
 
 node("zlux-agent") {
 
-  def lib = library("jenkins-library").org.zowe.jenkins_shared_library
+  def lib = library("jenkins-library@staging").org.zowe.jenkins_shared_library
   def pipeline = lib.pipelines.generic.GenericPipeline.new(this)
   pipeline.admins.add("dnikolaev", "sgrady")
 
   def baseBranch = env.CHANGE_TARGET? env.CHANGE_TARGET: env.BRANCH_NAME  
-  // A workaround to disable default checkout
-  (plugin_scm, scm) = [scm, null]
-
   def zoweManifestURL = \
       "https://raw.githubusercontent.com/zowe/zowe-install-packaging" +
       "/${baseBranch}/manifest.json.template"
@@ -49,13 +46,14 @@ node("zlux-agent") {
       sshCredential: lib.Constants.DEFAULT_PAX_PACKAGING_SSH_CREDENTIAL,
       remoteWorkspace: lib.Constants.DEFAULT_PAX_PACKAGING_REMOTE_WORKSPACE,
     ],
+    skipCheckout: true
   )
 
   pipeline.createStage(
     name: 'Checkout', 
     stage: {
       dir(PLUGIN_NAME) {
-        checkout plugin_scm
+        checkout scm
       }
       pipeline.github.cloneRepository(
           repository: "zowe/zlux-app-manager", branch: baseBranch, folder: "zlux-app-manager"
@@ -108,20 +106,20 @@ node("zlux-agent") {
   pipeline.packaging(
     name: PLUGIN_NAME,
     operation: {
-      sh "tar --exclude-from=${PLUGIN_NAME}/.tarignore -zcvf ${PLUGIN_NAME}.tgz ${PLUGIN_NAME}"
-      sh "mkdir -p .pax/ascii && tar -C .pax/ascii -xf ${PLUGIN_NAME}.tgz" 
+      sh "tar --exclude-from=${PLUGIN_NAME}/.tarignore -zcvf ${PLUGIN_NAME}.tar.gz ${PLUGIN_NAME}"
+      sh "mkdir -p .pax/ascii && tar -C .pax/ascii -xf ${PLUGIN_NAME}.tar.gz" 
       pipeline.pax.pack(
         job             : "pax-packaging-${PLUGIN_NAME}",
-        filename        : "${PLUGIN_NAME}.pax",
+        filename        : "${PLUGIN_NAME}.pax.Z",
         paxOptions      : '',
-        keepTempFolder  : false
+        keepTempFolder  : false,
+        compress        : true
       )
-      sh "compress .pax/${PLUGIN_NAME}.pax && mv .pax/${PLUGIN_NAME}.pax.Z ${PLUGIN_NAME}.pxz"
     }
   )
   
   pipeline.publish(
-    artifacts: ["${PLUGIN_NAME}.tgz", "${PLUGIN_NAME}.pxz"]
+    artifacts: ["${PLUGIN_NAME}.tar.gz", ".pax/${PLUGIN_NAME}.pax.Z"]
   )
 
   pipeline.end()
