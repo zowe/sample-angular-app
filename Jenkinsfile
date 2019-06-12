@@ -19,7 +19,7 @@ GITHUB_SSH_KEY = "zlux-jenkins" // This is required for git+ssh npm dependencies
 
 node("zlux-agent") {
 
-  def lib = library("jenkins-library@staging").org.zowe.jenkins_shared_library
+  def lib = library("jenkins-library").org.zowe.jenkins_shared_library
   def pipeline = lib.pipelines.generic.GenericPipeline.new(this)
   pipeline.admins.add("dnikolaev", "sgrady")
 
