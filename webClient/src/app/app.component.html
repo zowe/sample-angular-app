@@ -55,6 +55,10 @@
 
         <input type="radio" [(ngModel)]="targetMode" name="targetMode" value="PluginFindAnyOrCreate">
         <label for="targetReuse" i18n="reuse any open app@@reuse-any-open">Reuse Any Open</label>
+        <div *ngIf="this.actionType === 'Maximize' || this.actionType === 'Minimize' ">
+          <label class="targetLabel">Target ID</label>
+          <input type="number" [(ngModel)]="targetId" value="1">
+        </div>
       </div>      
       <span class="bold-text hide-it" i18n="window title for target app@@target-app-window-title">
         Target App Window Title (this will become the title for the target window)</span>

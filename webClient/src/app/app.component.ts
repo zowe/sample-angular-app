@@ -29,7 +29,7 @@ import { LocaleService, TranslationService, Language } from 'angular-l10n';
 
 export class AppComponent {
   @Language() lang: string;
-
+  targetId: number = 1;
   targetAppId: string = "org.zowe.terminal.tn3270";
   callStatus: string;
   parameters: string =
@@ -227,7 +227,7 @@ export class AppComponent {
           this.callStatus = message;
           /*Just because the Action is invoked does not mean the target App will accept it. We've made an Action on the fly,
             So the data could be in any shape under the "data" attribute and it is up to the target App to take action or ignore this request*/
-          dispatcher.invokeAction(action,argumentData);
+          dispatcher.invokeAction(action,argumentData, this.targetId);
         } else {
           this.log.warn((message = 'Invalid target mode or action type specified'));        
         }
