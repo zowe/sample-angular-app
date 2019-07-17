@@ -26,8 +26,16 @@
     <span class="bold-text" i18n="application identifier">Application Identifier: </span>
     <div>
       <div class="div-input">
-        <input class="iframe-input input-height input-corner input-text shadowed" type="text" [(ngModel)]="targetAppId"/>
+        <select [(ngModel)]="targetAppId" class="iframe-input input-height input-corner shadowed" id="identifierInput" [attr.disabled]="this.targetMode === 'PluginSpecifyTargetID' || this.actionType === 'Maximize' || this.actionType === 'Minimize' ? '' : null">
+           <option *ngFor="let app of appIdOptions" [value]="app.value">
+              {{app.description}}
+          </option>
+        </select>
       </div>
+       <label class="targetLabel bold-text">Target ID:</label>
+       <div class="div-input">
+       <input type="number" class="iframe-input input-height input-corner shadowed" [(ngModel)]="targetId" value="1" id="targetInput" [attr.disabled]="this.targetMode !== 'PluginSpecifyTargetID' || this.actionType === 'Launch' || this.actionType === 'Message' ? '' : null">
+       </div>
       <div>
         <!-- Action types are used to determine what sort of Action is being taken on whatever App instance is the target. Launch simply creates a new instance with the context you provide, but Message can be used to communicate with an already open Instance to drive some action -->
         
@@ -55,10 +63,9 @@
 
         <input type="radio" [(ngModel)]="targetMode" name="targetMode" value="PluginFindAnyOrCreate">
         <label for="targetReuse" i18n="reuse any open app@@reuse-any-open">Reuse Any Open</label>
-        <div *ngIf="this.actionType === 'Maximize' || this.actionType === 'Minimize' ">
-          <label class="targetLabel">Target ID</label>
-          <input type="number" [(ngModel)]="targetId" value="1">
-        </div>
+
+        <input type="radio" [(ngModel)]="targetMode" name="targetMode" value="PluginSpecifyTargetID">
+        <label for="targetReuse" i18n="reuse any open app@@reuse-any-open">Specify Target ID</label>
       </div>      
       <span class="bold-text hide-it" i18n="window title for target app@@target-app-window-title">
         Target App Window Title (this will become the title for the target window)</span>

@@ -52,6 +52,7 @@ export class AppComponent {
   items = ['a', 'b', 'c', 'd']
   helloText = '';
   serverResponseMessage: string;
+  appIdOptions: ApplicationIdentifierOption[]  = [];
 
   constructor(
     public locale: LocaleService,
@@ -69,6 +70,27 @@ export class AppComponent {
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
+    fetch('/plugins?type=all')
+      .then((res) => res.json())
+      .then((pluginData) => {
+        const pluginDefinitions = pluginData.pluginDefinitions;
+        for (const plugin of pluginDefinitions) {
+         if (plugin.identifier) {
+            if (plugin.webContent) {
+              if (plugin.webContent.launchDefinition) {
+               this.appIdOptions.push(new ApplicationIdentifierOption(
+                 `${plugin.webContent.launchDefinition.pluginShortNameDefault} - ${plugin.identifier}`, plugin.identifier));
+            } else {
+               this.appIdOptions.push(new ApplicationIdentifierOption(plugin.identifier, plugin.identifier));
+            }
+          }
+         }
+        }
+      }).then(() => {
+        if (this.appIdOptions.length > 0) {
+          this.targetAppId = this.appIdOptions[0].value
+        }
+      });
   }
 
   handleLaunchOrMessageObject(data: any) {
@@ -185,6 +207,10 @@ export class AppComponent {
   }
 
   sendAppRequest() {
+    if (document.getElementById('targetInput')!.getAttribute('disabled') === '' && document.getElementById('identifierInput')!.getAttribute('disabled') === '' ) {
+      return;
+    }
+
     var parameters = null;
     const popupOptions = {
       blocking: true,
@@ -210,7 +236,7 @@ export class AppComponent {
       let dispatcher = ZoweZLUX.dispatcher;
       let pluginManager = ZoweZLUX.pluginManager;
       let plugin = pluginManager.getPlugin(this.targetAppId);
-      if (plugin) {
+      if (plugin || this.targetMode === 'PluginSpecifyTargetID') {
         let type = dispatcher.constants.ActionType[this.actionType];
         let mode = dispatcher.constants.ActionTargetMode[this.targetMode];
 
@@ -243,7 +269,9 @@ export class AppComponent {
   }
 }
 
-
+class ApplicationIdentifierOption {
+   constructor(public description: string, public value: string) {}
+}
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
