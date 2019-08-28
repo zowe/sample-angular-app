@@ -75,6 +75,7 @@ export class AppComponent {
     this.log.warn("Sample warning message (no substitution).");
 
     //Test case 2 & 3 - Internationalize log statement + substitute with message
+    //For tests to work properly, change desktop language to "Russian"
     this.log.info("Z0001");
     this.log.info("Z0002");
   }
