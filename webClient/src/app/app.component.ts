@@ -84,6 +84,8 @@ export class AppComponent {
     //Expected output:
     //"Application has been created."(EN) "Приложение создано." (RU)
     //"This is a message." (EN) "Это сообщение." (RU)
+
+    this.log.info("Z0003");
   }
 
   handleLaunchOrMessageObject(data: any) {
