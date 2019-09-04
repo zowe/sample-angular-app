@@ -1,8 +1,6 @@
 import { Response, Request } from "express";
 import { Router } from "express-serve-static-core";
 
-
-
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
@@ -13,15 +11,19 @@ import { Router } from "express-serve-static-core";
   Copyright Contributors to the Zowe Project.
 */
 
+//import { Inject } from '@angular/core';
 const express = require('express');
 const Promise = require('bluebird');
 const obfuscator = require ('../../zlux-shared/src/obfuscator/htmlObfuscator.js');
+console.log("HELLO WORLD HERE!!!!!!!!!!");
 
 class HelloWorldDataservice{
   private context: any;
   private router: Router;
   
-  constructor(context: any){
+  constructor(context: any,
+    //@Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger
+    ){
     let htmlObfuscator = new obfuscator.HtmlObfuscator();
     this.context = context;
     let router = express.Router();
@@ -43,7 +45,8 @@ class HelloWorldDataservice{
         '${safeMessage}'
         
         from client`
-      }        
+      }
+      console.log("BIG BALLER HERE!!!!!!!!");        
       res.status(200).json(responseBody);
     });
     this.router = router;
