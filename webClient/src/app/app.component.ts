@@ -20,13 +20,18 @@ import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 
+import {Http} from '@angular/http';
+import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
+
+
+const EVERYONE = "Everyone"
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   providers: [HelloService, ZluxPopupManagerService, SettingsService]
 })
-
 export class AppComponent {
   @Language() lang: string;
 
@@ -52,8 +57,10 @@ export class AppComponent {
   items = ['a', 'b', 'c', 'd']
   helloText = '';
   serverResponseMessage: string;
+  response: string;
 
   constructor(
+    private http: Http,
     public locale: LocaleService,
     public translation: TranslationService,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
@@ -69,6 +76,7 @@ export class AppComponent {
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
+    this.response = "";
   }
 
   handleLaunchOrMessageObject(data: any) {
@@ -240,6 +248,23 @@ export class AppComponent {
       
       this.callStatus = message;
     }
+  }
+
+  sendNotification(): void {
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
+    let notification = new ZoweNotification("Test", "This notifications should produce a different icon", 1, pluginId)
+
+    ZoweZLUX.pluginManager.loadPlugins('bootstrap').then((res: any) => {
+      let url = ZoweZLUX.uriBroker.pluginRESTUri(res[0], 'adminnotificationdata', '') + 'write'
+        this.http.post(url, {"notification": notification, "recipient": EVERYONE})
+        .subscribe(
+          res => {
+            this.response = JSON.parse((res as any)['_body']).Response
+          },
+          error => {
+            this.response = JSON.parse((error as any)['_body']).Response
+          })
+        })
   }
 }
 
