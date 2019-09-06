@@ -23,7 +23,6 @@ import { LocaleService, TranslationService, Language } from 'angular-l10n';
 import {Http} from '@angular/http';
 import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
 
-
 const EVERYONE = "Everyone"
 
 @Component({
@@ -32,6 +31,7 @@ const EVERYONE = "Everyone"
   styleUrls: ['./app.component.css'],
   providers: [HelloService, ZluxPopupManagerService, SettingsService]
 })
+
 export class AppComponent {
   @Language() lang: string;
 
