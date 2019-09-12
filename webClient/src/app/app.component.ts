@@ -20,8 +20,6 @@ import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 
-// import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
-
 const EVERYONE = "Everyone"
 
 @Component({
