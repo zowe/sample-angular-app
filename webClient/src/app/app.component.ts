@@ -20,8 +20,7 @@ import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 
-import {Http} from '@angular/http';
-import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
+// import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
 
 const EVERYONE = "Everyone"
 
@@ -60,7 +59,6 @@ export class AppComponent {
   response: string;
 
   constructor(
-    private http: Http,
     public locale: LocaleService,
     public translation: TranslationService,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
@@ -250,21 +248,24 @@ export class AppComponent {
     }
   }
 
-  sendNotification(): void {
+  sendNotification(): number {
     let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
-    let notification = new ZoweNotification("Test", "This notifications should produce a different icon", 1, pluginId)
+    let notification = ZoweZLUX.notificationManager.createNotification("Test", "This notification is NOT being sent through the server", 1, pluginId)
+    return ZoweZLUX.notificationManager.notify(notification)
+  }
 
-    ZoweZLUX.pluginManager.loadPlugins('bootstrap').then((res: any) => {
-      let url = ZoweZLUX.uriBroker.pluginRESTUri(res[0], 'adminnotificationdata', '') + 'write'
-        this.http.post(url, {"notification": notification, "recipient": EVERYONE})
-        .subscribe(
-          res => {
-            this.response = JSON.parse((res as any)['_body']).Response
-          },
-          error => {
-            this.response = JSON.parse((error as any)['_body']).Response
-          })
-        })
+  sendRestNotification(): void {
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
+    let notification = ZoweZLUX.notificationManager.createNotification("Test", "This notification is being sent through the server", 1, pluginId)
+
+    ZoweZLUX.notificationManager.serverNotify({"notification": notification, "recipient": EVERYONE})
+    .then(
+      (res: any) => {
+        res.json().then((json: any) => this.response = "Server Response: " + json.Response)
+      },
+      (error: any) => {
+        error.json().then((json: any) => this.response = "Server Response: " + json.Response)
+      })
   }
 }
 
