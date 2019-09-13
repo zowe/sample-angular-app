@@ -19,7 +19,7 @@ import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
-
+import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
 const EVERYONE = "Everyone"
 
 @Component({
@@ -248,13 +248,13 @@ export class AppComponent {
 
   sendNotification(): number {
     let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
-    let notification = ZoweZLUX.notificationManager.createNotification("Test", "This notification is NOT being sent through the server", 1, pluginId)
+    let notification = new ZoweNotification("Test", "This notification is NOT being sent through the server", 1, pluginId)
     return ZoweZLUX.notificationManager.notify(notification)
   }
 
   sendRestNotification(): void {
     let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
-    let notification = ZoweZLUX.notificationManager.createNotification("Test", "This notification is being sent through the server", 1, pluginId)
+    let notification = new ZoweNotification("Test", "This notification is being sent through the server", 1, pluginId)
 
     ZoweZLUX.notificationManager.serverNotify({"notification": notification, "recipient": EVERYONE})
     .then(
