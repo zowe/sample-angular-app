@@ -19,6 +19,8 @@ import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
+import { ZoweNotification } from '../../../../zlux-platform/base/src/notification-manager/notification'
+const EVERYONE = "Everyone"
 
 @Component({
   selector: 'app-root',
@@ -52,6 +54,7 @@ export class AppComponent {
   items = ['a', 'b', 'c', 'd']
   helloText = '';
   serverResponseMessage: string;
+  response: string;
 
   constructor(
     public locale: LocaleService,
@@ -69,6 +72,7 @@ export class AppComponent {
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
+    this.response = "";
   }
 
   handleLaunchOrMessageObject(data: any) {
@@ -240,6 +244,26 @@ export class AppComponent {
       
       this.callStatus = message;
     }
+  }
+
+  sendNotification(): number {
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
+    let notification = new ZoweNotification("Test", "This notification is NOT being sent through the server", 1, pluginId)
+    return ZoweZLUX.notificationManager.notify(notification)
+  }
+
+  sendRestNotification(): void {
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
+    let notification = new ZoweNotification("Test", "This notification is being sent through the server", 1, pluginId)
+
+    ZoweZLUX.notificationManager.serverNotify({"notification": notification, "recipient": EVERYONE})
+    .then(
+      (res: any) => {
+        res.json().then((json: any) => this.response = "Server Response: " + json.Response)
+      },
+      (error: any) => {
+        error.json().then((json: any) => this.response = "Server Response: " + json.Response)
+      })
   }
 }
 

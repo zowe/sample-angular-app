@@ -81,6 +81,12 @@
       <textarea class="server-response" placeholder="Response" readonly
                 i18n-placeholder="@@appComponentResponse" >{{serverResponseMessage}}</textarea>
     </div>
+    <hr>
+    <button (click)="sendNotification()">Send Sample Notification</button>
+    <button (click)="sendRestNotification()">Send Sample Rest Notification</button>
+    <div class="response">
+      {{response}}
+    </div>
   </div>
 </div>
 <zlux-popup-manager>
