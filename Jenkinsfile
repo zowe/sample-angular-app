@@ -32,12 +32,7 @@ node("zlux-agent") {
   pipeline.createStage(
     name: 'Install dependencies',
     stage: {
-      pipeline.github.cloneRepository(
-        repository: "zowe/zlux-app-manager", branch: baseBranch, folder: "zlux-app-manager"
-      )
-      pipeline.github.cloneRepository(
-        repository: "zowe/zlux-platform", branch: baseBranch, folder: "zlux-platform"
-      )
+
       sshagent (credentials: [GITHUB_SSH_KEY]) {
         // sh "cd zlux-app-manager/virtual-desktop && npm ci"
         // TypeScript 2.7.2 is not supported; supported versions >=3.2.1
