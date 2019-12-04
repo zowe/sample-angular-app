@@ -43,7 +43,7 @@ node("zlux-agent") {
           packages=\$(find nodeServer webClient -name package.json | { grep -v node_modules || true; })
           for package in \$packages
             do
-              sh -c "cd `dirname \$package` && npm ci && npm update typescript"
+              sh -c "cd `dirname \$package` && npm i"
             done
           """
       }
