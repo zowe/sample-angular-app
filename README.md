@@ -17,7 +17,7 @@ By the end of this tutorial, you will:
 
 Further tutorials are present within this repository to expand upon what you learn here, adding new features to the App to teach about different aspects of Apps within Zowe.
 
-**Note: This tutorial assumes you already have a Zowe installation ready to be run. If you do not, try setting one up via the README at [zlux-example-server](https://github.com/zowe/zlux-example-server) before continuing.**
+**Note: This tutorial assumes you already have a Zowe installation ready to be run. If you do not, try setting one up via the README at [zlux-app-server](https://github.com/zowe/zlux-app-server) before continuing.**
 
 So, let's get started!
 
@@ -521,27 +521,10 @@ Incidentally, because a **dataservice** also exists in this plugin, we'll need t
 OK, after the first execution of the transpilation and packaging concludes, you should have `sample-angular-app/web` populated with files that can be served by the Zowe App Server for the UI, and incidentally also `sample-angular-app/lib` for the server-side logic for the dataservice we have just built.
 
 ## Adding Your App to the Desktop
-At this point, your sample-angular-app folder contains files for an App that could be added to a Zowe instance. We'll add this to our own Zowe instance. First, ensure that the Zowe App server is not running. Then, navigate to the instance's root folder, `/zlux-example-server`.
+At this point, your sample-angular-app folder contains files for an App that could be added to a Zowe instance. We'll add this to our own Zowe instance. Follow [this Installing Guide](https://github.com/zowe/zlux/wiki/Installing-Plugins), and you'll be ready to use the App in the Desktop. 
 
-Within, you'll see a folder, **plugins**. Take a look at one of the files within the folder. You can see that these are JSON files with the attributes **identifier** and **pluginLocation**. These files are what we call **Plugin Locators**, since they point to a Plugin to be included into the server.
-
-Let's make one ourselves. Make a file `/zlux-example-server/plugins/org.zowe.zlux.sample.angular.json`, with these contents:
-```json
-{
-  "identifier": "org.zowe.zlux.sample.angular",
-  "pluginLocation": "../../sample-angular-app"
-}
-```
-
-When the server runs, it will check for these sorts of files in its `pluginsDir`, a location known to the server via its specification in the [server configuration file](https://github.com/zowe/zlux/wiki/Configuration-for-zLUX-Proxy-Server-&-ZSS#app-configuration). In our case, this is `/zlux-example-server/deploy/instance/ZLUX/plugins/`.
-
-You could place the JSON directly into that location, but the recommended way to place content into the deploy area is via running the server deployment process.
-Simply:
-1. Open up a (second) command prompt to `zlux-build`
-1. `ant deploy`
-
-Now you're ready to run the server and see your App.
-1. `cd /zlux-example-server/bin`
+You can now start up the server:
+1. `cd /zlux-app-server/bin`
 1. `./nodeCluster.sh` ... if you're testing this in an environment where the ZSS server is not on the same system as the Zowe App Server, you'll instead need to do `./nodeCluster.sh -h \<zss host\> -P \<zss port\>`
 1. Open your browser to `https://hostname:port`, where the hsotname and port are for the Zowe App Server.
 1. Login with your credentials
