@@ -10,8 +10,8 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Component, Inject } from '@angular/core';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Component, Inject, Optional } from '@angular/core';
+import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 
@@ -52,6 +52,7 @@ export class AppComponent {
   items = ['a', 'b', 'c', 'd']
   helloText = '';
   serverResponseMessage: string;
+  private menuItems: ContextMenuItem[];
 
   constructor(
     public locale: LocaleService,
@@ -59,6 +60,7 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
+    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
@@ -241,6 +243,128 @@ export class AppComponent {
       this.callStatus = message;
     }
   }
+
+  generateTestMenuItems(translator: TranslationService): void {
+    this.menuItems = [
+        {
+          "text": translator.translate('items'),
+//        "icon": 'icon-person',
+          "action": () => {
+            this.log.info(translator.translate('items'));
+          },
+          "children": [
+            {
+              "text": translator.translate('item_1.1'),
+//            "icon": 'icon-settings',
+              "action": () => {
+                this.log.info(translator.translate('item_1.1'));
+              },
+              "children": [
+                {
+                  "text": translator.translate('item_1.1.1'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.1.1'));
+                  }
+                },
+                {
+                  "text": translator.translate('item_1.1.2'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.1.2'));
+                  }
+                }
+              ]
+            },
+            {
+              "text": translator.translate('item_1.2'),
+//            "icon": 'icon-person',
+              "action": () => {
+                this.log.info(translator.translate('item_1.2'));
+              },
+              "children": [
+                {
+                  "text": translator.translate('item_1.2.1'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.2.1'));
+                  }
+                },
+                {
+                  "text": translator.translate('item_1.2.2'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.2.2'));
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "text": translator.translate('disabled'),
+          "disabled": true,
+//        "icon": 'icon-person',
+          "action": () => {
+            this.log.info(translator.translate('disabled'));
+          },
+          "children": [
+            {
+              "text": translator.translate('disabled_1.1'),
+//            "icon": 'icon-person',
+              "action": () => {
+                this.log.info(translator.translate('disabled_1.1'));
+              }
+            },
+            {
+              "text": translator.translate('disabled_1.2'),
+//            "icon": 'icon-person',
+              "action": () => {
+                this.log.info(translator.translate('disabled_1.2'));
+              }
+            }
+          ]
+        },
+        {
+          "text": translator.translate('persisting_item'),
+//        "icon": 'icon-settings',
+          "action": () => {
+            this.log.info(translator.translate('persisting_item'));
+          },
+          "preventCloseMenu": true,
+          "children": [
+            {
+              "text": translator.translate('shortcut_item'),
+//            "icon": 'icon-person',
+              "shortcutText": 'F5',
+              "action": () => {
+                this.log.info(translator.translate('shortcut_item'));
+              }
+            },
+            {
+              "text": translator.translate('persisting_shortcut_item'),
+//            "icon": 'icon-person',
+              "shortcutText": 'F6',
+              "action": () => {
+                this.log.info(translator.translate('persisting_shortcut_item'));
+              },
+              "preventCloseMenu": true
+            }
+          ]
+        }
+      ];        
+  }
+
+  onRightClick(event: MouseEvent): boolean {
+    let appPosition = document.getElementsByClassName("test-panel-container")[0].getBoundingClientRect()
+    if (this.windowActions) {
+      if (!this.menuItems) {this.generateTestMenuItems(this.translation);}
+      this.windowActions.spawnContextMenu(event.clientX - appPosition.left, event.clientY - appPosition.top, this.menuItems);
+    }
+    return false;
+  }
+  
+  
 }
 
 
