@@ -3,5 +3,19 @@
     "close" : "閉じる",
     "invalid_plugin_identifier" : "無効なプラグイン識別子",
     "no_plugin_found_for_identifier" : "識別子のプラグインが見つかりません",
-    "server_replied_with": "サーバーが応答を返しました"
+    "server_replied_with": "サーバーが応答を返しました",
+    "items": "項目",
+    "item_1.1": "項目 1.1",
+    "item_1.2": "項目 1.2",
+    "item_1.1.1": "項目 1.1.1",
+    "item_1.1.2": "項目 1.1.2",
+    "item_1.2.1": "項目 1.2.1",
+    "item_1.2.2": "項目 1.2.2",
+    "disabled": "無効な項目",
+    "disabled_1.1": "無効な項目 1.1",
+    "disabled_1.2": "無効な項目 1.2",
+    "persisting_item": "持続的な項目",
+    "shortcut_item": "ショートカットの項目",
+    "persisting_shortcut_item": "持続的なショートカットの項目"
+
 }
