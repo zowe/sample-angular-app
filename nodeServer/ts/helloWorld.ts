@@ -20,23 +20,27 @@ class HelloWorldDataservice{
   private context: any;
   private router: Router;
   
-  constructor(context: any,
+  constructor(context: any, process: any,
     //@Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger
     ){
     let htmlObfuscator = new obfuscator.HtmlObfuscator();
     this.context = context;
         /* This code will get executed before clusterManager finishes creating the master storage */
         if (this.context.storage) {
-            context.logger.info("Can helloWorld access the storage object at constructor time?", this.context.storage);
-            this.context.storage.setStorageValue(Math.floor(Math.random() * 100) + 1, "A simple server object");
-            context.logger.info("Can helloWorld save any storage at constructor time?", this.context.storage);
+          context.logger.info("Can helloWorld access the storage object at constructor time?", this.context.storage);
+          this.context.storage.setStorageValue(Math.floor(Math.random() * 100) + 1, "A simple server object");
+          context.logger.info("Can helloWorld save any storage at constructor time?", this.context.storage);
         }
        
-        /* This code will get execute after 5 seconds (after the clusterManager finishes creating master storage) */
+        /* This code will get executed after 5 seconds (after the clusterManager finishes creating master storage) */
         setTimeout(function () {
+          if (process.clusterManager) {
             context.storage.getStorage().then(function (storage) {
               context.logger.info("Does helloWorld have the up-to-date storage data from the cluster?", storage);
             });
+          } else {
+            /* We do nothing here because if we are not in cluster mode, there is no master storage, only app storage */
+          }
         }, 5000);
     let router = express.Router();
     router.use(function noteRequest(req: Request,res: Response,next: any) {
@@ -71,7 +75,7 @@ class HelloWorldDataservice{
 
 exports.helloWorldRouter = function(context): Router {
   return new Promise(function(resolve, reject) {
-    let dataservice = new HelloWorldDataservice(context);
+    let dataservice = new HelloWorldDataservice(context, process);
     resolve(dataservice.getRouter());
   });
 }
