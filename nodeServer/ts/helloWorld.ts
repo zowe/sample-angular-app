@@ -27,16 +27,28 @@ class HelloWorldDataservice{
     this.context = context;
         /* This code will get executed before clusterManager finishes creating the master storage */
         if (this.context.storage) {
-          context.logger.info("Can helloWorld access the storage object at constructor time?", this.context.storage);
-          this.context.storage.setStorageValue(Math.floor(Math.random() * 100) + 1, "A simple server object");
-          context.logger.info("Can helloWorld save any storage at constructor time?", this.context.storage);
+
+          const randoNum = Math.floor(Math.random() * 100);
+          const aSimpleObject = "I am a simple object"
+          const aComplicatedObject = {
+              "inner Key 1": 'I am a value one layer down',
+              "inner Key 2": {
+                  [randoNum]: 'I am a value multiple layers down'
+              },
+            };
+
+          context.logger.info("Can helloWorld access the storage object at constructor time?\n", this.context.storage);
+          this.context.storage.setStorageValue("Key 1", aSimpleObject);
+          this.context.storage.setStorageValue("Key 2", aComplicatedObject);
+          context.logger.info("Can helloWorld save storage (with layers) at constructor time?\n", this.context.storage);
+
         }
        
         /* This code will get executed after 5 seconds (after the clusterManager finishes creating master storage) */
         setTimeout(function () {
           if (process.clusterManager) {
             context.storage.getStorage().then(function (storage) {
-              context.logger.info("Does helloWorld have the up-to-date storage data from the cluster?", storage);
+              context.logger.info("Does helloWorld have the up-to-date storage data from all clusters?\n", storage);
             });
           } else {
             /* We do nothing here because if we are not in cluster mode, there is no master storage, only app storage */
