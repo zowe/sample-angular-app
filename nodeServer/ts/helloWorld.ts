@@ -15,7 +15,6 @@ import { Router } from "express-serve-static-core";
 const express = require('express');
 const Promise = require('bluebird');
 const obfuscator = require ('../../zlux-shared/src/obfuscator/htmlObfuscator.js');
-console.log("HELLO WORLD HERE!!!!!!!!!!");
 
 class HelloWorldDataservice{
   private context: any;
@@ -26,6 +25,19 @@ class HelloWorldDataservice{
     ){
     let htmlObfuscator = new obfuscator.HtmlObfuscator();
     this.context = context;
+        /* This code will get executed before clusterManager finishes creating the master storage */
+        if (this.context.storage) {
+            context.logger.info("Can helloWorld access the storage object at constructor time?", this.context.storage);
+            this.context.storage.setStorageValue(Math.floor(Math.random() * 100) + 1, "A simple server object");
+            context.logger.info("Can helloWorld save any storage at constructor time?", this.context.storage);
+        }
+       
+        /* This code will get execute after 5 seconds (after the clusterManager finishes creating master storage) */
+        setTimeout(function () {
+            context.storage.getStorage().then(function (storage) {
+              context.logger.info("Does helloWorld have the up-to-date storage data from the cluster?", storage);
+            });
+        }, 5000);
     let router = express.Router();
     router.use(function noteRequest(req: Request,res: Response,next: any) {
       context.logger.info('Saw request, method='+req.method);
@@ -46,7 +58,6 @@ class HelloWorldDataservice{
         
         from client`
       }
-      console.log("BIG BALLER HERE!!!!!!!!");        
       res.status(200).json(responseBody);
     });
     this.router = router;
