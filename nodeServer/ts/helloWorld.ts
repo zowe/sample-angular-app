@@ -36,20 +36,42 @@ class HelloWorldDataservice{
                   [randoNum]: 'I am a value multiple layers down'
               },
             };
+          const key1 = "Key 1";
+          const key2 = "Key 2";
 
+          /* Access test */
           context.logger.info("Can helloWorld access the storage object at constructor time?\n", this.context.storage);
-          this.context.storage.setStorageValue("Key 1", aSimpleObject);
-          this.context.storage.setStorageValue("Key 2", aComplicatedObject);
-          context.logger.info("Can helloWorld save storage (with layers) at constructor time?\n", this.context.storage);
+          
+          /* Set by key */
+          this.context.storage.setStorageByKey(key1, aSimpleObject);
+          this.context.storage.setStorageByKey(key2, aComplicatedObject);
+          context.logger.info("Can helloWorld save storage (with layers)?\n", this.context.storage);
+      
+          /* Delete by key */
+          this.context.storage.deleteStorageByKey(key1);
+          context.logger.info("Can helloWorld delete '" + key1 + "'?\n", this.context.storage);
 
+          /* Set whole object */
+          this.context.storage.setStorageAll({[randoNum]: "Replacement"});
+          context.logger.info("Can helloWorld replace all its storage with key '" + randoNum + "'?\n", this.context.storage);
+
+          /* Access by key */
+          this.context.storage.setStorageByKey(randoNum, aSimpleObject);
+          context.logger.info("Can helloWorld find storage by key '" + randoNum + "'?\n", this.context.storage.getStorageByKey(randoNum));
         }
        
-        /* This code will get executed after 5 seconds (after the clusterManager finishes creating master storage) */
+        /* This code will get executed after 5 seconds (well after the clusterManager finishes creating master storage) */
         setTimeout(function () {
           if (process.clusterManager) {
-            context.storage.getStorage().then(function (storage) {
+            /* Here, you should see all storage data from the Sample Angular App x (# of clusters) */
+            context.storage.setStorageByKey("Hello", "I am a late value to show things have not broken");
+            context.storage.getStorageAll().then((storage) => {
               context.logger.info("Does helloWorld have the up-to-date storage data from all clusters?\n", storage);
             });
+            /* Here, you should see all storage data on the cluster for all apps */
+            process.clusterManager.getStorageCluster().then((storage) => {
+              context.logger.info("Does clusterManager have storage data from all workers?\n", storage);
+            })
           } else {
             /* We do nothing here because if we are not in cluster mode, there is no master storage, only app storage */
           }
