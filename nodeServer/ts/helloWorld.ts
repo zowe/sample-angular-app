@@ -43,29 +43,29 @@ class HelloWorldDataservice{
           context.logger.info("Can helloWorld access the storage object at constructor time?\n", this.context.storage);
           
           /* Set by key */
-          this.context.storage.setStorageByKey(key1, aSimpleObject);
-          this.context.storage.setStorageByKey(key2, aComplicatedObject);
+          this.context.storage.set(key1, aSimpleObject);
+          this.context.storage.set(key2, aComplicatedObject);
           context.logger.info("Can helloWorld save storage (with layers)?\n", this.context.storage);
       
           /* Delete by key */
-          this.context.storage.deleteStorageByKey(key1);
+          this.context.storage.delete(key1);
           context.logger.info("Can helloWorld delete '" + key1 + "'?\n", this.context.storage);
 
           /* Set whole object */
-          this.context.storage.setStorageAll({[randoNum]: "Replacement"});
+          this.context.storage.setAll({[randoNum]: "Replacement"});
           context.logger.info("Can helloWorld replace all its storage with key '" + randoNum + "'?\n", this.context.storage);
 
           /* Access by key */
-          this.context.storage.setStorageByKey(randoNum, aSimpleObject);
-          context.logger.info("Can helloWorld find storage by key '" + randoNum + "'?\n", this.context.storage.getStorageByKey(randoNum));
+          this.context.storage.set(randoNum, aSimpleObject);
+          context.logger.info("Can helloWorld find storage by key '" + randoNum + "'?\n", this.context.storage.get(randoNum));
         }
        
         /* This code will get executed after 5 seconds (well after the clusterManager finishes creating master storage) */
         setTimeout(function () {
           if (process.clusterManager) {
             /* Here, you should see all storage data from the Sample Angular App x (# of clusters) */
-            context.storage.setStorageByKey("Hello", "I am a late value to show things have not broken");
-            context.storage.getStorageAll().then((storage) => {
+            context.storage.set("Hello", "I am a late value to show things have not broken");
+            context.storage.getAll().then((storage) => {
               context.logger.info("Does helloWorld have the up-to-date storage data from all clusters?\n", storage);
             });
             /* Here, you should see all storage data on the cluster for all apps */
