@@ -69,23 +69,6 @@ export class AppComponent {
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
-
-    //Test case 1 - Log normally with no specified ID
-    this.log.severe("Sample severe message (no substitution).");
-    this.log.warn("Sample warning message (no substitution).");
-    //Expected output:
-    //"Sample severe message (no substitution)."
-    //"Sample warning message (no substitution)."
-
-    //Test case 2 & 3 - Internationalize log statement + substitute with message
-    //For tests to work properly, change desktop language to "Russian"
-    this.log.info("Z0001");
-    this.log.info("Z0002");
-    //Expected output:
-    //"Application has been created."(EN) "Приложение создано." (RU)
-    //"This is a message." (EN) "Это сообщение." (RU)
-
-    this.log.info("Z0003");
   }
 
   handleLaunchOrMessageObject(data: any) {
