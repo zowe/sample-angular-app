@@ -11,20 +11,20 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http} from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class SettingsService {
   private plugin:ZLUX.Plugin;
   
-  constructor(private http: Http){}
+  constructor(private http: HttpClient){}
 
   setPlugin(plugin: ZLUX.Plugin):void {
     this.plugin = plugin;
   }
 
   getDefaultsFromServer() {
-    return this.http.get(ZoweZLUX.uriBroker.pluginConfigUri(this.plugin, 'requests/app', undefined));
+    return this.http.get<any>(ZoweZLUX.uriBroker.pluginConfigUri(this.plugin, 'requests/app', undefined));
   }
 
   saveAppRequest(actionType: string, targetMode: string, parameters: string) {
