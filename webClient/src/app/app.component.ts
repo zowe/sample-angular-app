@@ -164,7 +164,7 @@ export class AppComponent {
 
   sayHello(): void {
     this.helloService.sayHello(this.helloText)
-    .subscribe(res => {
+    .subscribe((res:any) => {
       if (res != null) {
         this.serverResponseMessage =
         `${this.translation.translate('server_replied_with')}
@@ -343,14 +343,13 @@ export class AppComponent {
             }
           ]
         }
-      ];        
+      ];
   }
 
   onRightClick(event: MouseEvent): boolean {
-    let appPosition = document.getElementsByClassName("test-panel-container")[0].getBoundingClientRect()
     if (this.windowActions) {
       if (!this.menuItems) {this.generateTestMenuItems(this.translation);}
-      this.windowActions.spawnContextMenu(event.clientX - appPosition.left, event.clientY - appPosition.top, this.menuItems);
+      this.windowActions.spawnContextMenu(event.clientX, event.clientY, this.menuItems, true);
     }
     return false;
   }
