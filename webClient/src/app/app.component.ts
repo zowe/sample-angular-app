@@ -11,7 +11,7 @@
 */
 
 import { Component, Inject, Optional } from '@angular/core';
-import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginViewportEvents } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 
@@ -62,7 +62,7 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
-    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
+    @Optional() @Inject(Angular2InjectionTokens.VIEWPORT_EVENTS) private viewportEvents: Angular2PluginViewportEvents,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
@@ -347,9 +347,9 @@ export class AppComponent {
   }
 
   onRightClick(event: MouseEvent): boolean {
-    if (this.windowActions) {
+    if (this.viewportEvents) {
       if (!this.menuItems) {this.generateTestMenuItems(this.translation);}
-      this.windowActions.spawnContextMenu(event.clientX, event.clientY, this.menuItems, true);
+      this.viewportEvents.spawnContextMenu(event.clientX, event.clientY, this.menuItems, true);
     }
     return false;
   }
