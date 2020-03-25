@@ -10,8 +10,8 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Component, Inject } from '@angular/core';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Component, Inject, Optional } from '@angular/core';
+import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 
@@ -19,6 +19,8 @@ import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
+import { catchError } from 'rxjs/operators';
+import { zip, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -52,6 +54,7 @@ export class AppComponent {
   items = ['a', 'b', 'c', 'd']
   helloText = '';
   serverResponseMessage: string;
+  private menuItems: ContextMenuItem[];
 
   constructor(
     public locale: LocaleService,
@@ -59,6 +62,7 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
+    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
@@ -123,25 +127,15 @@ export class AppComponent {
 
   getDefaultsFromServer() {
     this.settingsService.getDefaultsFromServer().subscribe(res => {
-      if (res.status != 200) {
-        this.log.warn(`Get defaults from server failed. Data missing or request invalid. Status=${res.status}`);
-      }
-      try {
-        let responseJson = res.json();
-        this.log.info(`JSON=${JSON.stringify(responseJson)}`);
-        if (res.status == 200) {
-          if (responseJson.contents.appid && responseJson.contents.parameters) {
-            let paramData = responseJson.contents.parameters.data;
-            this.parameters = paramData.parameters;
-            this.actionType = paramData.actionType;
-            this.targetMode = paramData.appTarget;
-            this.targetAppId = responseJson.contents.appid.data.appId;
-          } else {
-            this.log.warn(`Incomplete data. AppID or Parameters missing.`);
-          }
-        }
-      } catch (e) {
-        this.log.warn(`Response was not JSON`);
+      this.log.info(`JSON=${JSON.stringify(res)}`);
+      if (res.contents.appid && res.contents.parameters) {
+        let paramData = res.contents.parameters.data;
+        this.parameters = paramData.parameters;
+        this.actionType = paramData.actionType;
+        this.targetMode = paramData.appTarget;
+        this.targetAppId = res.contents.appid.data.appId;
+      } else {
+        this.log.warn(`Incomplete data. AppID or Parameters missing.`);
       }
     }, e => {
       this.log.warn(`Error on getting defaults, e=${e}`);
@@ -149,38 +143,37 @@ export class AppComponent {
     });
   }
 
-  saveToServer() {
-    this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters).subscribe(res => {
-      this.log.info(`Saved parameters with HTTP status=${res.status}`);
-      if (res.status == 200 || res.status == 201) {
-        this.settingsService.saveAppId(this.targetAppId).subscribe(res=> {
-          this.log.info(`Saved App ID with HTTP status=${res.status}`);
-        }, e=> {
-          this.log.warn(`Error on saving App ID, e=${e}`);
+  saveToServer(): void {
+    zip(
+      this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters)
+        .pipe(catchError(err => {
+          this.log.warn(`Error on saving parameters, e=${err}`);
+          this.callStatus = 'Error saving parameters';
+          return throwError(err);
+        })),
+      this.settingsService.saveAppId(this.targetAppId)
+        .pipe(catchError(err => {
+          this.log.warn(`Error on saving App ID, e=${err}`);
           this.callStatus = 'Error saving App ID';
-        });
-      } else {
-        this.log.warn(`Error on saving parameters, response status=${res.status}`);
-      }
-    }, e => {
-      this.log.warn(`Error on saving parameters, e=${e}`);
-      this.callStatus = 'Error saving parameters';
-    });
+          return throwError(err);
+        })),
+    ).subscribe(
+      () => this.log.info(`Saved parameters and App ID`)
+    )
   }
 
-  sayHello() {
+  sayHello(): void {
     this.helloService.sayHello(this.helloText)
-    .subscribe(res => {
-      const responseJson: any = res.json();
-      if (responseJson != null && responseJson.serverResponse != null) {
-        this.serverResponseMessage = 
+    .subscribe((res:any) => {
+      if (res != null) {
+        this.serverResponseMessage =
         `${this.translation.translate('server_replied_with')}
 
-        "${responseJson.serverResponse}"`;
+        "${res.serverResponse}"`;
       } else {
         this.serverResponseMessage = "<Empty Reply from Server>";
       }
-      this.log.info(responseJson);
+      this.log.info(res);
     });
   }
 
@@ -241,6 +234,127 @@ export class AppComponent {
       this.callStatus = message;
     }
   }
+
+  generateTestMenuItems(translator: TranslationService): void {
+    this.menuItems = [
+        {
+          "text": translator.translate('items'),
+//        "icon": 'icon-person',
+          "action": () => {
+            this.log.info(translator.translate('items'));
+          },
+          "children": [
+            {
+              "text": translator.translate('item_1.1'),
+//            "icon": 'icon-settings',
+              "action": () => {
+                this.log.info(translator.translate('item_1.1'));
+              },
+              "children": [
+                {
+                  "text": translator.translate('item_1.1.1'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.1.1'));
+                  }
+                },
+                {
+                  "text": translator.translate('item_1.1.2'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.1.2'));
+                  }
+                }
+              ]
+            },
+            {
+              "text": translator.translate('item_1.2'),
+//            "icon": 'icon-person',
+              "action": () => {
+                this.log.info(translator.translate('item_1.2'));
+              },
+              "children": [
+                {
+                  "text": translator.translate('item_1.2.1'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.2.1'));
+                  }
+                },
+                {
+                  "text": translator.translate('item_1.2.2'),
+//                "icon": 'icon-person',
+                  "action": () => {
+                    this.log.info(translator.translate('item_1.2.2'));
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "text": translator.translate('disabled'),
+          "disabled": true,
+//        "icon": 'icon-person',
+          "action": () => {
+            this.log.info(translator.translate('disabled'));
+          },
+          "children": [
+            {
+              "text": translator.translate('disabled_1.1'),
+//            "icon": 'icon-person',
+              "action": () => {
+                this.log.info(translator.translate('disabled_1.1'));
+              }
+            },
+            {
+              "text": translator.translate('disabled_1.2'),
+//            "icon": 'icon-person',
+              "action": () => {
+                this.log.info(translator.translate('disabled_1.2'));
+              }
+            }
+          ]
+        },
+        {
+          "text": translator.translate('persisting_item'),
+//        "icon": 'icon-settings',
+          "action": () => {
+            this.log.info(translator.translate('persisting_item'));
+          },
+          "preventCloseMenu": true,
+          "children": [
+            {
+              "text": translator.translate('shortcut_item'),
+//            "icon": 'icon-person',
+              "shortcutText": 'F5',
+              "action": () => {
+                this.log.info(translator.translate('shortcut_item'));
+              }
+            },
+            {
+              "text": translator.translate('persisting_shortcut_item'),
+//            "icon": 'icon-person',
+              "shortcutText": 'F6',
+              "action": () => {
+                this.log.info(translator.translate('persisting_shortcut_item'));
+              },
+              "preventCloseMenu": true
+            }
+          ]
+        }
+      ];
+  }
+
+  onRightClick(event: MouseEvent): boolean {
+    if (this.windowActions) {
+      if (!this.menuItems) {this.generateTestMenuItems(this.translation);}
+      this.windowActions.spawnContextMenu(event.clientX, event.clientY, this.menuItems, true);
+    }
+    return false;
+  }
+  
+  
 }
 
 

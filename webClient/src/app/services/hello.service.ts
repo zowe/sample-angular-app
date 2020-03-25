@@ -11,26 +11,34 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http} from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface HelloResponseBody {
+  _objectType: string,
+  _metaDataVersion: string,
+  requestBody: string,
+  requestURL: string,
+  serverResponse: string;
+}
 
 @Injectable()
 export class HelloService {
   private destination:string;
   
-  constructor(private http: Http){}
+  constructor(private http: HttpClient){}
 
   setDestination(path: string):void {
     this.destination = path;
   }
 
-  sayHello(text: string): Observable<any> {
+  sayHello(text: string): Observable<HelloResponseBody> {
     const requestBody = {
       "_objectType": "org.zowe.zlux.sample.angular.request.hello",
       "_metaDataVersion": "1.0.0",
       "messageFromClient": text
     }
-    return this.http.post(this.destination, requestBody);
+    return this.http.post<HelloResponseBody>(this.destination, requestBody);
   }
 
 }
