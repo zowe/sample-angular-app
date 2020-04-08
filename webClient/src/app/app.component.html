@@ -8,7 +8,7 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="app-component test-panel-container">
+<div class="app-component test-panel-container" (contextmenu)="onRightClick($event)">
   <div class="test-panel plugin-test-panel">
     <div class="bottom-10">
       <span class="bigger-bold-text"
@@ -50,7 +50,7 @@
       <span class="bold-text hide-it" i18n="window title for target app@@target-app-window-title">
         Target App Window Title (this will become the title for the target window)</span>
       <div class="div-input hide-it">
-        <input class="iframe-input input-height input-corner input-text shadowed" type="text" name="appWindowTitle" id="appWindowTitle" placeholder="app window title" value="My New Title"/>
+        <input class="iframe-input input-height input-corner input-text shadowed" type="text" placeholder="app window title" value="My New Title"/>
       </div>
       <span class="div-input bold-text" i18n="parameters@@parameters">Parameters:</span>
       <div class="div-textarea-input">
