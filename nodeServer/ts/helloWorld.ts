@@ -64,6 +64,7 @@ class HelloWorldDataservice{
         setTimeout(function () {
           if (process.clusterManager) {
             /* Here, you should see all storage data from the Sample Angular App x (# of clusters) */
+            context.storage.setAll({"54": "hello"})
             context.storage.set("Hello", "I am a late value to show things have not broken");
             context.storage.getAll().then((storage) => {
               context.logger.info("Does helloWorld have the up-to-date storage data from all clusters?\n", storage);
