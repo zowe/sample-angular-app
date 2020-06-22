@@ -11,7 +11,7 @@
 */
 
 import { Component, Inject, Optional } from '@angular/core';
-import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginWindowActions, Angular2PluginSessionEvents } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 
@@ -63,6 +63,7 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
+    @Inject(Angular2InjectionTokens.SESSION_EVENTS) private sessionEvents: Angular2PluginSessionEvents,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
@@ -73,6 +74,12 @@ export class AppComponent {
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
+    this.sessionEvents.autosaveEmitter.subscribe((thing: any)=> {
+      console.log('in the angular app, I got thing=',thing);
+      if (thing) {
+        thing({'Savethis':"Hello world"});
+      }
+    });
   }
 
   handleLaunchOrMessageObject(data: any) {
@@ -143,6 +150,9 @@ export class AppComponent {
     });
   }
 
+  /*
+    This does a manual save to the plugin's own storage area, as opposed to a desktop-orchestrated autosave
+   */
   saveToServer(): void {
     zip(
       this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters)
