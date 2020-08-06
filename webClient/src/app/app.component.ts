@@ -21,6 +21,7 @@ import { SettingsService } from './services/settings.service';
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 import { catchError } from 'rxjs/operators';
 import { zip, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -65,7 +66,8 @@ export class AppComponent {
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
-    private settingsService: SettingsService) {   
+    private settingsService: SettingsService,
+    private http: HttpClient) {   
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
     this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
@@ -145,7 +147,13 @@ export class AppComponent {
 
   getServerInfo(){
     this.settingsService.getInfoByPid().subscribe(res => {
-      console.log('TIMS RES: ', res);
+      let pidReq = this.http.get<any>(ZoweZLUX.uriBroker.serverRootUri('pid'));
+      pidReq.subscribe(res2 => {
+        let pid = res2;
+        let procs = res.procs;
+        let filteredProcs = procs.filter(obj => obj.PID == pid);
+        console.log('FILTERED PROCS', filteredProcs);
+      })
     })
   }
 

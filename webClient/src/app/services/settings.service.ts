@@ -28,10 +28,6 @@ export class SettingsService {
   }
 
   getInfoByPid(){
-    let pid = this.http.get<any>(ZoweZLUX.uriBroker.serverRootUri('pid'));
-    pid.subscribe(res => {
-      console.log('TIMS PID YO:', res);
-    })
     return this.http.get<any>(ZoweZLUX.uriBroker.serverRootUri('ZLUX/plugins/com.rs.ztop/services/sys/_current/ps'));
   }
 
