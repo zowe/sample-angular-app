@@ -143,6 +143,12 @@ export class AppComponent {
     });
   }
 
+  getServerInfo(){
+    this.settingsService.getInfoByPid().subscribe(res => {
+      console.log('TIMS RES: ', res);
+    })
+  }
+
   saveToServer(): void {
     zip(
       this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters)

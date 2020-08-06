@@ -27,6 +27,10 @@ export class SettingsService {
     return this.http.get<any>(ZoweZLUX.uriBroker.pluginConfigUri(this.plugin, 'requests/app', undefined));
   }
 
+  getInfoByPid(){
+    return this.http.get<any>(ZoweZLUX.uriBroker.serverRootUri('com.rs.ztop/services/sys/_current/ps'));
+  }
+
   saveAppRequest(actionType: string, targetMode: string, parameters: string) {
     const requestBody = {
       "_objectType": "org.zowe.zlux.sample.setting.request.app.parameters",
