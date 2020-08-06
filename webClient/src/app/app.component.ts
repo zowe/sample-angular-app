@@ -151,7 +151,7 @@ export class AppComponent {
       pidReq.subscribe(res2 => {
         let pid = res2;
         let procs = res.procs;
-        let filteredProcs = procs.filter(obj => obj.PID == pid);
+        let filteredProcs = procs.filter((obj:any) => obj.PID == pid);
         console.log('FILTERED PROCS', filteredProcs);
       })
     })
