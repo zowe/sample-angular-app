@@ -16,7 +16,8 @@
     "defaultWindowStyle": {
       "width": 850,
       "height": 450
-    }
+    },
+    "autosave": true
   },
   "dataServices": [
     {
