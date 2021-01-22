@@ -27,7 +27,7 @@
       <div class="div-input">
         <input class="iframe-input input-height input-corner input-text shadowed" type="text" [(ngModel)]="targetAppId"/>
       </div>
-      <div>
+      <div *ngIf="!asEvent">
         <!-- Action types are used to determine what sort of Action is being taken on whatever App instance is the target. Launch simply creates a new instance with the context you provide, but Message can be used to communicate with an already open Instance to drive some action -->
         
         <label class="bold-text" i18n="type of action|choose a type of action to perform@@action-type">Action Type: </label>
@@ -38,7 +38,7 @@
         <label for="actionMessage" i18n="send a message to another app@@message">Message</label>
       </div>
       <!-- App target modes are used to determine which instance of an App should be communicated with. You can create a new instance to send the Action to, or you could reuse an existing instance that is open. -->
-      <div>
+      <div *ngIf="!asEvent">
         <label class="bold-text"
         i18n="action mode|how to handle launch depending on whether target app has already been launched@@app-target-mode">App Target Mode: </label>
         <input type="radio" [(ngModel)]="targetMode" name="targetMode" value="PluginCreate">
@@ -46,7 +46,17 @@
 
         <input type="radio" [(ngModel)]="targetMode" name="targetMode" value="PluginFindAnyOrCreate">
         <label for="targetReuse" i18n="reuse any open app@@reuse-any-open">Reuse Any Open</label>
-      </div>      
+      </div>
+      <div>
+        <label class="bold-text" i18n="request v2"> Request V2 </label>
+        <input type="checkbox" [(ngModel)]="asEvent" name="asEvent" value="asEvent">
+      </div>
+      <div *ngIf="asEvent">
+      <span class="bold-text" i18n="event name">Event Name: </span>
+      <div class="div-input"> 
+        <input class="iframe-input input-height input-corner input-text shadowed" type="text" [(ngModel)]="eventName"/>
+      </div>
+      </div>
       <span class="bold-text hide-it" i18n="window title for target app@@target-app-window-title">
         Target App Window Title (this will become the title for the target window)</span>
       <div class="div-input hide-it">
