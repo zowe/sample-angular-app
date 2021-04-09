@@ -27,13 +27,15 @@ export class SettingsService {
     return this.http.get<any>(ZoweZLUX.uriBroker.pluginConfigUri(this.plugin, 'requests/app', undefined));
   }
 
-  saveAppRequest(actionType: string, targetMode: string, parameters: string) {
+  saveAppRequest(actionType: string, targetMode: string, parameters: string, asEvent: boolean, eventName: string) {
     const requestBody = {
       "_objectType": "org.zowe.zlux.sample.setting.request.app.parameters",
-      "_metaDataVersion": "1.0.0",
+      "_metaDataVersion": "1.1.0",
       "actionType": actionType,
       "appTarget": targetMode,
-      "parameters": parameters
+      "parameters": parameters,
+      "asEvent": asEvent,
+      "eventName": eventName
     }
     return this.http.put(ZoweZLUX.uriBroker.pluginConfigUri(this.plugin, 'requests/app', 'parameters'), requestBody);
   }

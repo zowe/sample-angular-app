@@ -10,7 +10,7 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Component, Inject, Optional } from '@angular/core';
+import { Component, Inject, Optional} from '@angular/core';
 import { Angular2InjectionTokens, ContextMenuItem, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
 
 import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
@@ -55,6 +55,8 @@ export class AppComponent {
   helloText = '';
   serverResponseMessage: string;
   private menuItems: ContextMenuItem[];
+  public asEvent: boolean;
+  public eventName: string;
 
   constructor(
     public locale: LocaleService,
@@ -62,10 +64,12 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
+    @Inject(Angular2InjectionTokens.INSTANCE_ID) private instanceId: string,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
+
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
     this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
@@ -75,6 +79,15 @@ export class AppComponent {
     }
   }
 
+  ngAfterContentInit() {
+    //INSTANCE_ID
+    ZoweZLUX.dispatcher.registerEventListener('hello', (event:any)=> {
+      console.log('got event detail=',event.detail);
+      event.detail.return = 'hello';
+    },this.instanceId);
+    ZoweZLUX.dispatcher.callAny('hello', this.pluginDefinition.getBasePlugin().getIdentifier(), {a:'b', c: false});
+  }
+  
   handleLaunchOrMessageObject(data: any) {
     switch (data.type) {
     case 'setAppRequest':
@@ -134,6 +147,8 @@ export class AppComponent {
         this.actionType = paramData.actionType;
         this.targetMode = paramData.appTarget;
         this.targetAppId = res.contents.appid.data.appId;
+        this.asEvent = !!paramData.asEvent;
+        this.eventName = paramData.eventName ? paramData.eventName : '';
       } else {
         this.log.warn(`Incomplete data. AppID or Parameters missing.`);
       }
@@ -145,7 +160,7 @@ export class AppComponent {
 
   saveToServer(): void {
     zip(
-      this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters)
+      this.settingsService.saveAppRequest(this.actionType, this.targetMode, this.parameters, this.asEvent, this.eventName)
         .pipe(catchError(err => {
           this.log.warn(`Error on saving parameters, e=${err}`);
           this.callStatus = 'Error saving parameters';
@@ -207,7 +222,7 @@ export class AppComponent {
         let type = dispatcher.constants.ActionType[this.actionType];
         let mode = dispatcher.constants.ActionTargetMode[this.targetMode];
 
-        if (type != undefined && mode != undefined) {
+        if (!this.asEvent && type != undefined && mode != undefined) {
           let actionTitle = 'Launch app from sample app';
           let actionID = 'org.zowe.zlux.sample.launch';
           let argumentFormatter = {data: {op:'deref',source:'event',path:['data']}};
@@ -215,12 +230,26 @@ export class AppComponent {
             Actions are also typically associated with Recognizers, which execute an Action when a certain pattern is seen in the running App.
           */
           let action = dispatcher.makeAction(actionID, actionTitle, mode,type,this.targetAppId,argumentFormatter);
+//          console.log('forgetting params=',parameters);
+          //          let argumentData = {'data':{'type':'get','callback':(d:any)=> {console.log('i got called back with d=',d);}}};
           let argumentData = {'data':(parameters ? parameters : this.parameters)};
           this.log.info((message = this.translation.translate('request_succeeded'))); // App request succeeded
           this.callStatus = message;
           /*Just because the Action is invoked does not mean the target App will accept it. We've made an Action on the fly,
             So the data could be in any shape under the "data" attribute and it is up to the target App to take action or ignore this request*/
           dispatcher.invokeAction(action,argumentData);
+        } else if (this.asEvent) {
+          let retVal = ZoweZLUX.dispatcher.callAny(this.eventName, this.targetAppId, parameters);
+          if (!!retVal.then) {
+            retVal.then((response)=> {
+              if (typeof response == 'object' || typeof response == 'function') {
+                this.callStatus = JSON.stringify(response);
+              } else {
+                this.callStatus = response;
+              }
+            });
+          }
+          this.log.info('callAny returned with val=',retVal);
         } else {
           this.log.warn((message = 'Invalid target mode or action type specified'));        
         }
