@@ -23,6 +23,7 @@ import {HelloService} from './services/hello.service';
 import { TranslationModule, L10nConfig, ISOCode, L10nLoader, LOCALE_CONFIG,
   TRANSLATION_CONFIG, LocaleConfig, TranslationConfig } from 'angular-l10n';
 import { Angular2L10nConfig, Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { StorageService } from './services/storage.service';
 
 
 const l10nConfig: L10nConfig = {
@@ -47,7 +48,7 @@ const l10nConfig: L10nConfig = {
     ZluxPopupManagerModule,
     TranslationModule.forRoot(l10nConfig)
   ],
-  providers: [HelloService],
+  providers: [HelloService, StorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { 

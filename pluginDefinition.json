@@ -15,7 +15,7 @@
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
       "width": 850,
-      "height": 450
+      "height": 520
     }
   },
   "dataServices": [
@@ -24,6 +24,15 @@
       "name": "hello",
       "filename": "helloWorld.js",
       "routerFactory": "helloWorldRouter",
+      "dependenciesIncluded": true,
+      "initializerLookupMethod": "external",
+      "version": "1.0.1"
+    },
+    {
+      "type": "router",
+      "name": "storage",
+      "filename": "storage.js",
+      "routerFactory": "storageRouter",
       "dependenciesIncluded": true,
       "initializerLookupMethod": "external",
       "version": "1.0.1"
