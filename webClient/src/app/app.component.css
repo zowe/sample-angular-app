@@ -116,6 +116,47 @@ h1 {
 .dataservice-test-panel {
   border-left: outset;
 }
+
+.test-storage {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1 1 auto;
+}
+
+.test-storage div{
+  margin: 2px 2px;
+}
+
+.test-storage .row {
+  display: flex;
+  height: 1.8rem;
+}
+
+.test-storage .row span{
+  width: 4rem;
+  flex: 0 0 auto;
+  margin: 0.2rem 0;
+}
+
+.test-storage .row input,select {
+  flex: 1 1 auto;
+}
+
+.test-storage .controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.test-storage .controls zlux-button {
+  width: 6rem;
+}
+.test-storage .controls zlux-button.wide {
+  flex: 1 1 auto;
+}
+
+
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
