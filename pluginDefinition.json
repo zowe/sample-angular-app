@@ -15,7 +15,7 @@
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
       "width": 850,
-      "height": 520
+      "height": 540
     }
   },
   "dataServices": [
@@ -30,7 +30,7 @@
     },
     {
       "type": "router",
-      "name": "storage",
+      "name": "appServerStorage",
       "filename": "storage.js",
       "routerFactory": "storageRouter",
       "dependenciesIncluded": true,
@@ -45,7 +45,6 @@
       "methods": [
         "GET",
         "POST",
-        "PUT",
         "DELETE"
       ],
       "initializerName": "storageServiceInstaller",

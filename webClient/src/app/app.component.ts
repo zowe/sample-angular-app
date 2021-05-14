@@ -21,7 +21,7 @@ import { SettingsService } from './services/settings.service';
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 import { catchError } from 'rxjs/operators';
 import { zip, throwError } from 'rxjs';
-import { StorageService, StorageType } from './services/storage.service';
+import { StorageServer, StorageService, StorageType } from './services/storage.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -61,13 +61,8 @@ export class AppComponent {
   storageKey: string;
   storageValue: string;
   storageStatus: string = 'ready';
-  storageTypes: {title: string; value?: StorageType}[] = [
-    {title: 'Default'},
-    {title: 'HA', value: 'ha'},
-    {title: 'Cluster', value: 'cluster'},
-    {title: 'Local' , value: 'local'}
-  ];
-  selectedStorageType = this.storageTypes[0];
+  storageServer: StorageServer = 'app-server';
+  storageType?: StorageType;
 
   constructor(
     public locale: LocaleService,
@@ -370,7 +365,7 @@ export class AppComponent {
 
   storageGet(): void {
     this.storageStatus = 'waiting...';
-    this.storageService.get(this.storageKey, this.selectedStorageType.value)
+    this.storageService.get(this.storageKey, this.storageServer, this.storageType)
       .subscribe(
         value => {
           this.storageValue = value;
@@ -380,7 +375,7 @@ export class AppComponent {
 
   storageSet(): void {
     this.storageStatus = 'waiting...';
-    this.storageService.set(this.storageKey, this.storageValue, this.selectedStorageType.value)
+    this.storageService.set(this.storageKey, this.storageValue, this.storageServer, this.storageType)
       .subscribe(() => {
         this.storageClearValue();
         this.storageStatus = 'ok'
@@ -389,7 +384,7 @@ export class AppComponent {
 
   storageDelete(): void {
     this.storageStatus = 'waiting...';
-    this.storageService.delete(this.storageKey, this.selectedStorageType.value)
+    this.storageService.delete(this.storageKey, this.storageServer, this.storageType)
       .subscribe(() => {
         this.storageClearValue();
         this.storageStatus = 'ok'
@@ -398,7 +393,7 @@ export class AppComponent {
 
   storageDeleteAll(): void {
     this.storageStatus = 'waiting...';
-    this.storageService.deleteAll(this.selectedStorageType.value)
+    this.storageService.deleteAll(this.storageType)
       .subscribe(() => {
         this.storageClearValue();
         this.storageStatus = 'ok'
@@ -407,11 +402,21 @@ export class AppComponent {
 
   storageSetAll(): void {
     this.storageStatus = 'waiting...';
-    this.storageService.setAll({ [this.storageKey]: this.storageValue }, this.selectedStorageType.value)
+    this.storageService.setAll({ [this.storageKey]: this.storageValue }, this.storageType)
       .subscribe(() => {
         this.storageClearValue();
         this.storageStatus = 'ok'
       }, err => this.handleStorageError(err));
+  }
+
+  get zssServerSelected(): boolean {
+    return this.storageServer === 'zss';
+  }
+
+  storageServerChanged(storageServer: StorageServer): void {
+    if (storageServer === 'zss' && this.storageType === 'cluster') {
+      this.storageType = undefined;
+    }
   }
 
   private storageClearValue(): void {

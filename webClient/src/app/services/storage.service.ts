@@ -17,19 +17,23 @@ import { map } from 'rxjs/operators';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 export type StorageType = 'ha' | 'cluster' | 'local';
+export type StorageServer = 'zss' | 'app-server';
 @Injectable()
 export class StorageService {
-  private uri: string;
 
   constructor(
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     private http: HttpClient
   ) {
-    this.uri = ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'storage', '');
   }
 
-  private makeKeyUri(key: string, storageType?: StorageType): string {
-    let uri = this.uri;
+  private getStorageApiUri(apiTarget: StorageServer): string {
+    const serviceName = (apiTarget === 'zss') ? 'zssStorage' : 'appServerStorage';
+    return ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), serviceName, '');
+  }
+
+  private makeKeyUri(key: string, apiTarget: StorageServer, storageType?: StorageType): string {
+    let uri = this.getStorageApiUri(apiTarget);
     if (!uri.endsWith('/')) {
       uri += '/';
     }
@@ -41,7 +45,7 @@ export class StorageService {
   }
 
   private makeAllUri(storageType?: StorageType): string {
-    let uri = this.uri;
+    let uri = this.getStorageApiUri('app-server');
     if (!uri.endsWith('/')) {
       uri += '/';
     }
@@ -51,8 +55,8 @@ export class StorageService {
     return uri;
   }
 
-  get(key: string, storageType?: StorageType): Observable<string> {
-    const uri = this.makeKeyUri(key, storageType);
+  get(key: string, apiTarget: StorageServer, storageType?: StorageType): Observable<string> {
+    const uri = this.makeKeyUri(key, apiTarget, storageType);
     return this.http.get<{ key: string, value: string }>(uri).pipe(map(body => body.value));
   }
 
@@ -61,8 +65,8 @@ export class StorageService {
     return this.http.get<{[key:string]:string}>(uri);
   }
 
-  set(key: string, value: string, storageType?: StorageType): Observable<void> {
-    const uri = this.makeKeyUri(key, storageType);
+  set(key: string, value: string, apiTarget: StorageServer, storageType?: StorageType): Observable<void> {
+    const uri = this.makeKeyUri(key, apiTarget, storageType);
     return this.http.post<void>(uri, { value });
   }
 
@@ -71,8 +75,8 @@ export class StorageService {
     return this.http.post<void>(uri, dict);
   }
 
-  delete(key: string, storageType?: StorageType): Observable<void> {
-    const uri = this.makeKeyUri(key, storageType);
+  delete(key: string, apiTarget: StorageServer, storageType?: StorageType): Observable<void> {
+    const uri = this.makeKeyUri(key, apiTarget, storageType);
     return this.http.delete<void>(uri);
   }
 
