@@ -27,13 +27,13 @@ export class StorageService {
   ) {
   }
 
-  private getStorageApiUri(apiTarget: StorageServer): string {
-    const serviceName = (apiTarget === 'zss') ? 'zssStorage' : 'appServerStorage';
+  private getStorageApiUri(storageServer: StorageServer): string {
+    const serviceName = (storageServer === 'zss') ? 'zssStorage' : 'appServerStorage';
     return ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), serviceName, '');
   }
 
-  private makeKeyUri(key: string, apiTarget: StorageServer, storageType?: StorageType): string {
-    let uri = this.getStorageApiUri(apiTarget);
+  private makeKeyUri(key: string, storageServer: StorageServer, storageType?: StorageType): string {
+    let uri = this.getStorageApiUri(storageServer);
     if (!uri.endsWith('/')) {
       uri += '/';
     }
@@ -55,8 +55,8 @@ export class StorageService {
     return uri;
   }
 
-  get(key: string, apiTarget: StorageServer, storageType?: StorageType): Observable<string> {
-    const uri = this.makeKeyUri(key, apiTarget, storageType);
+  get(key: string, storageServer: StorageServer, storageType?: StorageType): Observable<string> {
+    const uri = this.makeKeyUri(key, storageServer, storageType);
     return this.http.get<{ key: string, value: string }>(uri).pipe(map(body => body.value));
   }
 
@@ -65,8 +65,8 @@ export class StorageService {
     return this.http.get<{[key:string]:string}>(uri);
   }
 
-  set(key: string, value: string, apiTarget: StorageServer, storageType?: StorageType): Observable<void> {
-    const uri = this.makeKeyUri(key, apiTarget, storageType);
+  set(key: string, value: string, storageServer: StorageServer, storageType?: StorageType): Observable<void> {
+    const uri = this.makeKeyUri(key, storageServer, storageType);
     return this.http.post<void>(uri, { value });
   }
 
@@ -75,8 +75,8 @@ export class StorageService {
     return this.http.post<void>(uri, dict);
   }
 
-  delete(key: string, apiTarget: StorageServer, storageType?: StorageType): Observable<void> {
-    const uri = this.makeKeyUri(key, apiTarget, storageType);
+  delete(key: string, storageServer: StorageServer, storageType?: StorageType): Observable<void> {
+    const uri = this.makeKeyUri(key, storageServer, storageType);
     return this.http.delete<void>(uri);
   }
 
