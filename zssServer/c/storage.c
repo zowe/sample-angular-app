@@ -76,9 +76,11 @@ static void respondWithStorageError(HttpResponse *response, const char *fmt, ...
   finishResponse(response);
 }
 
+#define URI_MAX_PART_COUNT 6
+#define URI_LAST_PART_INDEX (URI_MAX_PART_COUNT - 1)
+
 static char* getKey(HttpRequest *request) {
-  int keyStart = 5;
-  char *encodedKey = stringListPrint(request->parsedFile, keyStart, 1, "/", 0);
+  char *encodedKey = stringListPrint(request->parsedFile, URI_LAST_PART_INDEX, 1, "/", 0);
   return cleanURLParamValue(request->slh, encodedKey);
 }
 
@@ -204,7 +206,7 @@ static int serveStorage(HttpService *service, HttpResponse *response) {
   DataService *dataService = (DataService*)service->userPointer;
   StorageServiceData *serviceData = (StorageServiceData*)dataService->extension;
   int urlLen = stringListLength(request->parsedFile);
-  if (urlLen != 6) {
+  if (urlLen != URI_MAX_PART_COUNT) {
     respondWithBadRequestError(response, "Bad Request: URI not supported");
     return 0;
   }
