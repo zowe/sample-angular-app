@@ -8,35 +8,45 @@
 #
 #  Copyright Contributors to the Zowe Project.
 ################################################################################
-TARGET=../../lib/storage.so
+export _C89_ACCEPTABLE_RC=0
 ZSS=~/zowe/zss
-ZOWECOMMON="${ZSS}/deps/zowe-common-c"
+WORKDIR=$(dirname "$0")
+TARGET="${WORKDIR}/../../lib/storage.so"
+COMMON="${ZSS}/deps/zowe-common-c"
 LIBDIR=$(dirname "${TARGET}")
+TMP="${WORKDIR}/tmp"
 
-mkdir tmp 2>/dev/null
-mkdir "$LIBDIR" 2>/dev/null
+mkdir "${TMP}" 2>/dev/null
+mkdir "${LIBDIR}" 2>/dev/null
+rm -f "${TARGET}"
 
 
-(
-  cd tmp && \
-  c89 -D_XOPEN_SOURCE=600 -DAPF_AUTHORIZED=0 -DNOIBMHTTP \
+cd "${TMP}" || exit 8
+
+if ! c89 \
+  -D_XOPEN_SOURCE=600 \
+  -DAPF_AUTHORIZED=0 \
+  -DNOIBMHTTP \
   "-Wa,goff" "-Wc,langlvl(EXTC99),float(HEX),agg,expo,list(),so(),search(),\
-  goff,xref,gonum,roconst,gonum,asm,asmlib('SYS1.MACLIB'),asmlib('CEE.SCEEMAC'),dll" -Wl,dll \
+  goff,xref,gonum,roconst,gonum,asm,asmlib('SYS1.MACLIB'),asmlib('CEE.SCEEMAC'),dll" \
+   -Wl,dll \
   -I "${ZSS}/h" \
-  -I "${ZOWECOMMON}/h" \
-  -I../../h \
+  -I "${COMMON}/h" \
   -o "../${TARGET}" \
   ../../c/storage.c \
-  ../pluginAPI.x \
-)
-rm -rf tmp 2>/dev/null
+  ../pluginAPI.x
+then
+  echo "Build failed"
+  RC=8
+else
+  echo "Build successful"
+  extattr +p "../${TARGET}"
+  RC=0
+fi
 
-extattr +p "${TARGET}"
+cd ".." && rm -rf "${TMP}"
 
-# Remove lines below
-cp -v "${TARGET}" ~/zowe/zlux/lib/storage.so
-extattr +p ~/zowe/zlux/lib/storage.so
-
+exit $RC
 ################################################################################
 #  This program and the accompanying materials are
 #  made available under the terms of the Eclipse Public License v2.0 which accompanies
