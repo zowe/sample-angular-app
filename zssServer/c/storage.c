@@ -29,22 +29,17 @@
 #include "http.h"
 #include "storage.h"
 
-
 typedef struct StorageServiceData_t {
   long loggingId;
 } StorageServiceData;
 
 static void respondWithUnsupportedMethodError(HttpResponse *response) {
   jsonPrinter *p = respondWithJsonPrinter(response);
-
   setResponseStatus(response, 405, "Method Not Allowed");
   setDefaultJSONRESTHeaders(response);
   writeHeader(response);
-
   jsonStart(p);
-  {
-    jsonAddString(p, "error", "This method is not supported");
-  }
+  jsonAddString(p, "err", "This method is not supported");
   jsonEnd(p);
   finishResponse(response);
 }
@@ -60,7 +55,7 @@ static void respondWithBadRequestError(HttpResponse *response, const char *fmt, 
   setDefaultJSONRESTHeaders(response);
   writeHeader(response);
   jsonStart(p);
-  jsonAddString(p, "error", buf);
+  jsonAddString(p, "err", buf);
   jsonEnd(p);
   finishResponse(response);
 }
@@ -76,7 +71,7 @@ static void respondWithStorageError(HttpResponse *response, const char *fmt, ...
   setDefaultJSONRESTHeaders(response);
   writeHeader(response);
   jsonStart(p);
-  jsonAddString(p, "error", buf);
+  jsonAddString(p, "err", buf);
   jsonEnd(p);
   finishResponse(response);
 }
