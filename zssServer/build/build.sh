@@ -32,7 +32,7 @@ if ! c89 \
   -I "${ZSS}/h" \
   -I "${COMMON}/h" \
   -o "${TARGET}" \
-  ../../c/storage.c \
+  ../../src/storage.c \
   ../pluginAPI.x
 then
   echo "Build failed"
