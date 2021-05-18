@@ -9,19 +9,18 @@
 #  Copyright Contributors to the Zowe Project.
 ################################################################################
 export _C89_ACCEPTABLE_RC=0
-ZSS=~/zowe/zss
 WORKDIR=$(dirname "$0")
-TARGET="${WORKDIR}/../../lib/storage.so"
-COMMON="${ZSS}/deps/zowe-common-c"
-LIBDIR=$(dirname "${TARGET}")
 TMP="${WORKDIR}/tmp"
-
 mkdir "${TMP}" 2>/dev/null
+cd "${TMP}" || exit 8
+
+TARGET="../../../lib/storage.so"
+LIBDIR=$(dirname "${TARGET}")
 mkdir "${LIBDIR}" 2>/dev/null
 rm -f "${TARGET}"
 
-
-cd "${TMP}" || exit 8
+ZSS="../../../../../zss"
+COMMON="${ZSS}/deps/zowe-common-c"
 
 if ! c89 \
   -D_XOPEN_SOURCE=600 \
@@ -32,7 +31,7 @@ if ! c89 \
    -Wl,dll \
   -I "${ZSS}/h" \
   -I "${COMMON}/h" \
-  -o "../${TARGET}" \
+  -o "${TARGET}" \
   ../../c/storage.c \
   ../pluginAPI.x
 then
@@ -40,11 +39,9 @@ then
   RC=8
 else
   echo "Build successful"
-  extattr +p "../${TARGET}"
+  extattr +p "${TARGET}"
   RC=0
 fi
-
-cd ".." && rm -rf "${TMP}"
 
 exit $RC
 ################################################################################
