@@ -19,7 +19,9 @@ LIBDIR=$(dirname "${TARGET}")
 mkdir "${LIBDIR}" 2>/dev/null
 rm -f "${TARGET}"
 
-ZSS="../../../../../zss"
+if [ -z "${ZSS}" ]; then
+  ZSS="../../../../../zss"
+fi
 COMMON="${ZSS}/deps/zowe-common-c"
 
 if ! c89 \
