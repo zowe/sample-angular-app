@@ -1,69 +1,16 @@
 swagger: '2.0'
 info:
-  description: This service provides access to Storage API
+  description: This service provides access to Storage API using ZSS Server
   version: 1.0.0
   title: Storage DataService API
 host: localhost
-basePath: /storage
+basePath: /zssStorage
 schemes:
   - http
   - https
 tags:
   - name: Storage
 paths:
-  /:
-    post:
-      summary: Set all key/value pairs in Storage
-      description: Set all key/value pairs in Storage using object as source.
-      operationId: setAll
-      tags:
-        - Storage
-      consumes:
-        - application/json
-      parameters:
-        - $ref: '#/parameters/storageType'
-        - $ref: '#/parameters/dict'
-      responses:
-        204:
-          description: Success
-        500:
-          description: Error
-          schema:
-            $ref: '#/definitions/Error'
-    get:
-      summary: Get all key/value pairs from Storage
-      description: Get all key/value pairs as object from Storage
-      operationId: getAll
-      tags:
-        - Storage
-      produces:
-        - application/json
-      parameters:
-        - $ref: '#/parameters/storageType'
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Dict'
-        500:
-          description: Error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      summary: Delete all key/value pairs from Storage
-      description: Clear Storage
-      operationId: deleteAll
-      tags:
-        - Storage
-      parameters:
-        - $ref: '#/parameters/storageType'
-      responses:
-        204:
-          description: Success
-        500:
-          description: Error
-          schema:
-            $ref: '#/definitions/Error'
   /{key}:
     post:
       summary: Set value for a given key in Storage
@@ -99,7 +46,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Dict'
+            $ref: '#/definitions/Pair'
         500:
           description: Error
           schema:
@@ -127,7 +74,7 @@ parameters:
     name: storageType
     required: false
     type: string
-    enum: [local, cluster, ha]
+    enum: [local, ha]
     description: Storage location type
   key:
     in: path
@@ -142,25 +89,27 @@ parameters:
       type: object
       properties:
         value:
-          $ref: '#/definitions/AnyValue'
+          type: string
       example:
-        value: 'someValue'
-  dict:
+        value: 'myValue'
+  pair:
     in: body
     required: true
-    name: dict
+    name: pair
     schema:
-      $ref: '#/definitions/Dict'
+      $ref: '#/definitions/Pair'
 
 definitions:
-  AnyValue: {}
-  Dict:
+  Pair:
     type: object
-    additionalProperties:
-      $ref: '#/definitions/AnyValue'
+    properties:
+      key:
+        type: string
+      value:
+        type: string
     example:
-      key1: value1
-      key2: value2
+      key: 'myVey'
+      value: 'myValue'
   Error:
     type: object
     properties:
