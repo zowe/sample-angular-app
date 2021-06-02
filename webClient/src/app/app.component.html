@@ -1,10 +1,10 @@
-<!-- 
+<!--
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 -->
 
@@ -29,7 +29,7 @@
       </div>
       <div>
         <!-- Action types are used to determine what sort of Action is being taken on whatever App instance is the target. Launch simply creates a new instance with the context you provide, but Message can be used to communicate with an already open Instance to drive some action -->
-        
+
         <label class="bold-text" i18n="type of action|choose a type of action to perform@@action-type">Action Type: </label>
         <input type="radio" [(ngModel)]="actionType" name="actionType" value="Launch">
         <label for="actionLaunch" i18n="launch another app@@launch">Launch</label>
@@ -46,7 +46,7 @@
 
         <input type="radio" [(ngModel)]="targetMode" name="targetMode" value="PluginFindAnyOrCreate">
         <label for="targetReuse" i18n="reuse any open app@@reuse-any-open">Reuse Any Open</label>
-      </div>      
+      </div>
       <span class="bold-text hide-it" i18n="window title for target app@@target-app-window-title">
         Target App Window Title (this will become the title for the target window)</span>
       <div class="div-input hide-it">
@@ -70,7 +70,7 @@
       <span class="bigger-bold-text" i18n="test of dataservice requests@@dataservice-request-test">Dataservice Request Test</span>
     </div>
     <div>
-      <input placeholder="Message" 
+      <input placeholder="Message"
              i18n-placeholder="message|indicates that the user will enter a message@@appComponentMessage" [(ngModel)]="helloText"
       (keyup.enter)="sayHello()"/>
       <zlux-button (click)="sayHello()" [disabled]="helloText === ''"
@@ -81,17 +81,52 @@
       <textarea class="server-response" placeholder="Response" readonly
                 i18n-placeholder="@@appComponentResponse" >{{serverResponseMessage}}</textarea>
     </div>
+    <div class="test-storage">
+      <div class="bigger-bold-text" i18n="storageTest@@storageTestLabel">Storage Test</div>
+      <div class="row">
+        <span i18n="server@@server">Server</span>
+        <select [(ngModel)]="storageServer" (change)="storageServerChanged($event.target.value)">
+          <option value='zss'>ZSS</option>
+          <option value='app-server'>App Server</option>
+        </select>
+      </div>
+      <div class="row">
+        <span i18n="storage@@storage">Storage</span>
+        <select [(ngModel)]="storageType">
+          <option [ngValue]="undefined">Default</option>
+          <option value="ha">HA</option>
+          <option value="cluster" *ngIf="!zssServerSelected">Cluster</option>
+          <option value="local">Local</option>
+        </select>
+      </div>
+      <div class="row">
+        <span i18n="key@@keyLabel">Key</span><input [(ngModel)]="storageKey">
+      </div>
+      <div class="row">
+        <span i18n="value@@valueLabel">Value</span><input [(ngModel)]="storageValue">
+      </div>
+      <div><ng-container i18n="status@@stoargeStatusLabel">Status:</ng-container> {{storageStatus}}</div>
+      <div class="controls">
+        <zlux-button type="button" (click)="storageSet()" [disabled]="!storageKey || !storageValue" i18n="set@@setButtonLabel">Set</zlux-button>
+        <zlux-button type="button" (click)="storageGet()" [disabled]="!storageKey" i18n="get@@getButtonLabel">Get</zlux-button>
+        <zlux-button type="button" (click)="storageDelete()" [disabled]="!storageKey" i18n="delete@@deleteButtonLabel">Delete</zlux-button>
+      </div>
+      <div class="controls">
+        <zlux-button class="wide" type="button" (click)="storageSetAll()" [disabled]="!storageKey || !storageValue || zssServerSelected" i18n="setAll@@setAllButtonLabel">Set All</zlux-button>
+        <zlux-button class="wide"type="button" (click)="storageDeleteAll()" [disabled]="zssServerSelected" i18n="deleteAll@@deleteAllButtonLabel">Delete All</zlux-button>
+      </div>
+    </div>
   </div>
 </div>
 <zlux-popup-manager>
 </zlux-popup-manager>
 
-<!-- 
+<!--
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 -->
