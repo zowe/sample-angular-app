@@ -4,9 +4,9 @@
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */
 
@@ -21,6 +21,8 @@ import { SettingsService } from './services/settings.service';
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
 import { catchError } from 'rxjs/operators';
 import { zip, throwError } from 'rxjs';
+import { StorageServer, StorageService, StorageType } from './services/storage.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -56,16 +58,23 @@ export class AppComponent {
   serverResponseMessage: string;
   private menuItems: ContextMenuItem[];
 
+  storageKey: string;
+  storageValue: string;
+  storageStatus: string = 'ready';
+  storageServer: StorageServer = 'app-server';
+  storageType?: StorageType;
+
   constructor(
     public locale: LocaleService,
     public translation: TranslationService,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
     private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
-    private settingsService: SettingsService) {   
+    private storageService: StorageService,
+    private settingsService: SettingsService) {
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
     this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
@@ -116,12 +125,12 @@ export class AppComponent {
     });
   }
 
-  
+
   provideZLUXDispatcherCallbacks(): ZLUX.ApplicationCallbacks {
     return {
       onMessage: (eventContext: any): Promise<any> => {
         return this.zluxOnMessage(eventContext);
-      }      
+      }
     }
   }
 
@@ -193,7 +202,7 @@ export class AppComponent {
     }
     if (this.targetAppId) {
       let message = '';
-      /* 
+      /*
          With ZLUX, there's a global called ZoweZLUX which holds useful tools. So, a site
          Can determine what actions to take by knowing if it is or isnt embedded in ZLUX via IFrame.
       */
@@ -222,15 +231,15 @@ export class AppComponent {
             So the data could be in any shape under the "data" attribute and it is up to the target App to take action or ignore this request*/
           dispatcher.invokeAction(action,argumentData);
         } else {
-          this.log.warn((message = 'Invalid target mode or action type specified'));        
+          this.log.warn((message = 'Invalid target mode or action type specified'));
         }
       } else {
         this.popupManager.reportError(
           ZluxErrorSeverity.WARNING,
-          this.translation.translate('invalid_plugin_identifier'), // 
+          this.translation.translate('invalid_plugin_identifier'), //
           `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
       }
-      
+
       this.callStatus = message;
     }
   }
@@ -353,8 +362,81 @@ export class AppComponent {
     }
     return false;
   }
-  
-  
+
+  storageGet(): void {
+    this.storageStatus = 'waiting...';
+    this.storageService.get(this.storageKey, this.storageServer, this.storageType)
+      .subscribe(
+        value => {
+          this.storageValue = value;
+          this.storageStatus = 'ok'
+        }, err => this.handleStorageError(err));
+  }
+
+  storageSet(): void {
+    this.storageStatus = 'waiting...';
+    this.storageService.set(this.storageKey, this.storageValue, this.storageServer, this.storageType)
+      .subscribe(() => {
+        this.storageClearValue();
+        this.storageStatus = 'ok'
+      }, err => this.handleStorageError(err));
+  }
+
+  storageDelete(): void {
+    this.storageStatus = 'waiting...';
+    this.storageService.delete(this.storageKey, this.storageServer, this.storageType)
+      .subscribe(() => {
+        this.storageClearValue();
+        this.storageStatus = 'ok'
+      }, err => this.handleStorageError(err));
+  }
+
+  storageDeleteAll(): void {
+    this.storageStatus = 'waiting...';
+    this.storageService.deleteAll(this.storageType)
+      .subscribe(() => {
+        this.storageClearValue();
+        this.storageStatus = 'ok'
+      }, err => this.handleStorageError(err));
+  }
+
+  storageSetAll(): void {
+    this.storageStatus = 'waiting...';
+    this.storageService.setAll({ [this.storageKey]: this.storageValue }, this.storageType)
+      .subscribe(() => {
+        this.storageClearValue();
+        this.storageStatus = 'ok'
+      }, err => this.handleStorageError(err));
+  }
+
+  get zssServerSelected(): boolean {
+    return this.storageServer === 'zss';
+  }
+
+  storageServerChanged(storageServer: StorageServer): void {
+    if (storageServer === 'zss' && this.storageType === 'cluster') {
+      this.storageType = undefined;
+    }
+  }
+
+  private storageClearValue(): void {
+    this.storageValue = '';
+  }
+
+  private handleStorageError(err: any): void {
+    this.storageStatus = 'failed';
+    if (err instanceof HttpErrorResponse) {
+      if (err.error && err.error.err) {
+        this.log.warn(`Storage error: ${err.error.err}`);
+      } else {
+        this.log.warn(`Storage error: ${err.error}`);
+      }
+    } else if (err instanceof Error) {
+      this.log.warn(`Storage error: ${err.message}`);
+    } else {
+      this.log.warn(`Storage error: ${err}`);
+    }
+  }
 }
 
 
@@ -362,9 +444,9 @@ export class AppComponent {
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */
 

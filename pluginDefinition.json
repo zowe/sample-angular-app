@@ -15,7 +15,7 @@
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
       "width": 850,
-      "height": 450
+      "height": 540
     }
   },
   "dataServices": [
@@ -27,6 +27,29 @@
       "dependenciesIncluded": true,
       "initializerLookupMethod": "external",
       "version": "1.0.1"
+    },
+    {
+      "type": "router",
+      "name": "appServerStorage",
+      "filename": "storage.js",
+      "routerFactory": "storageRouter",
+      "dependenciesIncluded": true,
+      "initializerLookupMethod": "external",
+      "version": "1.0.1"
+    },
+    {
+      "type": "service",
+      "name": "zssStorage",
+      "libraryName": "storage.so",
+      "dependenciesIncluded": true,
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "initializerName": "storageServiceInstaller",
+      "initializerLookupMethod": "external",
+      "version": "0.0.1"
     }
   ],
   "configurationData": {
