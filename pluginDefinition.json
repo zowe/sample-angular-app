@@ -1,7 +1,7 @@
 {
   "identifier": "org.zowe.zlux.sample.angular",
   "apiVersion": "1.0.0",
-  "pluginVersion": "1.1.0",
+  "pluginVersion": "1.2.0",
   "pluginType": "application",
   "webContent": {
     "framework": "angular2",
@@ -27,6 +27,15 @@
       "dependenciesIncluded": true,
       "initializerLookupMethod": "external",
       "version": "1.0.1"
+    },
+    {
+      "type": "router",
+      "name": "callservice",
+      "filename": "callService.js",
+      "routerFactory": "callServiceRouter",
+      "dependenciesIncluded": true,
+      "initializerLookupMethod": "external",
+      "version": "1.0.0"
     },
     {
       "type": "router",
