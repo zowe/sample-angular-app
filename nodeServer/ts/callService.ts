@@ -29,7 +29,7 @@ class CallService{
     });
     context.addBodyParseMiddleware(router);
     router.post('/',function(req: Request,res: Response) {
-      (req as any).zluxData.plugin.callService('hello', '', {method:'POST', body: req.body, contentType:"text/plain"}).then((callRes)=> {
+      (req as any).zluxData.plugin.callService('hello', '', {method:'POST', body: req.body, contentType:req.get('content-type')}).then((callRes)=> {
         context.logger.info('callService Returned: statusCode=%s, statusMessage=%s, body length=%s',
                             callRes.statusCode,
                             callRes.statusMessage,
