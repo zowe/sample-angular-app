@@ -16,6 +16,8 @@ interface NodeModule {
   id: string;
 }
 
+declare function $localize(messageParts: TemplateStringsArray, ...expressions: readonly any[]): string;
+
 
 /*
   This program and the accompanying materials are

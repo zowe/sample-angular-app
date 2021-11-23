@@ -18,7 +18,6 @@ import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
-import { LocaleService, TranslationService, Language } from 'angular-l10n';
 import { catchError } from 'rxjs/operators';
 import { zip, throwError } from 'rxjs';
 import { StorageServer, StorageService, StorageType } from './services/storage.service';
@@ -32,7 +31,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 
 export class AppComponent {
-  @Language() lang: string;
 
   targetAppId: string = "org.zowe.terminal.tn3270";
   callStatus: string;
@@ -65,8 +63,6 @@ export class AppComponent {
   storageType?: StorageType;
 
   constructor(
-    public locale: LocaleService,
-    public translation: TranslationService,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
@@ -176,11 +172,11 @@ export class AppComponent {
     .subscribe((res:any) => {
       if (res != null) {
         this.serverResponseMessage =
-        `${this.translation.translate('server_replied_with')}
+        $localize`server_replied_with
 
         "${res.serverResponse}"`;
       } else {
-        this.serverResponseMessage = "<Empty Reply from Server>";
+        this.serverResponseMessage = $localize`<Empty Reply from Server>`;
       }
       this.log.info(res);
     });
@@ -190,7 +186,7 @@ export class AppComponent {
     var parameters = null;
     const popupOptions = {
       blocking: true,
-      buttons: [this.translation.translate('close')]
+      buttons: [$localize`close`]
     };
     /*Parameters for Actions could be a number, string, or object. The actual event context of an Action that an App recieves will be an object with attributes filled in via these parameters*/
     try {
@@ -225,76 +221,76 @@ export class AppComponent {
           */
           let action = dispatcher.makeAction(actionID, actionTitle, mode,type,this.targetAppId,argumentFormatter);
           let argumentData = {'data':(parameters ? parameters : this.parameters)};
-          this.log.info((message = this.translation.translate('request_succeeded'))); // App request succeeded
+          this.log.info((message = $localize`request_succeeded`)); // App request succeeded
           this.callStatus = message;
           /*Just because the Action is invoked does not mean the target App will accept it. We've made an Action on the fly,
             So the data could be in any shape under the "data" attribute and it is up to the target App to take action or ignore this request*/
           dispatcher.invokeAction(action,argumentData);
         } else {
-          this.log.warn((message = 'Invalid target mode or action type specified'));
+          this.log.warn((message = $localize`Invalid target mode or action type specified`));
         }
       } else {
         this.popupManager.reportError(
           ZluxErrorSeverity.WARNING,
-          this.translation.translate('invalid_plugin_identifier'), //
-          `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
+          $localize`invalid_plugin_identifier`,
+          $localize`no_plugin_found_for_identifier ${this.targetAppId}`, popupOptions);
       }
 
       this.callStatus = message;
     }
   }
 
-  generateTestMenuItems(translator: TranslationService): void {
+  generateTestMenuItems(): void {
     this.menuItems = [
         {
-          "text": translator.translate('items'),
+          "text": $localize`items`,
 //        "icon": 'icon-person',
           "action": () => {
-            this.log.info(translator.translate('items'));
+            this.log.info($localize`items`);
           },
           "children": [
             {
-              "text": translator.translate('item_1.1'),
+              "text": $localize`item_1.1`,
 //            "icon": 'icon-settings',
               "action": () => {
-                this.log.info(translator.translate('item_1.1'));
+                this.log.info($localize`item_1.1`);
               },
               "children": [
                 {
-                  "text": translator.translate('item_1.1.1'),
+                  "text": $localize`item_1.1.1`,
 //                "icon": 'icon-person',
                   "action": () => {
-                    this.log.info(translator.translate('item_1.1.1'));
+                    this.log.info($localize`item_1.1.1`);
                   }
                 },
                 {
-                  "text": translator.translate('item_1.1.2'),
+                  "text": $localize`item_1.1.2`,
 //                "icon": 'icon-person',
                   "action": () => {
-                    this.log.info(translator.translate('item_1.1.2'));
+                    this.log.info($localize`item_1.1.2`);
                   }
                 }
               ]
             },
             {
-              "text": translator.translate('item_1.2'),
+              "text": $localize`item_1.2`,
 //            "icon": 'icon-person',
               "action": () => {
-                this.log.info(translator.translate('item_1.2'));
+                this.log.info($localize`item_1.2`);
               },
               "children": [
                 {
-                  "text": translator.translate('item_1.2.1'),
+                  "text": $localize`item_1.2.1`,
 //                "icon": 'icon-person',
                   "action": () => {
-                    this.log.info(translator.translate('item_1.2.1'));
+                    this.log.info($localize`item_1.2.1`);
                   }
                 },
                 {
-                  "text": translator.translate('item_1.2.2'),
+                  "text": $localize`item_1.2.2`,
 //                "icon": 'icon-person',
                   "action": () => {
-                    this.log.info(translator.translate('item_1.2.2'));
+                    this.log.info($localize`item_1.2.2`);
                   }
                 }
               ]
@@ -302,51 +298,51 @@ export class AppComponent {
           ]
         },
         {
-          "text": translator.translate('disabled'),
+          "text": $localize`disabled`,
           "disabled": true,
 //        "icon": 'icon-person',
           "action": () => {
-            this.log.info(translator.translate('disabled'));
+            this.log.info($localize`disabled`);
           },
           "children": [
             {
-              "text": translator.translate('disabled_1.1'),
+              "text": $localize`disabled_1.1`,
 //            "icon": 'icon-person',
               "action": () => {
-                this.log.info(translator.translate('disabled_1.1'));
+                this.log.info($localize`disabled_1.1`);
               }
             },
             {
-              "text": translator.translate('disabled_1.2'),
+              "text": $localize`disabled_1.2`,
 //            "icon": 'icon-person',
               "action": () => {
-                this.log.info(translator.translate('disabled_1.2'));
+                this.log.info($localize`disabled_1.2`);
               }
             }
           ]
         },
         {
-          "text": translator.translate('persisting_item'),
+          "text": $localize`persisting_item`,
 //        "icon": 'icon-settings',
           "action": () => {
-            this.log.info(translator.translate('persisting_item'));
+            this.log.info($localize`persisting_item`);
           },
           "preventCloseMenu": true,
           "children": [
             {
-              "text": translator.translate('shortcut_item'),
+              "text": $localize`shortcut_item`,
 //            "icon": 'icon-person',
               "shortcutText": 'F5',
               "action": () => {
-                this.log.info(translator.translate('shortcut_item'));
+                this.log.info($localize`shortcut_item`);
               }
             },
             {
-              "text": translator.translate('persisting_shortcut_item'),
+              "text": $localize`persisting_shortcut_item`,
 //            "icon": 'icon-person',
               "shortcutText": 'F6',
               "action": () => {
-                this.log.info(translator.translate('persisting_shortcut_item'));
+                this.log.info($localize`persisting_shortcut_item`);
               },
               "preventCloseMenu": true
             }
@@ -357,7 +353,7 @@ export class AppComponent {
 
   onRightClick(event: MouseEvent): boolean {
     if (this.windowActions) {
-      if (!this.menuItems) {this.generateTestMenuItems(this.translation);}
+      if (!this.menuItems) {this.generateTestMenuItems();}
       this.windowActions.spawnContextMenu(event.clientX, event.clientY, this.menuItems, true);
     }
     return false;
