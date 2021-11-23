@@ -5,6 +5,7 @@
     "start": "webpack --progress --colors --watch",
     "build": "webpack --progress --colors",
     "i18n": "ng-xi18n -p tsconfig.i18n.json --i18nFormat=xlf  --outFile=messages.xlf && xliffmerge -p xliffmerge.json",
+    "localize": "localize-extract -s ../web/main.js -f xlf -o messages-l.xlf",
     "lint": "tslint -c tslint.json \"./**/*.ts\"",
     "localize-extract": "localize-extract --format=legacy-migrate --source=../web/main.js --outputPath=./messages.json"
   },
