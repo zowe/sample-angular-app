@@ -18,7 +18,7 @@ import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
-import { LocaleService, TranslationService, Language } from 'angular-l10n';
+import { L10nTranslationService } from 'angular-l10n';
 import { catchError } from 'rxjs/operators';
 import { zip, throwError } from 'rxjs';
 import { StorageServer, StorageService, StorageType } from './services/storage.service';
@@ -32,7 +32,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 
 export class AppComponent {
-  @Language() lang: string;
 
   targetAppId: string = "org.zowe.terminal.tn3270";
   callStatus: string;
@@ -65,8 +64,7 @@ export class AppComponent {
   storageType?: StorageType;
 
   constructor(
-    public locale: LocaleService,
-    public translation: TranslationService,
+    public translation: L10nTranslationService,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
@@ -244,7 +242,7 @@ export class AppComponent {
     }
   }
 
-  generateTestMenuItems(translator: TranslationService): void {
+  generateTestMenuItems(translator: L10nTranslationService): void {
     this.menuItems = [
         {
           "text": translator.translate('items'),
