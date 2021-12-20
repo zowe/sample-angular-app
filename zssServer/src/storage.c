@@ -30,7 +30,7 @@
 #include "storage.h"
 
 typedef struct StorageServiceData_t {
-  long loggingId;
+  uint64 loggingId;
 } StorageServiceData;
 
 static void respondWithUnsupportedMethodError(HttpResponse *response) {
@@ -205,14 +205,17 @@ static int serveStorage(HttpService *service, HttpResponse *response) {
   HttpRequest *request = response->request;
   DataService *dataService = (DataService*)service->userPointer;
   StorageServiceData *serviceData = (StorageServiceData*)dataService->extension;
+  zowelog(NULL, serviceData->loggingId, ZOWE_LOG_DEBUG2, "begin %s\n", __FUNCTION__);
   int urlLen = stringListLength(request->parsedFile);
   if (urlLen != URI_MAX_PART_COUNT) {
+    zowelog(NULL, serviceData->loggingId, ZOWE_LOG_DEBUG, "URI not supported\n");
     respondWithBadRequestError(response, "Bad Request: URI not supported");
     return 0;
   }
   char *key = getKey(request);
   char *storageType = getStorageType(request);
   if (storageType && !isValidStorageType(storageType)) {
+    zowelog(NULL, serviceData->loggingId, ZOWE_LOG_DEBUG, "Unrecognized storage type '%s', known types are 'ha' and 'local'\n", storageType);
     respondWithBadRequestError(response, "Unrecognized storage type, known types are 'ha' and 'local'");
     return 0;
   }
@@ -223,10 +226,12 @@ static int serveStorage(HttpService *service, HttpResponse *response) {
   }
   Handler handler = findRequestHandler(request);
   if (!handler) {
+    zowelog(NULL, serviceData->loggingId, ZOWE_LOG_DEBUG, "%s method  is not supported\n", request->method);
     respondWithUnsupportedMethodError(response);
     return 0;
   }
   handler(storage, response);
+  zowelog(NULL, serviceData->loggingId, ZOWE_LOG_DEBUG2, "end %s\n", __FUNCTION__);
   return 0;
 }
 
