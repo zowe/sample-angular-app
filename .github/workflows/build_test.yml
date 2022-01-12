@@ -50,7 +50,9 @@ jobs:
             ${{ runner.os }}-build-cache-node-modules-
       
       - name : 'npm install'
-        run: npm install -g npm 
+        run: |
+          git config --globalurl."https://".insteadOfgit://
+          npm cache clean --force
         
       - name: '[Prep 3] Setup Node'
         uses: actions/setup-node@v2
