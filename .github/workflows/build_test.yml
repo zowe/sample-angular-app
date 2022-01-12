@@ -48,11 +48,6 @@ jobs:
           key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-cache-node-modules-
-      
-      - name : 'npm install'
-        run: |
-          git config --globalurl."https://".insteadOfgit://
-          npm cache clean --force
         
       - name: '[Prep 3] Setup Node'
         uses: actions/setup-node@v2
