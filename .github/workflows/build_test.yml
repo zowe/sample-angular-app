@@ -48,6 +48,8 @@ jobs:
           key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-cache-node-modules-
+      - name: 'Test'
+        run: git config --list
         
       - name: '[Prep 3] Setup Node'
         uses: actions/setup-node@v2
