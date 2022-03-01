@@ -2,7 +2,9 @@ name: Build sample-angular-app workflow
 on:
   push:
     branches:
-      - staging, master, rc 
+      - v1.x/staging
+      - master
+      - rc 
   pull_request:
     types: [opened, reopened, synchronize]
 
