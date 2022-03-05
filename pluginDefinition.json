@@ -1,7 +1,7 @@
 {
   "identifier": "org.zowe.zlux.sample.angular",
   "apiVersion": "1.0.0",
-  "pluginVersion": "1.1.0",
+  "pluginVersion": "1.2.1",
   "pluginType": "application",
   "webContent": {
     "framework": "angular2",
@@ -15,7 +15,7 @@
     "isSingleWindowApp": true,
     "defaultWindowStyle": {
       "width": 850,
-      "height": 520
+      "height": 540
     }
   },
   "dataServices": [
@@ -30,12 +30,35 @@
     },
     {
       "type": "router",
-      "name": "storage",
+      "name": "callservice",
+      "filename": "callService.js",
+      "routerFactory": "callServiceRouter",
+      "dependenciesIncluded": true,
+      "initializerLookupMethod": "external",
+      "version": "1.0.0"
+    },
+    {
+      "type": "router",
+      "name": "appServerStorage",
       "filename": "storage.js",
       "routerFactory": "storageRouter",
       "dependenciesIncluded": true,
       "initializerLookupMethod": "external",
       "version": "1.0.1"
+    },
+    {
+      "type": "service",
+      "name": "zssStorage",
+      "libraryName": "storage.so",
+      "dependenciesIncluded": true,
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "initializerName": "storageServiceInstaller",
+      "initializerLookupMethod": "external",
+      "version": "0.0.1"
     }
   ],
   "configurationData": {

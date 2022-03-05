@@ -84,11 +84,19 @@
     <div class="test-storage">
       <div class="bigger-bold-text" i18n="storageTest@@storageTestLabel">Storage Test</div>
       <div class="row">
+        <span i18n="server@@server">Server</span>
+        <select [(ngModel)]="storageServer" (change)="storageServerChanged($event.target.value)">
+          <option value='zss'>ZSS</option>
+          <option value='app-server'>App Server</option>
+        </select>
+      </div>
+      <div class="row">
         <span i18n="storage@@storage">Storage</span>
-        <select [(ngModel)]="selectedStorageType">
-          <option *ngFor="let storageType of storageTypes" [ngValue]="storageType">
-            {{ storageType.title }}
-          </option>
+        <select [(ngModel)]="storageType">
+          <option [ngValue]="undefined">Default</option>
+          <option value="ha">HA</option>
+          <option value="cluster" *ngIf="!zssServerSelected">Cluster</option>
+          <option value="local">Local</option>
         </select>
       </div>
       <div class="row">
@@ -104,8 +112,8 @@
         <zlux-button type="button" (click)="storageDelete()" [disabled]="!storageKey" i18n="delete@@deleteButtonLabel">Delete</zlux-button>
       </div>
       <div class="controls">
-        <zlux-button class="wide" type="button" (click)="storageSetAll()" [disabled]="!storageKey || !storageValue" i18n="setAll@@setAllButtonLabel">Set All</zlux-button>
-        <zlux-button class="wide"type="button" (click)="storageDeleteAll()" i18n="deleteAll@@deleteAllButtonLabel">Delete All</zlux-button>
+        <zlux-button class="wide" type="button" (click)="storageSetAll()" [disabled]="!storageKey || !storageValue || zssServerSelected" i18n="setAll@@setAllButtonLabel">Set All</zlux-button>
+        <zlux-button class="wide"type="button" (click)="storageDeleteAll()" [disabled]="zssServerSelected" i18n="deleteAll@@deleteAllButtonLabel">Delete All</zlux-button>
       </div>
     </div>
   </div>

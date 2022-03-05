@@ -1,0 +1,170 @@
+swagger: '2.0'
+info:
+  description: This service provides access to Storage API using App Server
+  version: 1.0.0
+  title: Storage DataService API
+host: localhost
+basePath: /appServerStorage
+schemes:
+  - http
+  - https
+tags:
+  - name: Storage
+paths:
+  /:
+    post:
+      summary: Set all key/value pairs in Storage
+      description: Set all key/value pairs in Storage using object as source.
+      operationId: setAll
+      tags:
+        - Storage
+      consumes:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/storageType'
+        - $ref: '#/parameters/dict'
+      responses:
+        204:
+          description: Success
+        500:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get all key/value pairs from Storage
+      description: Get all key/value pairs as object from Storage
+      operationId: getAll
+      tags:
+        - Storage
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/storageType'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Dict'
+        500:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete all key/value pairs from Storage
+      description: Clear Storage
+      operationId: deleteAll
+      tags:
+        - Storage
+      parameters:
+        - $ref: '#/parameters/storageType'
+      responses:
+        204:
+          description: Success
+        500:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /{key}:
+    post:
+      summary: Set value for a given key in Storage
+      description: Set value for a given key in Storage
+      operationId: set
+      tags:
+        - Storage
+      consumes:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/key'
+        - $ref: '#/parameters/storageType'
+        - $ref: '#/parameters/valueObject'
+      responses:
+        204:
+          description: Success
+        500:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get value assosiated with key from Storage
+      description: Get value assosiated with key from Storage
+      operationId: get
+      tags:
+        - Storage
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/key'
+        - $ref: '#/parameters/storageType'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Dict'
+        500:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete value assosiated with key from Storage
+      description: Delete value assosiated with key from Storage
+      operationId: delete
+      tags:
+        - Storage
+      parameters:
+        - $ref: '#/parameters/key'
+        - $ref: '#/parameters/storageType'
+      responses:
+        204:
+          description: Success
+        500:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+
+parameters:
+  storageType:
+    in: query
+    name: storageType
+    required: false
+    type: string
+    enum: [local, cluster, ha]
+    description: Storage location type
+  key:
+    in: path
+    name: key
+    required: true
+    type: string
+  valueObject:
+    in: body
+    name: value
+    required: true
+    schema:
+      type: object
+      properties:
+        value:
+          $ref: '#/definitions/AnyValue'
+      example:
+        value: 'someValue'
+  dict:
+    in: body
+    required: true
+    name: dict
+    schema:
+      $ref: '#/definitions/Dict'
+
+definitions:
+  AnyValue: {}
+  Dict:
+    type: object
+    additionalProperties:
+      $ref: '#/definitions/AnyValue'
+    example:
+      key1: value1
+      key2: value2
+  Error:
+    type: object
+    properties:
+      err:
+        type: string
+    example:
+      err: "An error occurred"
