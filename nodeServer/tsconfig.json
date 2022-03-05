@@ -11,6 +11,7 @@
     "types": [
       "node",
       "express"
-    ]
+    ],
+    "lib": ["es5", "es6"]
   }
 }
