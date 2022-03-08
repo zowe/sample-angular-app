@@ -49,7 +49,8 @@
     {
       "type": "service",
       "name": "zssStorage",
-      "libraryName": "storage.so",
+      "libraryName31": "storage31.so",
+      "libraryName64": "storage64.so",
       "dependenciesIncluded": true,
       "methods": [
         "GET",
