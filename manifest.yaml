@@ -2,7 +2,7 @@
 name: angular-sample
 id: org.zowe.zlux.sample.angular
 # Without the v
-version: 2.0.0
+version: 2.0.1
 # Human readable component name
 title: Angular Sample
 # Human readable component description
@@ -19,10 +19,7 @@ repository:
   type: git
   url: https://github.com/zowe/sample-angular-app.git
 # we do not specify encoding here because its already tagged ascii
-build:
-  branch: "{{build.branch}}"
-  number: "{{build.number}}"
-  commitHash: "{{build.commitHash}}"
-  timestamp: "{{build.timestamp}}"
 appfwPlugins:
   - path: .
+schemas:
+  configs: trivial-schema.json
