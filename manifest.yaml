@@ -22,4 +22,4 @@ repository:
 appfwPlugins:
   - path: .
 schemas:
-  configs: trivial-schema.json
+  configs: schemas/trivial-schema.json
