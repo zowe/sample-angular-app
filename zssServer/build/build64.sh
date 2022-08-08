@@ -34,6 +34,7 @@ if ! c89 \
    -Wl,lp64,dll \
   -I "${ZSS}/h" \
   -I "${COMMON}/h" \
+  -I "${COMMON}/platform/posix" \
   -o "${TARGET}" \
   ../../src/storage.c \
   ../pluginAPI64.x
