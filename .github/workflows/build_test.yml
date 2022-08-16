@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - v1.x/staging
-      - master
-      - rc 
+      - v1.x/master
+      - v1.x/rc
   pull_request:
     types: [opened, reopened, synchronize]
 
@@ -50,9 +50,6 @@ jobs:
           key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-cache-node-modules-
-      - name: 'Test'
-        run: git config --list
-        
       - name: '[Prep 3] Setup Node'
         uses: actions/setup-node@v2
         with:
@@ -74,7 +71,7 @@ jobs:
       - name: '[Prep 6] build'
         uses: zowe-actions/zlux-builds/zlux-plugins@main
         with:
-          build-zss: false
+          build-zss: true
 
       - name: '[Prep 7] packaging'
         uses: zowe-actions/zlux-builds/make-pax@main
@@ -84,4 +81,4 @@ jobs:
           pax-name: sample-angular-app
 
       - name: '[Prep 8] deploy '
-        uses: zowe-actions/zlux-builds/deploy-pax@main 
+        uses: zowe-actions/zlux-builds/deploy-pax@main
