@@ -1,0 +1,7 @@
+.*
+*.js.map
+dco-signoffs
+Jenkinsfile
+sonar-project.properties
+webClient/node_modules
+nodeServer/node_modules
