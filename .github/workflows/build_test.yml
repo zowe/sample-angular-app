@@ -84,3 +84,28 @@ jobs:
 
       - name: '[Prep 8] deploy '
         uses: zowe-actions/zlux-builds/plugins/deploy-pax@v2.x/main
+        
+      - name: 'create json'
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "package.json"
+          json: '{
+            "name": "angular-sample",
+            "version": "2.0.6",
+            "description": "Sample app Showcasing Angular Adapter",
+            "main": "angular-sample.pax",
+            "homepgae": "https://zowe.org",
+            "keywords": [
+                "zlux",
+                "appfw",
+                "app",
+                "angular",
+                "sample"
+            ],
+            "license": "EPL-2.0",
+            "repository": {
+                "type": "git",
+                "url": "https://github.com/zowe/sample-angular-app.git"
+            }
+          }'
+          dir: '/home/runner/work/'
