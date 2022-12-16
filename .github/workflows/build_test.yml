@@ -108,4 +108,3 @@ jobs:
                 "url": "https://github.com/zowe/sample-angular-app.git"
             }
           }'
-          dir: 'npm/build/'
