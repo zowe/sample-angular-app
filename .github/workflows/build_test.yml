@@ -108,3 +108,6 @@ jobs:
                 "url": "https://github.com/zowe/sample-angular-app.git"
             }
           }'
+
+      - name: 'publish npm'
+        uses: zowe-actions/zlux-builds/plugins/npm-publish@users/jstruga/add-npm-publish
