@@ -90,7 +90,7 @@ jobs:
         with:
           name: "package.json"
           json: '{
-            "name": "angular-sample",
+            "name": "@zowe/angular-sample",
             "version": "2.0.6",
             "description": "Sample app Showcasing Angular Adapter",
             "main": "angular-sample.pax",
