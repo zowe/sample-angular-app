@@ -1,0 +1,19 @@
+{
+	"name": "angular-sample",
+	"version": "2.6.0",
+	"description": "Sample App Showcasing Angular Adapter",
+	"main": "angular-sample.pax",
+	"homepgae": "https://zowe.org",
+	"keywords": [
+		"zlux",
+		"appfw",
+		"app",
+		"angular",
+		"sample"
+	],
+	"license": "EPL-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/zowe/sample-angular-app.git"
+	}
+ }
