@@ -86,6 +86,7 @@ jobs:
         uses: zowe-actions/zlux-builds/plugins/deploy-pax@v2.x/main
 
       - name: '[Prep 9] NodeJS project setup'
+        if: ${{ github.event.inputs.BRANCH_NAME}} == "true"
         uses: zowe-actions/zlux-builds/plugins/npm-setup@users/jstruga/add-npm-publish
         with:
           package-name: 'org.zowe.zlux-angular-file-tree'
@@ -97,6 +98,6 @@ jobs:
           publish-registry-username: ${{ secrets.NPM_PRIVATE_REGISTRY_USERNAME }}
           publish-registry-password: ${{ secrets.NPM_PRIVATE_REGISTRY_PASSWORD }}
 
-
-      - name: '[Prep 10] deploy npm  '
+      - name: '[Prep 10] Publish NPM Package  '
+        if: ${{ github.event.inputs.BRANCH_NAME}} == "true"
         uses: zowe-actions/zlux-builds/plugins/npm-publish@users/jstruga/add-npm-publish
