@@ -71,7 +71,7 @@ jobs:
           release: ${{ github.event.inputs.PERFORM_RELEASE }}
 
       - name: '[Prep 6] build'
-        uses: zowe-actions/zlux-builds/plugins/zlux-plugins@users/jstruga/add-npm-publish
+        uses: zowe-actions/zlux-builds/plugins/zlux-plugins@v2.x/main
         with:
           build-zss: true
 
@@ -87,7 +87,7 @@ jobs:
 
       - name: '[Prep 9] NodeJS project setup'
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
-        uses: zowe-actions/zlux-builds/plugins/npm-setup@users/jstruga/add-npm-publish
+        uses: zowe-actions/zlux-builds/plugins/npm-setup@v2.x/main
         with:
           package-name: 'org.zowe.zlux-angular-file-tree'
           install-registry-url: ${{ env.DEFAULT_NPM_PRIVATE_INSTALL_REGISTRY }}
@@ -100,4 +100,4 @@ jobs:
 
       - name: '[Prep 10] Publish NPM Package  '
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
-        uses: zowe-actions/zlux-builds/plugins/npm-publish@users/jstruga/add-npm-publish
+        uses: zowe-actions/zlux-builds/plugins/npm-publish@v2.x/main
