@@ -4,7 +4,8 @@
   "description": "Hello World message",
   "scripts": {
     "build": "tsc",
-    "start": "tsc --watch"
+    "start": "tsc --watch",
+	"test": "exit 0"
   },
   "dependencies": {},
   "devDependencies": {
