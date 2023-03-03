@@ -1,6 +1,6 @@
 {
   "name": "org.zowe.zlux.sample.angular.nodeserver",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Hello World message",
   "scripts": {
     "build": "tsc",
