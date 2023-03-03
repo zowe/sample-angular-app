@@ -12,6 +12,9 @@
 		"sample"
 	],
 	"license": "EPL-2.0",
+	"publishConfig":{
+		"registry": "https://zowe.jfrog.io/zowe/api/npm/npm-local-release/"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/zowe/sample-angular-app.git"
