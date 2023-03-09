@@ -1,5 +1,5 @@
 {
-	"name": "angular-sample",
+	"name": "@zowe/angular-sample",
 	"version": "2.8.0",
 	"description": "Sample App Showcasing Angular Adapter",
 	"main": "angular-sample.pax",
