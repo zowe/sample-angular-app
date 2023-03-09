@@ -72,7 +72,6 @@ jobs:
           plugin-version: ${{ github.event.inputs.BUILD_VERSION }}
 
       - name: '[Prep 9] NodeJS project setup'
-        if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/npm-setup@v2.x/main
         with:
           package-name: 'org.zowe.zlux-angular-file-tree'
