@@ -71,21 +71,6 @@ jobs:
           release: ${{ github.event.inputs.PERFORM_RELEASE }}
           plugin-version: ${{ github.event.inputs.BUILD_VERSION }}
 
-      - name: '[Prep 6] Build'
-        uses: zowe-actions/zlux-builds/plugins/zlux-plugins@v2.x/main
-        with:
-          build-zss: true
-
-      - name: '[Prep 7] Packaging'
-        uses: zowe-actions/zlux-builds/plugins/make-pax@v2.x/main
-        with:
-          pax-ssh-username: ${{ secrets.SSH_MARIST_USERNAME }}
-          pax-ssh-password: ${{ secrets.SSH_MARIST_RACF_PASSWORD }}
-          pax-name: sample-angular-app
-
-      - name: '[Prep 8] Deploy '
-        uses: zowe-actions/zlux-builds/plugins/deploy-pax@v2.x/main
-
       - name: '[Prep 9] NodeJS project setup'
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/npm-setup@v2.x/main
