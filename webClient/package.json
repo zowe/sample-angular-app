@@ -1,6 +1,6 @@
 {
   "name": "org.zowe.zlux.sample.angular.webclient",
-  "version": "2.9.0",
+  "version": "2.11.0",
   "scripts": {
     "start": "webpack --progress --colors --watch",
     "build": "webpack --progress --colors",

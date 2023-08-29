@@ -85,8 +85,14 @@ jobs:
 
       - name: '[Prep 8] Deploy '
         uses: zowe-actions/zlux-builds/plugins/deploy-pax@v2.x/main
+        
+      - name: '[Prep 9] Bump Staging Version '
+        if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
+        uses: zowe-actions/zlux-builds/plugins/bump-version@v2.x/main
+        env: 
+         GITHUB_TOKEN: ${{ secrets.ZOWE_ROBOT_TOKEN }}
 
-      - name: '[Prep 9] NodeJS project setup'
+      - name: '[Prep 10] NodeJS project setup'
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/npm-setup@v2.x/main
         with:
@@ -99,12 +105,6 @@ jobs:
           publish-registry-username: ${{ secrets.NPM_PRIVATE_REGISTRY_USERNAME }}
           publish-registry-password: ${{ secrets.NPM_PRIVATE_REGISTRY_PASSWORD }}
 
-      - name: '[Prep 10] Publish NPM Package  '
+      - name: '[Prep 11] Publish NPM Package  '
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/npm-publish@v2.x/main
-        
-      - name: '[Prep 11] Bump Staging Version '
-        if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
-        uses: zowe-actions/zlux-builds/plugins/bump-version@v2.x/main
-        env: 
-         GITHUB_TOKEN: ${{ secrets.ZOWE_ROBOT_TOKEN }}
