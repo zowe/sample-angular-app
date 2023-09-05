@@ -1,6 +1,6 @@
 {
 	"name": "angular-sample",
-	"version": "2.10.0",
+	"version": "2.11.0",
 	"description": "Sample App Showcasing Angular Adapter",
 	"main": "angular-sample.pax",
 	"homepgae": "https://zowe.org",
