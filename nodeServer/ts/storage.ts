@@ -8,21 +8,21 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Response, Request } from 'express';
-import { Router } from 'express-serve-static-core';
+import { Response, Request, Router } from 'express';
 import express = require('express');
+import { ZLUXServerFramework } from 'zlux-platform/server-framework';
 
 class StorageDataService {
   private router: Router;
 
-  constructor(private context: any) {
+  constructor(private context: ZLUXServerFramework.DataServiceContext) {
     const storage = this.context.storage;
     const router = express.Router();
     this.router = router;
     context.addBodyParseMiddleware(router);
 
     router.post('/', (req: Request, res: Response) => {
-      const storageType = req.query.storageType;
+      const storageType = req.query.storageType as ZLUXServerFramework.StorageLocationType;
       const dict = req.body;
       storage.setAll(dict, storageType).then(() => {
         res.sendStatus(204);
@@ -34,7 +34,7 @@ class StorageDataService {
     });
 
     router.get('/', (req: Request, res: Response) => {
-      const storageType = req.query.storageType;
+      const storageType = req.query.storageType as ZLUXServerFramework.StorageLocationType;
       storage.getAll(storageType).then(dict => {
         res.status(200).json(dict);
       }).catch(e => {
@@ -45,7 +45,7 @@ class StorageDataService {
     });
 
     router.delete('/', (req: Request, res: Response) => {
-      const storageType = req.query.storageType;
+      const storageType = req.query.storageType as ZLUXServerFramework.StorageLocationType;
       storage.deleteAll(storageType).then(() => {
         res.sendStatus(204);
       }).catch(e => {
@@ -57,7 +57,7 @@ class StorageDataService {
 
     router.post('/:key', (req: Request, res: Response) => {
       const key = req.params.key;
-      const storageType = req.query.storageType;
+      const storageType = req.query.storageType as ZLUXServerFramework.StorageLocationType;
       const { value } = req.body;
       storage.set(key, value, storageType).then(() => {
         res.sendStatus(204);
@@ -70,7 +70,7 @@ class StorageDataService {
 
     router.get('/:key', (req: Request, res: Response) => {
       const key = req.params.key;
-      const storageType = req.query.storageType;
+      const storageType = req.query.storageType as ZLUXServerFramework.StorageLocationType;
       storage.get(key, storageType).then(value => {
         res.status(200).json({ key, value });
       }).catch(e => {
@@ -82,7 +82,7 @@ class StorageDataService {
 
     router.delete('/:key', (req: Request, res: Response) => {
       const key = req.params.key;
-      const storageType = req.query.storageType;
+      const storageType = req.query.storageType as ZLUXServerFramework.StorageLocationType;
       storage.delete(key, storageType).then(() => {
         res.sendStatus(204);
       }).catch(e => {
@@ -99,7 +99,7 @@ class StorageDataService {
   }
 }
 
-export function storageRouter(context: any): Promise<Router> {
+export function storageRouter(context: ZLUXServerFramework.DataServiceContext): Promise<Router> {
   const dataService = new StorageDataService(context);
   return Promise.resolve(dataService.getRouter());
 }

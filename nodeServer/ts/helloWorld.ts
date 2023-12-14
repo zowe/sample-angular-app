@@ -1,7 +1,3 @@
-import { Response, Request } from "express";
-import { Router } from "express-serve-static-core";
-
-
 
 /*
   This program and the accompanying materials are
@@ -13,15 +9,16 @@ import { Router } from "express-serve-static-core";
   Copyright Contributors to the Zowe Project.
 */
 
+import { Response, Request, Router } from 'express';
 const express = require('express');
-const Promise = require('bluebird');
 const obfuscator = require ('zlux-shared/src/obfuscator/htmlObfuscator.js');
+import { ZLUXServerFramework } from 'zlux-platform/server-framework';
 
 class HelloWorldDataservice{
-  private context: any;
+  private context: ZLUXServerFramework.DataServiceContext;
   private router: Router;
-  
-  constructor(context: any){
+
+  constructor(context: ZLUXServerFramework.DataServiceContext){
     let htmlObfuscator = new obfuscator.HtmlObfuscator();
     this.context = context;
     let router = express.Router();
@@ -55,7 +52,7 @@ class HelloWorldDataservice{
 }
 
 
-exports.helloWorldRouter = function(context): Router {
+export function helloWorldRouter(context: ZLUXServerFramework.DataServiceContext): Promise<Router> {
   return new Promise(function(resolve, reject) {
     let dataservice = new HelloWorldDataservice(context);
     resolve(dataservice.getRouter());
@@ -67,9 +64,9 @@ exports.helloWorldRouter = function(context): Router {
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */
 
