@@ -3,7 +3,12 @@
   "include": [
     "ts/*.ts"
   ],
+  "files": [
+    "../../zlux-platform/interface/src/index.d.ts",
+    "../../zlux-platform/interface/src/server-framework.d.ts"
+  ],
   "compilerOptions": {
+    "baseUrl": "",
     "outDir": "../lib",
     "sourceMap": true,
     "allowJs": true,
@@ -12,6 +17,10 @@
       "node",
       "express"
     ],
+    "paths": {
+      "zlux-platform/*": ["../../zlux-platform/interface/src/*"]
+    },
+    "skipLibCheck": true,
     "lib": ["es5", "es6"]
   }
 }
