@@ -2,8 +2,8 @@
   "name": "org.zowe.zlux.sample.angular.webclient",
   "version": "3.0.0",
   "scripts": {
-    "start": "webpack --progress --colors --watch",
-    "build": "webpack --progress --colors",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider webpack --progress --colors --watch",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --progress --colors",
     "i18n": "ng-xi18n -p tsconfig.i18n.json --i18nFormat=xlf  --outFile=messages.xlf && xliffmerge -p xliffmerge.json",
     "lint": "tslint -c tslint.json \"./**/*.ts\"",
 	"test": "exit 0"
