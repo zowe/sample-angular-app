@@ -47,7 +47,7 @@ jobs:
           args: >
             -Dsonar.projectKey=zowe_sample-angular-app
             -Dsonar.organization=zowe
-            -Dsonar.sources=webClient
+            -Dsonar.sources=webClient,nodeServer,zssServer
             -Dsonar.tests=webClient/src/app
             -Dsonar.test.inclusions=**/*.(spec|test).ts,**/*.(spec|test).tsx,**/*.(spec|test).js,**/*.(spec|test).jsx
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.d.ts
