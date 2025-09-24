@@ -54,3 +54,6 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=webClient/coverage/lcov.info
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=600
+            -Dsonar.c.file.suffixes=-
+            -Dsonar.cpp.file.suffixes=-
+            -Dsonar.objc.file.suffixes=-
