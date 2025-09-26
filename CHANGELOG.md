@@ -2,6 +2,10 @@
 
 All notable changes to the sample angular app will be documented in this file.
 
+## 2.0.2
+- Bugfix: Generate build information in manifest.
+- Enhancement: Upgrade semver to 7.7.2.
+
 ## 2.0.1
 - Bugfix: Schema file was not included, preventing installation as a component
 - Bugfix: Manifest build content template was never resolved, so it has been removed.
