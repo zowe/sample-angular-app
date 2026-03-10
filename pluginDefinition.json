@@ -18,6 +18,10 @@
     "defaultWindowStyle": {
       "width": 850,
       "height": 540
+    },
+    "entryPoint": {
+      "2.0": "main.js",
+      "3.0": "v3/main.js"
     }
   },
   "dataServices": [

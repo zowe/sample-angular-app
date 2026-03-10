@@ -85,7 +85,7 @@
       <div class="bigger-bold-text" i18n="storageTest@@storageTestLabel">Storage Test</div>
       <div class="row">
         <span i18n="server@@server">Server</span>
-        <select [(ngModel)]="storageServer" (change)="storageServerChanged($event.target.value)">
+        <select [(ngModel)]="storageServer" (change)="storageServerChanged($any($event.target).value)">
           <option value='zss'>ZSS</option>
           <option value='app-server'>App Server</option>
         </select>

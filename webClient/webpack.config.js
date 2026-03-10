@@ -14,35 +14,43 @@ var path = require('path');
 var webpackConfig = require('webpack-config');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const { AngularWebpackPlugin } = require('@ngtools/webpack');
 
 if (process.env.MVD_DESKTOP_DIR == null) {
   throw new Error('You must specify MVD_DESKTOP_DIR in your environment');
 }
 
 var config = {
-  'entry': [
+  mode: 'development',
+  entry: [
     path.resolve(__dirname, './src/plugin.ts')
   ],
-  'output': {
-    'path': path.resolve(__dirname, '../web'),
-    'filename': 'main.js',
+  output: {
+    path: path.resolve(__dirname, '../web/v3'),
+    filename: 'main.js',
   },
-  'plugins': [
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, './src/assets'),
-        to: path.resolve('../web/assets')
-      }
-    ]),
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, './src/assets'),
+          to: path.resolve(__dirname, '../web/v3/assets')
+        }
+      ]
+    }),
     new CompressionPlugin({
       threshold: 100000,
       minRatio: 0.8
+    }),
+    new AngularWebpackPlugin({
+      tsConfigPath: './tsconfig.json',
+      entryModule: './src/app/app.module.ts#AppModule'
     })
   ]
 };
 
 module.exports = new webpackConfig.Config()
-  .extend(path.resolve(process.env.MVD_DESKTOP_DIR, 'plugin-config/webpack.base.js'))
+  .extend(path.resolve(process.env.MVD_DESKTOP_DIR, 'plugin-config/webpack5.base.js'))
   .merge(config);
 
 
