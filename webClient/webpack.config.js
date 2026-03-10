@@ -29,6 +29,11 @@ var config = {
     path: path.resolve(__dirname, '../web/v3'),
     filename: 'main.js',
   },
+  resolve: {
+    alias: {
+      'zlux-widgets': path.resolve(__dirname, 'node_modules/@zlux/widgets')
+    }
+  },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
