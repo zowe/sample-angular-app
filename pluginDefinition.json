@@ -11,7 +11,7 @@
     "launchDefinition": {
       "pluginShortNameKey": "sampleangular",
       "pluginShortNameDefault": "Angular Sample",
-      "imageSrc": "assets/icon.png"
+      "imageSrc": "v3/assets/icon.png"
     },
     "descriptionKey": "sampleangulardescription",
     "descriptionDefault": "Sample App Showcasing Angular Adapter",
