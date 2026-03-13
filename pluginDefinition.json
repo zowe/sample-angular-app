@@ -51,21 +51,6 @@
       "dependenciesIncluded": true,
       "initializerLookupMethod": "external",
       "version": "1.0.1"
-    },
-    {
-      "type": "service",
-      "name": "zssStorage",
-      "libraryName31": "storage31.so",
-      "libraryName64": "storage64.so",
-      "dependenciesIncluded": true,
-      "methods": [
-        "GET",
-        "POST",
-        "DELETE"
-      ],
-      "initializerName": "storageServiceInstaller",
-      "initializerLookupMethod": "external",
-      "version": "0.0.1"
     }
   ],
   "configurationData": {
