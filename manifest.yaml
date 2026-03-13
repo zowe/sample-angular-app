@@ -23,3 +23,5 @@ commands:
   validate: bin/validate.sh
 appfwPlugins:
   - path: .
+schemas:
+  configs: schemas/trivial-schema.json
