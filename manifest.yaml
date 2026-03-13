@@ -19,6 +19,8 @@ repository:
   type: git
   url: https://github.com/zowe/sample-angular-app.git
 # we do not specify encoding here because its already tagged ascii
+commands:
+  validate: bin/validate.sh
 appfwPlugins:
   - path: .
 schemas:
