@@ -2,6 +2,14 @@
 
 All notable changes to the sample angular app will be documented in this file.
 
+## 3.1.0
+
+- Enhancement: i18n support aligned with Zowe v3 Desktop (zlux-app-manager PR #684).
+- Bumped angular-l10n from 16.0.0 to ~17.0.1 to match Desktop runtime and resolve Angular 18 peer dependency conflict.
+- Fixed @zlux/widgets webpack alias to point to ESM (.mjs) bundle for correct module resolution.
+- Added Angular locale asset copying in angular.json for locale file availability.
+- Enabled detailed source maps (scripts, styles, vendor) for improved debugging.
+
 ## 3.0.0
 
 - AI DISCLAIMER: This upgrade was performed with Claude Opus 4.6.
