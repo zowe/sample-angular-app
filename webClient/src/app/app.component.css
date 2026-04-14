@@ -128,21 +128,21 @@ h1 {
   margin: 2px 2px;
 }
 
-.test-storage .row {
+.test-storage .storage-row {
   display: flex;
   align-items: center;
   min-height: 2rem;
   column-gap: 0.4rem;
 }
 
-.test-storage .row span{
+.test-storage .storage-row span {
   width: 4rem;
   flex: 0 0 auto;
   margin: 0.2rem 0;
 }
 
-.test-storage .row input,
-.test-storage .row select {
+.test-storage .storage-row input,
+.test-storage .storage-row select {
   flex: 1 1 auto;
 }
 
