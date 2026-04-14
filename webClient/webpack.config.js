@@ -50,7 +50,8 @@ var config = {
     }),
     new AngularWebpackPlugin({
       tsConfigPath: './tsconfig.json',
-      entryModule: './src/app/app.module.ts#AppModule'
+      entryModule: './src/app/app.module.ts#AppModule',
+      jitMode: true
     })
   ]
 };
