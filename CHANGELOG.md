@@ -2,7 +2,7 @@
 
 All notable changes to the sample angular app will be documented in this file.
 
-## 3.1.0
+## 3.0.1
 
 - Enhancement: i18n support aligned with Zowe v3 Desktop (zlux-app-manager PR #684).
 - Bumped angular-l10n from 16.0.0 to ~17.0.1 to match Desktop runtime and resolve Angular 18 peer dependency conflict.
