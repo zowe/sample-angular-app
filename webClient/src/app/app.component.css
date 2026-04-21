@@ -132,7 +132,6 @@ h1 {
   display: flex;
   align-items: center;
   min-height: 2rem;
-  column-gap: 0.4rem;
 }
 
 .test-storage .storage-row span {
