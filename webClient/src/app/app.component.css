@@ -143,6 +143,12 @@ h1 {
 .test-storage .storage-row input,
 .test-storage .storage-row select {
   flex: 1 1 auto;
+  height: 2rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: inherit;
+  box-sizing: border-box;
 }
 
 .test-storage .controls {
