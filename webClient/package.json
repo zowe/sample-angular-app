@@ -1,6 +1,6 @@
 {
   "name": "org.zowe.zlux.sample.angular.webclient",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "scripts": {
     "start": "webpack --progress --watch",
     "build": "webpack --progress",
@@ -24,7 +24,7 @@
     "@angular/router": "~18.2.14",
     "@ngtools/webpack": "^18.2.14",
     "@zlux/widgets": "github:zowe/zlux-widgets#v3.x/master",
-    "angular-l10n": "16.0.0",
+    "angular-l10n": "~17.0.1",
     "codelyzer": "~6.0.2",
     "compression-webpack-plugin": "~11.0.0",
     "copy-webpack-plugin": "~11.0.0",

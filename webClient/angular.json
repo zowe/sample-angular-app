@@ -17,18 +17,24 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              {
+                "glob": "**/*",
+                "input": "node_modules/@angular/common/locales",
+                "output": "locales"
+              }
             ],
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "sourceMap": { "scripts": true, "styles": true, "vendor": true }
           },
           "configurations": {
             "production": {
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": { "scripts": true, "styles": true, "vendor": true },
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,

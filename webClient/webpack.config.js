@@ -31,7 +31,8 @@ var config = {
   },
   resolve: {
     alias: {
-      'zlux-widgets': path.resolve(__dirname, 'node_modules/@zlux/widgets')
+      '@zlux/widgets': path.resolve(__dirname, 'node_modules/@zlux/widgets/dist/zlux-widgets/fesm2022/zlux-widgets.mjs'),
+      'zlux-widgets': path.resolve(__dirname, 'node_modules/@zlux/widgets/dist/zlux-widgets/fesm2022/zlux-widgets.mjs')
     }
   },
   plugins: [
