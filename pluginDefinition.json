@@ -11,13 +11,17 @@
     "launchDefinition": {
       "pluginShortNameKey": "sampleangular",
       "pluginShortNameDefault": "Angular Sample",
-      "imageSrc": "assets/icon.png"
+      "imageSrc": "v3/assets/icon.png"
     },
     "descriptionKey": "sampleangulardescription",
     "descriptionDefault": "Sample App Showcasing Angular Adapter",
     "defaultWindowStyle": {
       "width": 850,
       "height": 540
+    },
+    "entryPoint": {
+      "2.0": "main.js",
+      "3.0": "v3/main.js"
     }
   },
   "dataServices": [

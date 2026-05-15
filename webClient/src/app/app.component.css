@@ -128,19 +128,27 @@ h1 {
   margin: 2px 2px;
 }
 
-.test-storage .row {
+.test-storage .storage-row {
   display: flex;
-  height: 1.8rem;
+  align-items: center;
+  min-height: 2rem;
 }
 
-.test-storage .row span{
+.test-storage .storage-row span {
   width: 4rem;
   flex: 0 0 auto;
   margin: 0.2rem 0;
 }
 
-.test-storage .row input,select {
+.test-storage .storage-row input,
+.test-storage .storage-row select {
   flex: 1 1 auto;
+  height: 2rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: inherit;
+  box-sizing: border-box;
 }
 
 .test-storage .controls {
