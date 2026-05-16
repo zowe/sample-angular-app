@@ -42,9 +42,9 @@ then
   echo "${TARGET_ABS} - build failed"
   RC=8
 else
+  rm -rf "${TMP}"
   echo "${TARGET_ABS} - build successful"
   extattr +p "${TARGET}"
-  rm -rf ${TMP}
   RC=0
 fi
 
