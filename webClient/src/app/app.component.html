@@ -8,7 +8,21 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="app-component test-panel-container" (contextmenu)="onRightClick($event)">
+<div class="app-component" (contextmenu)="onRightClick($event)">
+  <!-- Top Navigation Bar -->
+  <div class="app-nav-bar">
+    <button class="app-nav-btn" [class.active]="activeView === 'demo'" (click)="activeView = 'demo'">
+      <svg viewBox="0 0 16 16" width="14" height="14" style="margin-right:5px"><path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3z" fill="currentColor"/></svg>
+      Demo
+    </button>
+    <button class="app-nav-btn" [class.active]="activeView === 'sysinfo'" (click)="activeView = 'sysinfo'">
+      <svg viewBox="0 0 16 16" width="14" height="14" style="margin-right:5px"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.502.002.071-.332 2.351-.386zm-.154-2.173a.9.9 0 1 1 0-1.798.9.9 0 0 1 0 1.798z" fill="currentColor"/></svg>
+      System Info
+    </button>
+  </div>
+
+  <!-- Demo View (existing panels) -->
+  <div class="test-panel-container" *ngIf="activeView === 'demo'">
   <div class="test-panel plugin-test-panel">
     <div class="bottom-10">
       <span class="bigger-bold-text"
@@ -116,6 +130,12 @@
         <zlux-button class="wide"type="button" (click)="storageDeleteAll()" [disabled]="zssServerSelected" i18n="deleteAll@@deleteAllButtonLabel">Delete All</zlux-button>
       </div>
     </div>
+  </div>
+  </div>
+
+  <!-- System Info View -->
+  <div class="sysinfo-view" *ngIf="activeView === 'sysinfo'">
+    <app-sysinfo></app-sysinfo>
   </div>
 </div>
 <zlux-popup-manager>

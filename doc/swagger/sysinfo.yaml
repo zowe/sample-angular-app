@@ -1,0 +1,305 @@
+openapi: 3.0.0
+info:
+  title: System Info Dataservice
+  description: >
+    Returns comprehensive system information about the Zowe server environment,
+    including OS details, CPU, memory, uptime, network interfaces, Zowe
+    configuration, installed plugins, cluster info, and ZSS agent connectivity.
+    Leverages the ZLUX DataserviceContext for Zowe-specific data.
+  version: 2.0.0
+paths:
+  /:
+    get:
+      summary: Get system information
+      description: >
+        Returns a JSON object with server hardware/OS, Zowe environment,
+        installed plugins, and current plugin details.
+      operationId: getSysInfo
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SysInfoResponse'
+        '500':
+          description: Server error gathering system information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to gather system information"
+                  message:
+                    type: string
+    put:
+      summary: Method not allowed
+      responses:
+        '405':
+          description: Only GET method is supported
+    post:
+      summary: Method not allowed
+      responses:
+        '405':
+          description: Only GET method is supported
+    delete:
+      summary: Method not allowed
+      responses:
+        '405':
+          description: Only GET method is supported
+
+components:
+  schemas:
+    SysInfoResponse:
+      type: object
+      properties:
+        _objectType:
+          type: string
+          example: "org.zowe.zlux.sample.service.sysinfo"
+        _metaDataVersion:
+          type: string
+          example: "2.0.0"
+        timestamp:
+          type: string
+          format: date-time
+        server:
+          $ref: '#/components/schemas/ServerInfo'
+        zowe:
+          $ref: '#/components/schemas/ZoweInfo'
+        plugins:
+          $ref: '#/components/schemas/PluginsInfo'
+        currentPlugin:
+          $ref: '#/components/schemas/CurrentPluginInfo'
+
+    ServerInfo:
+      type: object
+      properties:
+        hostname:
+          type: string
+        platform:
+          type: string
+          description: "Node.js os.platform() value (e.g., linux, darwin, win32, os390)"
+        osType:
+          type: string
+        osRelease:
+          type: string
+        architecture:
+          type: string
+        endianness:
+          type: string
+          enum: [BE, LE]
+        eol:
+          type: string
+          enum: [LF, CRLF]
+        totalMemoryMB:
+          type: number
+        freeMemoryMB:
+          type: number
+        usedMemoryMB:
+          type: number
+        memoryUsagePercent:
+          type: number
+        cpus:
+          type: object
+          properties:
+            model:
+              type: string
+            speed:
+              type: number
+              description: "CPU speed in MHz"
+            cores:
+              type: number
+        uptimeSeconds:
+          type: number
+        uptimeFormatted:
+          type: string
+          example: "3d 4h 12m 5s"
+        loadAverage:
+          type: array
+          items:
+            type: number
+          description: "1, 5, and 15 minute load averages"
+        nodeVersion:
+          type: string
+          example: "v18.18.2"
+        nodeRelease:
+          type: string
+          example: "node"
+        pid:
+          type: number
+        ppid:
+          type: number
+          nullable: true
+        processMemoryMB:
+          type: object
+          properties:
+            rss:
+              type: number
+            heapTotal:
+              type: number
+            heapUsed:
+              type: number
+            external:
+              type: number
+        tempDir:
+          type: string
+        homeDir:
+          type: string
+        userInfo:
+          type: object
+          properties:
+            username:
+              type: string
+            homedir:
+              type: string
+            shell:
+              type: string
+              nullable: true
+        networkInterfaces:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              address:
+                type: string
+              family:
+                type: string
+                enum: [IPv4, IPv6]
+              mac:
+                type: string
+              internal:
+                type: boolean
+        cluster:
+          type: object
+          properties:
+            isCluster:
+              type: boolean
+            isMaster:
+              type: boolean
+            workersNum:
+              type: number
+            cpuUsagePercent:
+              type: number
+              nullable: true
+              description: "Cluster CPU usage percentage (0-100), null if unavailable"
+
+    ZoweInfo:
+      type: object
+      description: "Zowe environment info from plugin context and environment variables"
+      properties:
+        version:
+          type: string
+          nullable: true
+          description: "Zowe version from manifest.json"
+        productCode:
+          type: string
+          nullable: true
+        rootRedirectURL:
+          type: string
+          nullable: true
+        agent:
+          type: object
+          description: "ZSS agent connectivity details"
+          properties:
+            host:
+              type: string
+              nullable: true
+            port:
+              type: number
+              nullable: true
+            mediationLayer:
+              type: object
+              nullable: true
+        externalDomains:
+          type: array
+          items:
+            type: string
+        externalPort:
+          type: number
+          nullable: true
+        runtimeDirectory:
+          type: string
+          nullable: true
+        mediationLayer:
+          type: object
+          description: "API Mediation Layer (API ML) configuration"
+          properties:
+            enabled:
+              type: boolean
+            gatewayHostname:
+              type: string
+              nullable: true
+            gatewayPort:
+              type: number
+              nullable: true
+        instanceDir:
+          type: string
+          nullable: true
+        workspaceDir:
+          type: string
+          nullable: true
+        extensionDir:
+          type: string
+          nullable: true
+        javaHome:
+          type: string
+          nullable: true
+        nodeEnv:
+          type: string
+          nullable: true
+        launchComponents:
+          type: string
+          nullable: true
+
+    PluginsInfo:
+      type: object
+      properties:
+        total:
+          type: number
+        applications:
+          type: number
+          description: "Count of plugins with pluginType 'application'"
+        list:
+          type: array
+          items:
+            type: object
+            properties:
+              identifier:
+                type: string
+              pluginVersion:
+                type: string
+              pluginType:
+                type: string
+                description: "e.g., application, library, nodeAuthentication"
+              webContent:
+                type: boolean
+              dataServices:
+                type: number
+                description: "Number of dataServices registered by this plugin"
+
+    CurrentPluginInfo:
+      type: object
+      description: "Information about the currently running plugin"
+      properties:
+        identifier:
+          type: string
+          nullable: true
+        version:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        framework:
+          type: string
+          nullable: true
+          description: "Web framework, e.g., angular2"
+        dataServices:
+          type: array
+          items:
+            type: string
+          description: "List of dataservice names for this plugin"

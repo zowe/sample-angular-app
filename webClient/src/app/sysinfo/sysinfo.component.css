@@ -1,0 +1,1291 @@
+
+/*
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+
+  SPDX-License-Identifier: EPL-2.0
+
+  Copyright Contributors to the Zowe Project.
+*/
+
+/* ═══════════════════════════════════════════════════════
+   SYSTEM INFO COMPONENT — macOS / Fedora GNOME Inspired
+   ═══════════════════════════════════════════════════════ */
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  color: #1d1d1f;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 50%, #d5dce8 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sysinfo-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+}
+
+/* ═══════════ HEADER (macOS About This Mac style) ═══════════ */
+
+.sysinfo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.zowe-logo-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.zowe-logo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.zowe-icon {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 6px rgba(74, 144, 217, 0.3));
+}
+
+.zowe-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.zowe-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #1d1d1f;
+}
+
+.zowe-subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #6e6e73;
+  font-weight: 400;
+}
+
+.refresh-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #6e6e73;
+}
+
+.refresh-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1d1d1f;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.refresh-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.refresh-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════ TAB BAR (Fedora GNOME Settings style) ═══════════ */
+
+.tab-bar {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #6e6e73;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1d1d1f;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #1d1d1f;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 0.5px 1px rgba(0, 0, 0, 0.04);
+}
+
+.tab-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ═══════════ LOADING STATE ═══════════ */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(74, 144, 217, 0.15);
+  border-top-color: #4a90d9;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: #6e6e73;
+  font-size: 14px;
+}
+
+/* ═══════════ ERROR STATE ═══════════ */
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.error-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.error-text {
+  color: #6e6e73;
+  margin-bottom: 16px;
+  max-width: 400px;
+}
+
+.retry-btn {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #4a90d9;
+  color: white;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retry-btn:hover {
+  background: #3a7bc8;
+}
+
+/* ═══════════ PANEL CONTENT ═══════════ */
+
+.panel {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════ HERO CARD (macOS About style) ═══════════ */
+
+.hero-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.hero-os-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 12px;
+}
+
+.hero-os-badge.os-zos {
+  background: linear-gradient(135deg, #1a5fb4, #4a90d9);
+  color: white;
+}
+
+.hero-os-badge.os-linux {
+  background: linear-gradient(135deg, #e95420, #f7941d);
+  color: white;
+}
+
+.hero-os-badge.os-macos {
+  background: linear-gradient(135deg, #333, #666);
+  color: white;
+}
+
+.hero-os-badge.os-windows {
+  background: linear-gradient(135deg, #0078d4, #00bcf2);
+  color: white;
+}
+
+.hero-os-badge.os-generic {
+  background: linear-gradient(135deg, #6e6e73, #a1a1a6);
+  color: white;
+}
+
+.os-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.os-release {
+  font-size: 10px;
+  margin-top: 4px;
+  opacity: 0.85;
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+.hero-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.hero-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.hero-stat:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6e6e73;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+/* ═══════════ STATS GRID (Fedora About style) ═══════════ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.cpu-icon {
+  background: linear-gradient(135deg, #5856d6, #af52de);
+  color: white;
+}
+
+.memory-icon {
+  background: linear-gradient(135deg, #34c759, #30d158);
+  color: white;
+}
+
+.uptime-icon {
+  background: linear-gradient(135deg, #ff9500, #ff6b00);
+  color: white;
+}
+
+.node-icon {
+  background: linear-gradient(135deg, #43853d, #68a063);
+  color: white;
+}
+
+.agent-icon {
+  background: linear-gradient(135deg, #1a5fb4, #3584e4);
+  color: white;
+}
+
+.plugins-icon {
+  background: linear-gradient(135deg, #e95420, #f7941d);
+  color: white;
+}
+
+.stat-card-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.stat-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6e6e73;
+  margin-bottom: 2px;
+}
+
+.stat-card-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-card-value.uptime-live {
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card-sub {
+  font-size: 11px;
+  color: #8e8e93;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Memory bar in stat card */
+.memory-bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.memory-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease, background 0.3s ease;
+}
+
+/* ═══════════ INFO SECTIONS (Fedora Settings style) ═══════════ */
+
+.info-section {
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.section-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #4a90d9;
+}
+
+.zowe-section-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.info-table {
+  padding: 4px 0;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: baseline;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  transition: background 0.15s ease;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.info-row.full-width {
+  grid-template-columns: 1fr;
+  padding: 12px 18px;
+}
+
+.info-label {
+  font-size: 13px;
+  color: #6e6e73;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 13px;
+  color: #1d1d1f;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.path-value {
+  font-size: 12px;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  color: #555;
+}
+
+.monospace {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-size: 12px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Memory bar (large — server tab) */
+
+.memory-bar-large-container {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.memory-bar-large {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease, background 0.3s ease;
+}
+
+.memory-bar-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d1d1f;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+/* ═══════════ NETWORK CARDS ═══════════ */
+
+.network-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.network-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.network-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.network-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.network-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1d1d1f;
+}
+
+.network-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.network-badge.ipv4 {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.network-badge.ipv6 {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.network-card-body {
+  padding: 10px 14px;
+}
+
+.network-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.network-label {
+  font-size: 12px;
+  color: #6e6e73;
+}
+
+.network-value {
+  font-size: 12px;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+/* ═══════════ INTERFACES TABLE ═══════════ */
+
+.interfaces-table {
+  padding: 0 18px 14px;
+  overflow-x: auto;
+}
+
+.itable-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 0.7fr 2fr 0.8fr;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6e6e73;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.itable-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 0.7fr 2fr 0.8fr;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  align-items: center;
+  transition: background 0.15s ease;
+}
+
+.itable-row:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.itable-row.internal {
+  opacity: 0.6;
+}
+
+.itable-row:last-child {
+  border-bottom: none;
+}
+
+/* 3-column variant for plugin tables */
+.itable-header.cols-3 {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.itable-row.cols-3 {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+/* ═══════════ TIPS SECTION ═══════════ */
+
+.tips-container {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tip-card {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: rgba(74, 144, 217, 0.04);
+  border-radius: 10px;
+  border: 1px solid rgba(74, 144, 217, 0.1);
+  transition: transform 0.15s ease;
+}
+
+.tip-card:hover {
+  transform: translateX(3px);
+}
+
+.tip-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a90d9, #1a5fb4);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tip-content {
+  flex: 1;
+}
+
+.tip-content strong {
+  display: block;
+  font-size: 13px;
+  color: #1d1d1f;
+  margin-bottom: 4px;
+}
+
+.tip-content p {
+  margin: 0;
+  font-size: 12px;
+  color: #6e6e73;
+  line-height: 1.5;
+}
+
+/* ═══════════ FOOTER ═══════════ */
+
+.info-footer {
+  text-align: center;
+  padding: 12px 0 4px;
+}
+
+.footer-timestamp {
+  font-size: 11px;
+  color: #a1a1a6;
+}
+
+/* ═══════════ EMPTY TEXT ═══════════ */
+
+.empty-text {
+  padding: 16px 18px;
+  color: #8e8e93;
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* ═══════════ USER / SESSION HEADER ═══════════ */
+
+.zowe-user {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #6e6e73;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.session-expiry {
+  color: #8e8e93;
+}
+
+/* ═══════════ PLUGIN CARDS ═══════════ */
+
+.plugin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+.plugin-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.plugin-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.plugin-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.plugin-card-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.app-plugin-icon {
+  background: linear-gradient(135deg, #5856d6, #af52de);
+  color: white;
+}
+
+.plugin-card-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.plugin-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d1d1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+.plugin-version {
+  font-size: 11px;
+  color: #8e8e93;
+}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+
+@media (max-width: 680px) {
+  .sysinfo-container {
+    padding: 12px 12px 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-stats {
+    width: 100%;
+  }
+
+  .tab-btn {
+    font-size: 11px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .tab-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .info-row {
+    grid-template-columns: 140px 1fr;
+  }
+
+  .itable-header,
+  .itable-row {
+    grid-template-columns: 1fr 1.5fr 0.6fr 1.5fr 0.7fr;
+    font-size: 11px;
+  }
+
+  .itable-header.cols-3,
+  .itable-row.cols-3 {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+
+  .network-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 450px) {
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .info-label {
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .tab-btn span:not(.tab-icon) {
+    display: none;
+  }
+
+  .zowe-title {
+    font-size: 18px;
+  }
+
+  .joblog-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .joblog-fetch-btn {
+    align-self: flex-start;
+  }
+
+  .joblog-toolbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* ═══════════ DIAGNOSTICS TAB ═══════════ */
+
+.diagnostics-section {
+  padding: 0;
+}
+
+.diagnostics-description {
+  margin: 0 18px 16px;
+  font-size: 12.5px;
+  color: #6e6e73;
+  line-height: 1.6;
+}
+
+.diagnostics-description .monospace {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11.5px;
+}
+
+/* Input Row */
+.joblog-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 0 18px 14px;
+}
+
+.joblog-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.joblog-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.joblog-input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  background: rgba(255, 255, 255, 0.8);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.joblog-input:focus {
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+}
+
+.joblog-input.input-error {
+  border-color: #ff3b30;
+}
+
+.joblog-validation-error {
+  font-size: 11px;
+  color: #ff3b30;
+  margin-top: 2px;
+}
+
+.joblog-fetch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  background: linear-gradient(135deg, #4a90d9 0%, #1a5fb4 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.joblog-fetch-btn:hover:not([disabled]) {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.joblog-fetch-btn:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+.joblog-fetch-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-spinner-sm {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Member List */
+.joblog-members {
+  padding: 0 18px 12px;
+}
+
+.joblog-members-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6e6e73;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.joblog-member-list {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.joblog-member-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-weight: 500;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.joblog-member-btn:hover {
+  background: rgba(74, 144, 217, 0.08);
+  border-color: rgba(74, 144, 217, 0.3);
+}
+
+.joblog-member-btn.active {
+  background: linear-gradient(135deg, #4a90d9 0%, #1a5fb4 100%);
+  color: white;
+  border-color: transparent;
+}
+
+/* Error */
+.joblog-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 18px 12px;
+  padding: 10px 14px;
+  background: rgba(255, 59, 48, 0.06);
+  border: 1px solid rgba(255, 59, 48, 0.15);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #ff3b30;
+}
+
+/* Content Viewer */
+.joblog-viewer {
+  margin: 0 18px 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.joblog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.joblog-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: #6e6e73;
+}
+
+.joblog-meta-item strong {
+  color: #1d1d1f;
+}
+
+.joblog-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: white;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.joblog-copy-btn:hover {
+  background: rgba(74, 144, 217, 0.06);
+  border-color: rgba(74, 144, 217, 0.3);
+  color: #1a5fb4;
+}
+
+.joblog-copy-btn.copied {
+  background: rgba(52, 199, 89, 0.08);
+  border-color: rgba(52, 199, 89, 0.3);
+  color: #34c759;
+}
+
+.joblog-content {
+  margin: 0;
+  padding: 14px 16px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #1d1d1f;
+  overflow: auto;
+  max-height: 350px;
+  white-space: pre;
+  tab-size: 4;
+  background: #fafafa;
+}
+
+.joblog-error-content {
+  margin: 0 18px 14px;
+  border: 1.5px solid rgba(255, 59, 48, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 59, 48, 0.03);
+}
+
+.joblog-error-content .error-content {
+  color: #ff3b30;
+}
+
+/* Tips */
+.diagnostics-tips {
+  padding: 0 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(74, 144, 217, 0.04);
+  border: 1px solid rgba(74, 144, 217, 0.1);
+  border-radius: 10px;
+}
+
+.tip-icon {
+  flex-shrink: 0;
+  color: #4a90d9;
+  margin-top: 2px;
+}
+
+.tip-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #3a3a3c;
+}
+
+.tip-text strong {
+  color: #1d1d1f;
+}
+
+.tip-text ol {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.tip-text ol li {
+  margin-bottom: 4px;
+}
+
+/*
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+
+  SPDX-License-Identifier: EPL-2.0
+
+  Copyright Contributors to the Zowe Project.
+*/

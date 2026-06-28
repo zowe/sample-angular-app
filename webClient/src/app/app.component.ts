@@ -33,6 +33,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 export class AppComponent {
 
+  //filled in via radio buttons
+  activeView: string = "demo";
+
   targetAppId: string = "org.zowe.terminal.tn3270";
   callStatus: string;
   parameters: string =

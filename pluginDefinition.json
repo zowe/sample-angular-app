@@ -45,6 +45,15 @@
     },
     {
       "type": "router",
+      "name": "sysinfo",
+      "filename": "sysinfo.js",
+      "routerFactory": "sysinfoRouter",
+      "dependenciesIncluded": true,
+      "initializerLookupMethod": "external",
+      "version": "1.0.0"
+    },
+    {
+      "type": "router",
       "name": "appServerStorage",
       "filename": "storage.js",
       "routerFactory": "storageRouter",

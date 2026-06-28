@@ -1,0 +1,500 @@
+<!--
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+
+  SPDX-License-Identifier: EPL-2.0
+
+  Copyright Contributors to the Zowe Project.
+-->
+
+<div class="sysinfo-container">
+  <!-- Header: macOS "About This Mac" inspired -->
+  <div class="sysinfo-header">
+    <div class="zowe-logo-area">
+      <div class="zowe-logo">
+        <svg viewBox="0 0 64 64" class="zowe-icon">
+          <defs>
+            <linearGradient id="zoweGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#4a90d9;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#1a5fb4;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#zoweGrad)" />
+          <text x="32" y="42" text-anchor="middle" fill="white" font-size="24" font-weight="700" font-family="system-ui, -apple-system, sans-serif">Z</text>
+        </svg>
+      </div>
+      <div class="zowe-title-block">
+        <h1 class="zowe-title">Zowe Desktop</h1>
+        <p class="zowe-subtitle" *ngIf="zoweInfo?.version">Version {{ zoweInfo.version }}</p>
+        <p class="zowe-subtitle" *ngIf="!zoweInfo?.version">Open Mainframe Project</p>
+        <p class="zowe-user" *ngIf="loggedInUser && loggedInUser !== 'Unknown'">
+          <span class="status-dot" style="background: #34c759"></span>
+          {{ loggedInUser }}
+          <span class="session-expiry" *ngIf="sessionExpiryMs"> &middot; Session: {{ getSessionExpiryFormatted() }}</span>
+        </p>
+      </div>
+    </div>
+    <button class="refresh-btn" (click)="refreshData()" [disabled]="loading" title="Refresh system information">
+      <svg viewBox="0 0 16 16" class="refresh-icon" [class.spinning]="loading">
+        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 1 1 .908-.418A6 6 0 1 1 8 2v1z" fill="currentColor"/>
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Tab Navigation: Fedora Settings style -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3.5 6a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5v-5A1.5 1.5 0 0 1 4.5 7h7z" fill="currentColor"/></svg>
+      Overview
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'server'" (click)="setActiveTab('server')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-11A1.5 1.5 0 0 1 1 5.5v-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h11a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-3z" fill="currentColor"/></svg>
+      Server
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'client'" (click)="setActiveTab('client')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M13.5 3a.5.5 0 0 1 .5.5V11H2V3.5a.5.5 0 0 1 .5-.5h11zM2.5 2A1.5 1.5 0 0 0 1 3.5V12h14V3.5A1.5 1.5 0 0 0 13.5 2h-11zM0 12.5h16a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5z" fill="currentColor"/></svg>
+      Client
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'network'" (click)="setActiveTab('network')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09z" fill="currentColor"/></svg>
+      Network
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'zowe'" (click)="setActiveTab('zowe')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M5 0a.5.5 0 0 1 .5.5V2h5V.5a.5.5 0 0 1 1 0V2h1.5A1.5 1.5 0 0 1 14.5 3.5v11a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 14.5v-11A1.5 1.5 0 0 1 3 2h1.5V.5A.5.5 0 0 1 5 0zM3.5 6v8a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5V6h-9z" fill="currentColor"/></svg>
+      Zowe
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'plugins'" (click)="setActiveTab('plugins')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M6 0a.5.5 0 0 1 .5.5V3h3V.5a.5.5 0 0 1 1 0V3h1a.5.5 0 0 1 .5.5v3.191a2.717 2.717 0 0 1-.732 1.866L9 10.957V14.5a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 5 14.5v-3.543L2.732 8.557A2.717 2.717 0 0 1 2 6.691V3.5A.5.5 0 0 1 2.5 3h3V.5A.5.5 0 0 1 6 0z" fill="currentColor"/></svg>
+      Plugins
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'diagnostics'" (click)="setActiveTab('diagnostics')">
+      <svg viewBox="0 0 16 16" class="tab-icon"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" fill="currentColor"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" fill="currentColor"/></svg>
+      Diagnostics
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-container" *ngIf="loading && !serverInfo">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Gathering system information...</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="error-container" *ngIf="error && !serverInfo">
+    <div class="error-icon">!</div>
+    <p class="error-text">{{ error }}</p>
+    <button class="retry-btn" (click)="refreshData()">Retry</button>
+  </div>
+
+  <!-- Content panels -->
+  <div class="tab-content" *ngIf="!loading || serverInfo">
+
+    <!-- OVERVIEW TAB -->
+    <div class="panel" *ngIf="activeTab === 'overview'">
+      <div class="hero-card">
+        <div class="hero-os-badge" [ngClass]="getOSIcon()">
+          <span class="os-name">{{ getOSDisplayName() }}</span>
+          <span class="os-release" *ngIf="serverInfo">{{ serverInfo.osRelease }}</span>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span class="stat-label">Hostname</span><span class="stat-value">{{ serverInfo?.hostname || '—' }}</span></div>
+          <div class="hero-stat"><span class="stat-label">Architecture</span><span class="stat-value">{{ serverInfo?.architecture || '—' }}</span></div>
+          <div class="hero-stat"><span class="stat-label">User</span><span class="stat-value">{{ serverInfo?.userInfo?.username || loggedInUser || '—' }}</span></div>
+          <div class="hero-stat" *ngIf="serverInfo?.cluster?.isCluster"><span class="stat-label">Cluster Workers</span><span class="stat-value">{{ serverInfo.cluster.workersNum }}</span></div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon cpu-icon"><svg viewBox="0 0 24 24"><path d="M9 2v2H7v2H5v2H3v4h2v2h2v2h2v2h6v-2h2v-2h2v-2h2V8h-2V6h-2V4h-2V2H9zm1 4h4v2h2v4h-2v2h-4v-2H8V8h2V6z" fill="currentColor"/></svg></div>
+          <div class="stat-card-content">
+            <span class="stat-card-label">Processor</span>
+            <span class="stat-card-value">{{ serverInfo?.cpus?.model || '—' }}</span>
+            <span class="stat-card-sub">{{ serverInfo?.cpus?.cores || 0 }} cores @ {{ serverInfo?.cpus?.speed || 0 }} MHz</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon memory-icon"><svg viewBox="0 0 24 24"><path d="M2 7h20v10H2V7zm2 2v6h16V9H4zm1 1h2v4H5v-4zm3 0h2v4H8v-4zm3 0h2v4h-2v-4zm3 0h2v4h-2v-4zm3 0h2v4h-2v-4z" fill="currentColor"/></svg></div>
+          <div class="stat-card-content">
+            <span class="stat-card-label">Memory</span>
+            <span class="stat-card-value">{{ formatMemory(serverInfo?.totalMemoryMB || 0) }}</span>
+            <div class="memory-bar-container"><div class="memory-bar" [style.width.%]="getMemoryBarWidth()" [style.background]="getMemoryBarColor()"></div></div>
+            <span class="stat-card-sub">{{ formatMemory(serverInfo?.usedMemoryMB || 0) }} used ({{ serverInfo?.memoryUsagePercent || 0 }}%)</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon uptime-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" fill="currentColor"/></svg></div>
+          <div class="stat-card-content">
+            <span class="stat-card-label">Uptime</span>
+            <span class="stat-card-value uptime-live">{{ serverUptimeFormatted || '—' }}</span>
+            <span class="stat-card-sub">Load avg: {{ getLoadAverageDisplay() }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon node-icon"><svg viewBox="0 0 24 24"><path d="M12 1.85c-.27 0-.55.07-.78.2l-7.44 4.3c-.48.28-.78.8-.78 1.36v8.58c0 .56.3 1.08.78 1.36l1.95 1.12c.95.46 1.27.46 1.71.46 1.4 0 2.21-.85 2.21-2.33V8.44c0-.12-.1-.22-.22-.22H8.19c-.13 0-.23.1-.23.22v8.47c0 .66-.68 1.31-1.77.76L4.2 16.76a.26.26 0 0 1-.13-.22V7.96c0-.09.05-.17.13-.22l7.44-4.29c.08-.05.18-.05.27 0l7.44 4.29c.08.05.13.13.13.22v8.58c0 .09-.05.17-.13.22l-7.44 4.29c-.08.05-.2.05-.27 0l-1.88-1.11c-.07-.04-.16-.05-.24-.01-.67.36-.79.41-1.43.63-.16.05-.4.14.09.4l2.45 1.45c.24.14.5.21.78.21.27 0 .54-.07.78-.2l7.44-4.3c.48-.28.78-.8.78-1.36V7.71c0-.56-.3-1.08-.78-1.36l-7.44-4.3c-.23-.13-.5-.2-.78-.2z" fill="currentColor"/></svg></div>
+          <div class="stat-card-content">
+            <span class="stat-card-label">Node.js</span>
+            <span class="stat-card-value">{{ serverInfo?.nodeVersion || '—' }}</span>
+            <span class="stat-card-sub">PID {{ serverInfo?.pid || '—' }} &middot; Heap {{ serverInfo?.processMemoryMB?.heapUsed || 0 }}/{{ serverInfo?.processMemoryMB?.heapTotal || 0 }} MB</span>
+          </div>
+        </div>
+        <div class="stat-card" *ngIf="zoweInfo?.agent?.host">
+          <div class="stat-card-icon agent-icon"><svg viewBox="0 0 24 24"><path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" fill="currentColor"/></svg></div>
+          <div class="stat-card-content">
+            <span class="stat-card-label">ZSS Agent</span>
+            <span class="stat-card-value">{{ getAgentStatus() }}</span>
+            <span class="stat-card-sub">API ML: {{ getMediationLayerStatus() }}</span>
+          </div>
+        </div>
+        <div class="stat-card" *ngIf="pluginsInfo">
+          <div class="stat-card-icon plugins-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="stat-card-content">
+            <span class="stat-card-label">Plugins</span>
+            <span class="stat-card-value">{{ zowePluginDefs.length || pluginsInfo.total }} installed</span>
+            <span class="stat-card-sub">{{ getAppPlugins().length || pluginsInfo.applications }} applications</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-footer"><span class="footer-timestamp">Last updated: {{ getFormattedTimestamp() }}</span></div>
+    </div>
+
+    <!-- SERVER TAB -->
+    <div class="panel" *ngIf="activeTab === 'server'">
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-11A1.5 1.5 0 0 1 1 5.5v-3z" fill="currentColor"/></svg>Operating System</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">OS Type</span><span class="info-value">{{ getOSDisplayName() }}</span></div>
+          <div class="info-row"><span class="info-label">Platform</span><span class="info-value">{{ serverInfo?.platform || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Release</span><span class="info-value">{{ serverInfo?.osRelease || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Architecture</span><span class="info-value">{{ serverInfo?.architecture || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Hostname</span><span class="info-value">{{ serverInfo?.hostname || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Endianness</span><span class="info-value">{{ serverInfo?.endianness || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Line Endings</span><span class="info-value">{{ serverInfo?.eol || '—' }}</span></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 24 24" class="section-icon"><path d="M9 2v2H7v2H5v2H3v4h2v2h2v2h2v2h6v-2h2v-2h2v-2h2V8h-2V6h-2V4h-2V2H9z" fill="currentColor"/></svg>Processor</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Model</span><span class="info-value">{{ serverInfo?.cpus?.model || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Cores</span><span class="info-value">{{ serverInfo?.cpus?.cores || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Speed</span><span class="info-value">{{ serverInfo?.cpus?.speed || '—' }} MHz</span></div>
+          <div class="info-row"><span class="info-label">Load Average (1/5/15m)</span><span class="info-value">{{ getLoadAverageDisplay() }}</span></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 24 24" class="section-icon"><path d="M2 7h20v10H2V7zm2 2v6h16V9H4z" fill="currentColor"/></svg>Memory</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Total</span><span class="info-value">{{ formatMemory(serverInfo?.totalMemoryMB || 0) }}</span></div>
+          <div class="info-row"><span class="info-label">Used</span><span class="info-value">{{ formatMemory(serverInfo?.usedMemoryMB || 0) }} ({{ serverInfo?.memoryUsagePercent || 0 }}%)</span></div>
+          <div class="info-row"><span class="info-label">Free</span><span class="info-value">{{ formatMemory(serverInfo?.freeMemoryMB || 0) }}</span></div>
+          <div class="info-row full-width"><div class="memory-bar-large-container"><div class="memory-bar-large" [style.width.%]="getMemoryBarWidth()" [style.background]="getMemoryBarColor()"></div><span class="memory-bar-label">{{ serverInfo?.memoryUsagePercent || 0 }}% used</span></div></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.502.002.071-.332 2.351-.386zm-.154-2.173a.9.9 0 1 1 0-1.798.9.9 0 0 1 0 1.798z" fill="currentColor"/></svg>Process (Node.js)</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Node.js Version</span><span class="info-value">{{ serverInfo?.nodeVersion || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Process ID (PID)</span><span class="info-value">{{ serverInfo?.pid || '—' }}</span></div>
+          <div class="info-row" *ngIf="serverInfo?.ppid"><span class="info-label">Parent PID</span><span class="info-value">{{ serverInfo.ppid }}</span></div>
+          <div class="info-row"><span class="info-label">RSS Memory</span><span class="info-value">{{ serverInfo?.processMemoryMB?.rss || 0 }} MB</span></div>
+          <div class="info-row"><span class="info-label">Heap Total</span><span class="info-value">{{ serverInfo?.processMemoryMB?.heapTotal || 0 }} MB</span></div>
+          <div class="info-row"><span class="info-label">Heap Used</span><span class="info-value">{{ serverInfo?.processMemoryMB?.heapUsed || 0 }} MB</span></div>
+          <div class="info-row"><span class="info-label">External</span><span class="info-value">{{ serverInfo?.processMemoryMB?.external || 0 }} MB</span></div>
+        </div>
+      </div>
+      <div class="info-section" *ngIf="serverInfo?.cluster">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3z" fill="currentColor"/></svg>Cluster</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Cluster Mode</span><span class="info-value">{{ serverInfo.cluster.isCluster ? 'Enabled' : 'Disabled' }}</span></div>
+          <div class="info-row"><span class="info-label">Role</span><span class="info-value">{{ serverInfo.cluster.isMaster ? 'Master' : 'Worker' }}</span></div>
+          <div class="info-row"><span class="info-label">Workers</span><span class="info-value">{{ serverInfo.cluster.workersNum }}</span></div>
+          <div class="info-row" *ngIf="serverInfo.cluster.cpuUsagePercent !== null"><span class="info-label">CPU Usage</span><span class="info-value">{{ serverInfo.cluster.cpuUsagePercent }}%</span></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3.5 6a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5v-5A1.5 1.5 0 0 1 4.5 7h7z" fill="currentColor"/></svg>Process User</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Username</span><span class="info-value">{{ serverInfo?.userInfo?.username || '—' }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT TAB -->
+    <div class="panel" *ngIf="activeTab === 'client'">
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M13.5 3a.5.5 0 0 1 .5.5V11H2V3.5a.5.5 0 0 1 .5-.5h11zM2.5 2A1.5 1.5 0 0 0 1 3.5V12h14V3.5A1.5 1.5 0 0 0 13.5 2h-11zM0 12.5h16a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5z" fill="currentColor"/></svg>Browser</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Browser</span><span class="info-value">{{ clientInfo?.browserName || '—' }} {{ clientInfo?.browserVersion || '' }}</span></div>
+          <div class="info-row"><span class="info-label">Platform</span><span class="info-value">{{ clientInfo?.platform || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Language</span><span class="info-value">{{ clientInfo?.language || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">All Languages</span><span class="info-value">{{ clientInfo?.languages?.join(', ') || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Cookies</span><span class="info-value"><span class="status-dot" [style.background]="clientInfo?.cookiesEnabled ? '#34c759' : '#ff3b30'"></span>{{ clientInfo?.cookiesEnabled ? 'Enabled' : 'Disabled' }}</span></div>
+          <div class="info-row"><span class="info-label">Online</span><span class="info-value"><span class="status-dot" [style.background]="getConnectionStatusColor()"></span>{{ clientInfo?.onLine ? 'Connected' : 'Offline' }}</span></div>
+          <div class="info-row"><span class="info-label">Dark Mode</span><span class="info-value">{{ clientInfo?.darkMode ? 'Yes' : 'No' }}</span></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" fill="currentColor"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12z" fill="currentColor"/></svg>Display</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Screen Resolution</span><span class="info-value">{{ clientInfo?.screenWidth || 0 }} x {{ clientInfo?.screenHeight || 0 }}</span></div>
+          <div class="info-row"><span class="info-label">Window Size</span><span class="info-value">{{ clientInfo?.windowWidth || 0 }} x {{ clientInfo?.windowHeight || 0 }}</span></div>
+          <div class="info-row"><span class="info-label">Color Depth</span><span class="info-value">{{ clientInfo?.screenColorDepth || 0 }}-bit</span></div>
+          <div class="info-row"><span class="info-label">Device Pixel Ratio</span><span class="info-value">{{ clientInfo?.devicePixelRatio || 1 }}x</span></div>
+          <div class="info-row"><span class="info-label">Touch Points</span><span class="info-value">{{ clientInfo?.maxTouchPoints || 0 }}</span></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" fill="currentColor"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" fill="currentColor"/></svg>Locale &amp; Time</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Time Zone</span><span class="info-value">{{ clientInfo?.timeZone || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">UTC Offset</span><span class="info-value">UTC{{ (clientInfo?.timeZoneOffset || 0) <= 0 ? '+' : '-' }}{{ (Math.abs(clientInfo?.timeZoneOffset || 0) / 60) | number:'1.0-0' }}:{{ (Math.abs(clientInfo?.timeZoneOffset || 0) % 60) | number:'2.0-0' }}</span></div>
+          <div class="info-row"><span class="info-label">Hardware Concurrency</span><span class="info-value">{{ clientInfo?.hardwareConcurrency || '—' }} logical processors</span></div>
+          <div class="info-row" *ngIf="clientInfo?.connectionType && clientInfo.connectionType !== 'Unknown'"><span class="info-label">Connection Type</span><span class="info-value">{{ clientInfo.connectionType }}</span></div>
+        </div>
+      </div>
+      <div class="info-section" *ngIf="authStatus">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3.5 6a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5v-5A1.5 1.5 0 0 1 4.5 7h7z" fill="currentColor"/></svg>Session</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Authentication</span><span class="info-value"><span class="status-dot" [style.background]="authStatus.authenticated ? '#34c759' : '#ff3b30'"></span>{{ authStatus.authenticated ? 'Authenticated' : 'Not Authenticated' }}</span></div>
+          <div class="info-row" *ngIf="loggedInUser && loggedInUser !== 'Unknown'"><span class="info-label">Username</span><span class="info-value">{{ loggedInUser }}</span></div>
+          <div class="info-row" *ngIf="sessionExpiryMs"><span class="info-label">Session Timeout</span><span class="info-value">{{ getSessionExpiryFormatted() }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NETWORK TAB -->
+    <div class="panel" *ngIf="activeTab === 'network'">
+      <div class="info-section" *ngIf="zoweInfo?.agent?.host">
+        <h3 class="section-title"><svg viewBox="0 0 24 24" class="section-icon"><path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" fill="currentColor"/></svg>ZSS Agent Connectivity</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Agent Host</span><span class="info-value monospace">{{ zoweInfo.agent.host }}</span></div>
+          <div class="info-row"><span class="info-label">Agent Port</span><span class="info-value">{{ zoweInfo.agent.port }}</span></div>
+          <div class="info-row"><span class="info-label">API Mediation Layer</span><span class="info-value">{{ getMediationLayerStatus() }}</span></div>
+          <div class="info-row" *ngIf="zoweInfo.externalDomains?.length > 0"><span class="info-label">External Domains</span><span class="info-value monospace">{{ zoweInfo.externalDomains.join(', ') }}</span></div>
+          <div class="info-row" *ngIf="zoweInfo.externalPort"><span class="info-label">External Port</span><span class="info-value">{{ zoweInfo.externalPort }}</span></div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z" fill="currentColor"/></svg>External Interfaces</h3>
+        <div class="network-cards" *ngIf="getExternalInterfaces().length > 0; else noExtInterfaces">
+          <div class="network-card" *ngFor="let iface of getExternalInterfaces()">
+            <div class="network-card-header"><span class="network-name">{{ iface.name }}</span><span class="network-badge ipv4">{{ iface.family }}</span></div>
+            <div class="network-card-body">
+              <div class="network-detail"><span class="network-label">Address</span><span class="network-value monospace">{{ iface.address }}</span></div>
+              <div class="network-detail"><span class="network-label">MAC</span><span class="network-value monospace">{{ iface.mac }}</span></div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noExtInterfaces><p class="empty-text">No external network interfaces found.</p></ng-template>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12z" fill="currentColor"/></svg>All Interfaces</h3>
+        <div class="interfaces-table">
+          <div class="itable-header"><span>Name</span><span>Address</span><span>Family</span><span>MAC</span><span>Type</span></div>
+          <div class="itable-row" *ngFor="let iface of getAllInterfaces()" [class.internal]="iface.internal">
+            <span>{{ iface.name }}</span><span class="monospace">{{ iface.address }}</span>
+            <span><span class="network-badge" [ngClass]="iface.family === 'IPv4' ? 'ipv4' : 'ipv6'">{{ iface.family }}</span></span>
+            <span class="monospace">{{ iface.mac }}</span><span>{{ iface.internal ? 'Internal' : 'External' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZOWE TAB -->
+    <div class="panel" *ngIf="activeTab === 'zowe'">
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 64 64" class="section-icon zowe-section-icon"><rect x="4" y="4" width="56" height="56" rx="12" fill="#4a90d9"/><text x="32" y="42" text-anchor="middle" fill="white" font-size="28" font-weight="700">Z</text></svg>Zowe Environment</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Desktop Framework</span><span class="info-value">{{ desktopVersion || '—' }}</span></div>
+          <div class="info-row" *ngIf="zoweInfo?.version"><span class="info-label">Zowe Version</span><span class="info-value">{{ zoweInfo.version }}</span></div>
+          <div class="info-row" *ngIf="zoweInfo?.productCode"><span class="info-label">Product Code</span><span class="info-value monospace">{{ zoweInfo.productCode }}</span></div>
+          <div class="info-row"><span class="info-label">Current Plugin</span><span class="info-value monospace">{{ currentPlugin?.identifier || currentPluginId || '—' }}</span></div>
+          <div class="info-row"><span class="info-label">Plugin Version</span><span class="info-value">{{ currentPlugin?.version || currentPluginVersion || '—' }}</span></div>
+          <div class="info-row" *ngIf="currentPlugin?.framework"><span class="info-label">Framework</span><span class="info-value">{{ currentPlugin.framework }}</span></div>
+          <div class="info-row"><span class="info-label">Server Root</span><span class="info-value monospace path-value">{{ serverRootUri || '—' }}</span></div>
+        </div>
+      </div>
+      <div class="info-section" *ngIf="zoweInfo">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M5 0a.5.5 0 0 1 .5.5V2h5V.5a.5.5 0 0 1 1 0V2h1.5A1.5 1.5 0 0 1 14.5 3.5v11a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 14.5v-11A1.5 1.5 0 0 1 3 2h1.5V.5A.5.5 0 0 1 5 0z" fill="currentColor"/></svg>Instance Configuration</h3>
+        <div class="info-table">
+          <div class="info-row" *ngIf="zoweInfo.nodeEnv"><span class="info-label">Node Environment</span><span class="info-value">{{ zoweInfo.nodeEnv }}</span></div>
+          <div class="info-row" *ngIf="zoweInfo.launchComponents"><span class="info-label">Launched Components</span><span class="info-value">{{ zoweInfo.launchComponents }}</span></div>
+          <div class="info-row" *ngIf="zoweInfo.rootRedirectURL"><span class="info-label">Root Redirect</span><span class="info-value monospace">{{ zoweInfo.rootRedirectURL }}</span></div>
+          <div class="info-row" *ngIf="!zoweInfo.nodeEnv && !zoweInfo.launchComponents">
+            <span class="info-label empty-text" style="grid-column: 1 / -1;">No Zowe instance configuration variables detected. This may indicate the server is running outside a standard Zowe installation.</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z" fill="currentColor"/></svg>Tips for Zowe Users</h3>
+        <div class="tips-container">
+          <div class="tip-card"><div class="tip-number">1</div><div class="tip-content"><strong>System Resources</strong><p>Monitor Memory and CPU usage to ensure your Zowe instance has sufficient resources. High memory usage may indicate the need to increase allocation.</p></div></div>
+          <div class="tip-card"><div class="tip-number">2</div><div class="tip-content"><strong>Browser Compatibility</strong><p>Zowe Desktop works best with modern browsers. Check the Client tab to verify your browser version and ensure cookies and JavaScript are enabled.</p></div></div>
+          <div class="tip-card"><div class="tip-number">3</div><div class="tip-content"><strong>Network Connectivity</strong><p>The Network tab shows server interfaces and ZSS agent connectivity. Use this to verify connectivity and diagnose issues connecting to mainframe services.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLUGINS TAB -->
+    <div class="panel" *ngIf="activeTab === 'plugins'">
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3z" fill="currentColor"/></svg>Applications ({{ getAppPlugins().length }})</h3>
+        <div class="plugin-grid" *ngIf="getAppPlugins().length > 0; else noAppPlugins">
+          <div class="plugin-card" *ngFor="let plugin of getAppPlugins()">
+            <div class="plugin-card-icon app-plugin-icon"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z" fill="currentColor"/></svg></div>
+            <div class="plugin-card-content">
+              <span class="plugin-name">{{ plugin.identifier }}</span>
+              <span class="plugin-version">v{{ plugin.pluginVersion || '?' }}</span>
+            </div>
+          </div>
+        </div>
+        <ng-template #noAppPlugins><p class="empty-text">No application plugins found.</p></ng-template>
+      </div>
+      <div class="info-section">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M6 0a.5.5 0 0 1 .5.5V3h3V.5a.5.5 0 0 1 1 0V3h1a.5.5 0 0 1 .5.5v3.191a2.717 2.717 0 0 1-.732 1.866L9 10.957V14.5a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 5 14.5v-3.543L2.732 8.557A2.717 2.717 0 0 1 2 6.691V3.5A.5.5 0 0 1 2.5 3h3V.5A.5.5 0 0 1 6 0z" fill="currentColor"/></svg>Other Plugins ({{ getOtherPlugins().length }})</h3>
+        <div class="interfaces-table" *ngIf="getOtherPlugins().length > 0; else noOtherPlugins">
+          <div class="itable-header cols-3"><span>Identifier</span><span>Version</span><span>Type</span></div>
+          <div class="itable-row cols-3" *ngFor="let plugin of getOtherPlugins()">
+            <span class="monospace">{{ plugin.identifier }}</span>
+            <span>{{ plugin.pluginVersion || '—' }}</span>
+            <span><span class="network-badge" [ngClass]="{'ipv4': plugin.pluginType === 'library', 'ipv6': plugin.pluginType !== 'library'}">{{ plugin.pluginType }}</span></span>
+          </div>
+        </div>
+        <ng-template #noOtherPlugins><p class="empty-text">No other plugins found.</p></ng-template>
+      </div>
+      <div class="info-section" *ngIf="pluginsInfo">
+        <h3 class="section-title"><svg viewBox="0 0 16 16" class="section-icon"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.502.002.071-.332 2.351-.386zm-.154-2.173a.9.9 0 1 1 0-1.798.9.9 0 0 1 0 1.798z" fill="currentColor"/></svg>Summary</h3>
+        <div class="info-table">
+          <div class="info-row"><span class="info-label">Total Plugins</span><span class="info-value">{{ zowePluginDefs.length || pluginsInfo.total }}</span></div>
+          <div class="info-row"><span class="info-label">Applications</span><span class="info-value">{{ getAppPlugins().length || pluginsInfo.applications }}</span></div>
+          <div class="info-row"><span class="info-label">Libraries &amp; Services</span><span class="info-value">{{ getOtherPlugins().length }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ DIAGNOSTICS TAB ═══════════ -->
+    <div class="tab-content" *ngIf="activeTab === 'diagnostics'">
+      <div class="info-section diagnostics-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 16 16" class="section-icon"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" fill="currentColor"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z" fill="currentColor"/></svg>
+          Installation Job Log
+        </h3>
+        <p class="diagnostics-description">
+          Fetch z/OSMF installation logs to diagnose Zowe setup issues.
+          Enter the PDS dataset name containing job output (e.g., <span class="monospace">RSOMGR.JOBLOG</span>).
+          Your SAF credentials control which datasets you can access.
+        </p>
+
+        <!-- Dataset input & fetch button -->
+        <div class="joblog-input-row">
+          <div class="joblog-input-group">
+            <label class="joblog-label" for="joblog-dataset">Dataset Name (PDS)</label>
+            <input
+              id="joblog-dataset"
+              class="joblog-input"
+              type="text"
+              [(ngModel)]="jobLogDataset"
+              placeholder="RSOMGR.JOBLOG"
+              [class.input-error]="jobLogValidationError"
+              (keydown.enter)="fetchJobLog()"
+              maxlength="44"
+            />
+            <span class="joblog-validation-error" *ngIf="jobLogValidationError">{{ jobLogValidationError }}</span>
+          </div>
+          <button class="joblog-fetch-btn" (click)="fetchJobLog()" [disabled]="jobLogLoading">
+            <svg viewBox="0 0 16 16" width="14" height="14" *ngIf="!jobLogLoading"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="currentColor"/></svg>
+            <span class="loading-spinner-sm" *ngIf="jobLogLoading"></span>
+            {{ jobLogLoading ? 'Loading...' : 'Fetch Log' }}
+          </button>
+        </div>
+
+        <!-- Member list (horizontal scroll) -->
+        <div class="joblog-members" *ngIf="jobLogEntries.length > 0">
+          <span class="joblog-members-label">Members ({{ jobLogEntries.length }}) — most recent first:</span>
+          <div class="joblog-member-list">
+            <button
+              *ngFor="let entry of jobLogEntries"
+              class="joblog-member-btn"
+              [class.active]="jobLogSelectedMember === entry.memberName"
+              (click)="selectJobLogMember(entry)"
+              [title]="entry.fullPath"
+            >
+              {{ entry.memberName }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        <div class="joblog-error" *ngIf="jobLogError">
+          <svg viewBox="0 0 16 16" width="14" height="14"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="currentColor"/></svg>
+          {{ jobLogError }}
+        </div>
+
+        <!-- Content viewer -->
+        <div class="joblog-viewer" *ngIf="jobLogContent && !isJobLogError()">
+          <div class="joblog-toolbar">
+            <span class="joblog-meta">
+              <span class="joblog-meta-item" *ngIf="jobLogSelectedMember">
+                <strong>Member:</strong> {{ jobLogSelectedMember }}
+              </span>
+              <span class="joblog-meta-item">
+                <strong>Lines:</strong> {{ getJobLogLineCount() }}
+              </span>
+            </span>
+            <button class="joblog-copy-btn" (click)="copyJobLogToClipboard()" [class.copied]="jobLogCopied">
+              <svg viewBox="0 0 16 16" width="14" height="14" *ngIf="!jobLogCopied"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" fill="currentColor"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" fill="currentColor"/></svg>
+              <svg viewBox="0 0 16 16" width="14" height="14" *ngIf="jobLogCopied"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" fill="currentColor"/></svg>
+              {{ jobLogCopied ? 'Copied!' : 'Copy to Clipboard' }}
+            </button>
+          </div>
+          <pre class="joblog-content">{{ jobLogContent }}</pre>
+        </div>
+
+        <!-- Error content display -->
+        <div class="joblog-error-content" *ngIf="jobLogContent && isJobLogError()">
+          <pre class="joblog-content error-content">{{ jobLogContent }}</pre>
+        </div>
+
+        <!-- Helpful tips -->
+        <div class="diagnostics-tips" *ngIf="!jobLogContent && !jobLogLoading && !jobLogError">
+          <div class="tip-card">
+            <div class="tip-icon">
+              <svg viewBox="0 0 16 16" width="20" height="20"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.502.002.071-.332 2.351-.386zm-.154-2.173a.9.9 0 1 1 0-1.798.9.9 0 0 1 0 1.798z" fill="currentColor"/></svg>
+            </div>
+            <div class="tip-text">
+              <strong>How to use:</strong>
+              <ol>
+                <li>Enter the PDS dataset name containing your Zowe installation job logs (e.g., <span class="monospace">RSOMGR.JOBLOG</span>)</li>
+                <li>Click <strong>Fetch Log</strong> to list available members</li>
+                <li>The most recent member is loaded automatically</li>
+                <li>Click <strong>Copy to Clipboard</strong> to export for troubleshooting</li>
+              </ol>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon">
+              <svg viewBox="0 0 16 16" width="20" height="20"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" fill="currentColor"/></svg>
+            </div>
+            <div class="tip-text">
+              <strong>Access Control:</strong> Only datasets your TSO user has RACF READ access to will be accessible.
+              Contact your security administrator if you receive a 403 error.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!--
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+
+  SPDX-License-Identifier: EPL-2.0
+
+  Copyright Contributors to the Zowe Project.
+-->

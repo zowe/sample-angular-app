@@ -16,12 +16,16 @@ import { FormsModule } from '@angular/forms';
 import { ZluxButtonModule, ZluxPopupManagerModule } from '@zlux/widgets';
 import { L10nCache, L10nTranslationModule, L10nTranslationService } from 'angular-l10n';
 import { AppComponent } from './app.component';
+import { SysInfoComponent } from './sysinfo/sysinfo.component';
 import { HelloService } from './services/hello.service';
 import { StorageService } from './services/storage.service';
+import { SysInfoService } from './services/sysinfo.service';
+import { JobLogService } from './services/joblog.service';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SysInfoComponent
   ],
   imports: [
     // BrowserModule, /* remove this for within-MVD development */
@@ -34,7 +38,7 @@ import { StorageService } from './services/storage.service';
       providers: [ L10nCache, L10nTranslationService ] // New Cache and Translation Service
     }
   ],
-  providers: [HelloService, StorageService],
+  providers: [HelloService, StorageService, SysInfoService, JobLogService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -14,6 +14,70 @@
   font-size: 0.8em;
 }
 
+/* ═══════════ APP CONTAINER ═══════════ */
+.app-component {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ═══════════ NAVIGATION BAR ═══════════ */
+.app-nav-bar {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px;
+  background: linear-gradient(to bottom, #fafafa, #f0f0f0);
+  border-bottom: 1px solid #d1d1d6;
+  flex-shrink: 0;
+}
+
+.app-nav-btn {
+  display: flex;
+  align-items: center;
+  padding: 7px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6e6e73;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1d1d1f;
+}
+
+.app-nav-btn.active {
+  background: white;
+  color: #1d1d1f;
+  font-weight: 600;
+  border-color: #d1d1d6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ═══════════ VIEWS ═══════════ */
+.test-panel-container {
+  flex-direction: row;
+  display: flex;
+  flex: 1;
+  overflow: auto;
+}
+
+.sysinfo-view {
+  flex: 1;
+  overflow: hidden;
+}
+
+.sysinfo-view app-sysinfo {
+  display: block;
+  height: 100%;
+}
+
 .bold-text {
   font-weight: 600;
 }
@@ -101,11 +165,6 @@ h1 {
 
 .test-panel {
   padding: 5px 5px 5px 5px;
-}
-
-.test-panel-container {
-  flex-direction: row;
-  display: flex;
 }
 
 .plugin-test-panel {
