@@ -13,7 +13,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   SysInfoService,
-  SystemInfoResponse,
   ClientInfo,
   ServerInfo,
   ZoweInfo,

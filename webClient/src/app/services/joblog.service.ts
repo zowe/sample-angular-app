@@ -10,11 +10,10 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 /**
  * Production-grade Job Log Service for Zowe Desktop.
@@ -85,7 +84,6 @@ export class JobLogService {
   private static readonly DEFAULT_DATASET_PATTERN = 'RSOMGR.JOBLOG';
 
   constructor(
-    @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     private http: HttpClient
   ) {}
 
