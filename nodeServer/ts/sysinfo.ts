@@ -317,18 +317,18 @@ class SysInfoDataservice {
         agent: {
           host: startUpConfig.proxiedHost || null,
           port: startUpConfig.proxiedPort || null,
-          mediationLayer: componentConfig.agent?.mediationLayer || null
+          mediationLayer: (componentConfig.agent && componentConfig.agent.mediationLayer) || null
         },
 
         // External domains (for CORS/certificate validation awareness)
-        externalDomains: zoweConfig.zowe?.externalDomains || [],
-        externalPort: zoweConfig.zowe?.externalPort || null,
+        externalDomains: (zoweConfig.zowe && zoweConfig.zowe.externalDomains) || [],
+        externalPort: (zoweConfig.zowe && zoweConfig.zowe.externalPort) || null,
 
         // Mediation layer (API ML)
         mediationLayer: {
-          enabled: componentConfig.node?.mediationLayer?.enabled || false,
-          gatewayHostname: componentConfig.node?.mediationLayer?.server?.gatewayHostname || null,
-          gatewayPort: componentConfig.node?.mediationLayer?.server?.gatewayPort || null
+          enabled: (componentConfig.node && componentConfig.node.mediationLayer && componentConfig.node.mediationLayer.enabled) || false,
+          gatewayHostname: (componentConfig.node && componentConfig.node.mediationLayer && componentConfig.node.mediationLayer.server && componentConfig.node.mediationLayer.server.gatewayHostname) || null,
+          gatewayPort: (componentConfig.node && componentConfig.node.mediationLayer && componentConfig.node.mediationLayer.server && componentConfig.node.mediationLayer.server.gatewayPort) || null
         },
 
         // Non-sensitive environment indicators
@@ -348,7 +348,7 @@ class SysInfoDataservice {
         identifier: pluginDef.identifier || null,
         version: pluginDef.pluginVersion || null,
         type: pluginDef.pluginType || null,
-        framework: pluginDef.webContent?.framework || null,
+        framework: (pluginDef.webContent && pluginDef.webContent.framework) || null,
         dataServices: this.context.serviceDefinition ? [this.context.serviceDefinition.name] : []
       }
     };
