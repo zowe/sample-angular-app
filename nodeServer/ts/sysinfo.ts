@@ -216,11 +216,11 @@ class SysInfoDataservice {
     router.get('/', function (req: Request, res: Response) {
       try {
         res.status(200).json(self.buildResponse());
-      } catch (err: any) {
-        context.logger.warn('SysInfo error: ' + (err.message || err));
+      } catch (err) {
+        context.logger.warn('SysInfo error: ' + ((err as any).message || err));
         res.status(500).json({
           error: 'Failed to gather system information',
-          message: err.message || 'Unknown error'
+          message: (err as any).message || 'Unknown error'
         });
       }
     });
@@ -375,8 +375,8 @@ exports.sysinfoRouter = function (context: any): Promise<Router> {
     try {
       let dataservice = new SysInfoDataservice(context);
       resolve(dataservice.getRouter());
-    } catch (err: any) {
-      context.logger.warn('Failed to initialize SysInfo dataservice: ' + (err.message || err));
+    } catch (err) {
+      context.logger.warn('Failed to initialize SysInfo dataservice: ' + ((err as any).message || err));
       reject(err);
     }
   });
