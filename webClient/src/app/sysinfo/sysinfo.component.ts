@@ -73,6 +73,8 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   private uptimeBaseTimestamp: number = 0;
 
   // ─── Diagnostics / Job Log state ───
+  jobLogMode: 'jes' | 'dataset' = 'jes';
+  jobLogPrefix: string = 'ZWE*';
   jobLogDataset: string = '';
   jobLogEntries: JobLogEntry[] = [];
   jobLogContent: string = '';
@@ -81,9 +83,10 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   jobLogError: string | null = null;
   jobLogCopied: boolean = false;
   jobLogValidationError: string | null = null;
+  jobLogAutoFetched: boolean = false;
 
   constructor(private sysInfoService: SysInfoService, private jobLogService: JobLogService) {
-    this.jobLogDataset = this.jobLogService.getDefaultDatasetPattern();
+    this.jobLogPrefix = this.jobLogService.getDefaultJobPrefix();
   }
 
   ngOnInit(): void {
@@ -155,6 +158,9 @@ export class SysInfoComponent implements OnInit, OnDestroy {
 
   setActiveTab(tab: typeof this.activeTab): void {
     this.activeTab = tab;
+    if (tab === 'diagnostics') {
+      this.onDiagnosticsTabActivated();
+    }
   }
 
   refreshData(): void {
@@ -286,43 +292,94 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   // ─── Diagnostics / Job Log Methods ───
 
   /**
-   * Fetch job log members from the configured dataset.
-   * Auto-selects and loads the most recent member.
+   * Switch between JES (automatic) and Dataset (manual) modes.
+   */
+  setJobLogMode(mode: 'jes' | 'dataset'): void {
+    this.jobLogMode = mode;
+    this.jobLogEntries = [];
+    this.jobLogContent = '';
+    this.jobLogSelectedMember = null;
+    this.jobLogError = null;
+    this.jobLogValidationError = null;
+    this.jobLogAutoFetched = false;
+  }
+
+  /**
+   * Auto-fetch job logs when Diagnostics tab is selected.
+   * Uses JES mode by default (auto-detect user's jobs).
+   */
+  onDiagnosticsTabActivated(): void {
+    if (!this.jobLogAutoFetched && this.loggedInUser) {
+      this.jobLogAutoFetched = true;
+      this.fetchJobLog();
+    }
+  }
+
+  /**
+   * Fetch job log entries.
+   * JES mode: auto-detects user's recent jobs via z/OSMF.
+   * Dataset mode: reads members of specified PDS.
    */
   fetchJobLog(): void {
-    const validationErr = this.jobLogService.validateDatasetName(this.jobLogDataset);
-    if (validationErr) {
-      this.jobLogValidationError = validationErr;
-      return;
-    }
-    this.jobLogValidationError = null;
     this.jobLogLoading = true;
     this.jobLogError = null;
     this.jobLogContent = '';
     this.jobLogEntries = [];
     this.jobLogSelectedMember = null;
     this.jobLogCopied = false;
+    this.jobLogValidationError = null;
 
-    this.jobLogService.getMostRecentJobLog(this.jobLogDataset).subscribe(
-      (result) => {
-        this.jobLogEntries = result.entries;
-        this.jobLogContent = result.content;
-        this.jobLogSelectedMember = result.selectedMember;
-        this.jobLogLoading = false;
-        if (result.entries.length === 0) {
-          this.jobLogError = 'No members found in dataset ' + this.jobLogDataset.toUpperCase() +
-            '. Verify the dataset name and ensure you have READ access.';
+    if (this.jobLogMode === 'jes') {
+      // JES Mode: Use z/OSMF REST Jobs API (auto-detect)
+      const owner = this.loggedInUser || '*';
+      const prefix = this.jobLogPrefix || 'ZWE*';
+
+      this.jobLogService.getMostRecentJobLog(owner, prefix).subscribe(
+        (result) => {
+          this.jobLogEntries = result.entries;
+          this.jobLogContent = result.content;
+          this.jobLogSelectedMember = result.selectedMember;
+          this.jobLogLoading = false;
+          if (result.entries.length === 0) {
+            this.jobLogError = 'No jobs found for owner ' + owner.toUpperCase() +
+              ' with prefix ' + prefix + '. Try a different prefix or switch to Dataset mode.';
+          }
+        },
+        () => {
+          this.jobLogLoading = false;
+          this.jobLogError = 'Failed to fetch jobs from z/OSMF. Ensure z/OSMF is running and accessible.';
         }
-      },
-      (err) => {
+      );
+    } else {
+      // Dataset Mode: Use ZSS dataset API (manual)
+      const validationErr = this.jobLogService.validateDatasetName(this.jobLogDataset);
+      if (validationErr) {
+        this.jobLogValidationError = validationErr;
         this.jobLogLoading = false;
-        this.jobLogError = 'Failed to fetch job log. Ensure the ZSS agent is running and you have access.';
+        return;
       }
-    );
+
+      this.jobLogService.getMostRecentDatasetLog(this.jobLogDataset).subscribe(
+        (result) => {
+          this.jobLogEntries = result.entries;
+          this.jobLogContent = result.content;
+          this.jobLogSelectedMember = result.selectedMember;
+          this.jobLogLoading = false;
+          if (result.entries.length === 0) {
+            this.jobLogError = 'No members found in dataset ' + this.jobLogDataset.toUpperCase() +
+              '. Verify the dataset name and ensure you have READ access.';
+          }
+        },
+        () => {
+          this.jobLogLoading = false;
+          this.jobLogError = 'Failed to fetch dataset. Ensure the ZSS agent is running and you have access.';
+        }
+      );
+    }
   }
 
   /**
-   * Load a specific member's content.
+   * Load a specific entry's content (works for both JES and Dataset mode).
    */
   selectJobLogMember(entry: JobLogEntry): void {
     if (this.jobLogSelectedMember === entry.memberName) return;
@@ -330,13 +387,13 @@ export class SysInfoComponent implements OnInit, OnDestroy {
     this.jobLogLoading = true;
     this.jobLogCopied = false;
 
-    this.jobLogService.getMemberContent(entry.fullPath).subscribe(
+    this.jobLogService.getEntryContent(entry).subscribe(
       (content) => {
         this.jobLogContent = content;
         this.jobLogLoading = false;
       },
-      (err) => {
-        this.jobLogContent = 'Error loading member content.';
+      () => {
+        this.jobLogContent = 'Error loading content.';
         this.jobLogLoading = false;
       }
     );
@@ -365,11 +422,14 @@ export class SysInfoComponent implements OnInit, OnDestroy {
    * Build a structured clipboard output with metadata header.
    */
   private buildClipboardContent(): string {
+    const source = this.jobLogMode === 'jes'
+      ? ' Source: JES (' + (this.loggedInUser || 'Unknown') + ', prefix: ' + this.jobLogPrefix + ')'
+      : ' Dataset: ' + (this.jobLogDataset || '').toUpperCase();
     const header = [
       '═══════════════════════════════════════════════════════════',
       ' Zowe Installation Diagnostic Log',
-      ' Dataset: ' + (this.jobLogDataset || '').toUpperCase(),
-      ' Member: ' + (this.jobLogSelectedMember || 'N/A'),
+      source,
+      ' Entry: ' + (this.jobLogSelectedMember || 'N/A'),
       ' Exported: ' + new Date().toISOString(),
       ' User: ' + (this.loggedInUser || 'Unknown'),
       ' Server: ' + (this.serverInfo ? this.serverInfo.hostname : 'Unknown'),

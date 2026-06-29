@@ -382,13 +382,45 @@
           Installation Job Log
         </h3>
         <p class="diagnostics-description">
-          Fetch z/OSMF installation logs to diagnose Zowe setup issues.
-          Enter the PDS dataset name containing job output (e.g., <span class="monospace">RSOMGR.JOBLOG</span>).
-          Your SAF credentials control which datasets you can access.
+          View recent Zowe installation and runtime job logs for diagnostics.
+          Jobs are auto-detected for the logged-in user ({{ loggedInUser || 'unknown' }}).
         </p>
 
-        <!-- Dataset input & fetch button -->
-        <div class="joblog-input-row">
+        <!-- Mode selector -->
+        <div class="joblog-mode-selector">
+          <button class="mode-btn" [class.active]="jobLogMode === 'jes'" (click)="setJobLogMode('jes')">
+            <svg viewBox="0 0 16 16" width="12" height="12"><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z" fill="currentColor"/></svg>
+            JES Jobs (Auto)
+          </button>
+          <button class="mode-btn" [class.active]="jobLogMode === 'dataset'" (click)="setJobLogMode('dataset')">
+            <svg viewBox="0 0 16 16" width="12" height="12"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9z" fill="currentColor"/></svg>
+            Dataset (Manual)
+          </button>
+        </div>
+
+        <!-- JES Mode Input -->
+        <div class="joblog-input-row" *ngIf="jobLogMode === 'jes'">
+          <div class="joblog-input-group">
+            <label class="joblog-label" for="joblog-prefix">Job Name Prefix</label>
+            <input
+              id="joblog-prefix"
+              class="joblog-input"
+              type="text"
+              [(ngModel)]="jobLogPrefix"
+              placeholder="ZWE*"
+              (keydown.enter)="fetchJobLog()"
+              maxlength="8"
+            />
+          </div>
+          <button class="joblog-fetch-btn" (click)="fetchJobLog()" [disabled]="jobLogLoading">
+            <svg viewBox="0 0 16 16" width="14" height="14" *ngIf="!jobLogLoading"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="currentColor"/></svg>
+            <span class="loading-spinner-sm" *ngIf="jobLogLoading"></span>
+            {{ jobLogLoading ? 'Loading...' : 'Fetch Jobs' }}
+          </button>
+        </div>
+
+        <!-- Dataset Mode Input -->
+        <div class="joblog-input-row" *ngIf="jobLogMode === 'dataset'">
           <div class="joblog-input-group">
             <label class="joblog-label" for="joblog-dataset">Dataset Name (PDS)</label>
             <input
@@ -396,7 +428,7 @@
               class="joblog-input"
               type="text"
               [(ngModel)]="jobLogDataset"
-              placeholder="RSOMGR.JOBLOG"
+              placeholder="HLQ.JOBLOG"
               [class.input-error]="jobLogValidationError"
               (keydown.enter)="fetchJobLog()"
               maxlength="44"
@@ -410,9 +442,11 @@
           </button>
         </div>
 
-        <!-- Member list (horizontal scroll) -->
+        <!-- Entry list (horizontal scroll) -->
         <div class="joblog-members" *ngIf="jobLogEntries.length > 0">
-          <span class="joblog-members-label">Members ({{ jobLogEntries.length }}) — most recent first:</span>
+          <span class="joblog-members-label">
+            {{ jobLogMode === 'jes' ? 'Jobs' : 'Members' }} ({{ jobLogEntries.length }}) &#8212; most recent first:
+          </span>
           <div class="joblog-member-list">
             <button
               *ngFor="let entry of jobLogEntries"
@@ -421,7 +455,9 @@
               (click)="selectJobLogMember(entry)"
               [title]="entry.fullPath"
             >
-              {{ entry.memberName }}
+              <span class="member-name">{{ entry.memberName }}</span>
+              <span class="member-status" *ngIf="entry.retcode">{{ entry.retcode }}</span>
+              <span class="member-status running" *ngIf="!entry.retcode && entry.status === 'ACTIVE'">ACTIVE</span>
             </button>
           </div>
         </div>
@@ -437,7 +473,7 @@
           <div class="joblog-toolbar">
             <span class="joblog-meta">
               <span class="joblog-meta-item" *ngIf="jobLogSelectedMember">
-                <strong>Member:</strong> {{ jobLogSelectedMember }}
+                <strong>{{ jobLogMode === 'jes' ? 'Job' : 'Member' }}:</strong> {{ jobLogSelectedMember }}
               </span>
               <span class="joblog-meta-item">
                 <strong>Lines:</strong> {{ getJobLogLineCount() }}
@@ -464,12 +500,12 @@
               <svg viewBox="0 0 16 16" width="20" height="20"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.502.002.071-.332 2.351-.386zm-.154-2.173a.9.9 0 1 1 0-1.798.9.9 0 0 1 0 1.798z" fill="currentColor"/></svg>
             </div>
             <div class="tip-text">
-              <strong>How to use:</strong>
+              <strong>How it works:</strong>
               <ol>
-                <li>Enter the PDS dataset name containing your Zowe installation job logs (e.g., <span class="monospace">RSOMGR.JOBLOG</span>)</li>
-                <li>Click <strong>Fetch Log</strong> to list available members</li>
-                <li>The most recent member is loaded automatically</li>
-                <li>Click <strong>Copy to Clipboard</strong> to export for troubleshooting</li>
+                <li><strong>JES Jobs (Auto)</strong> &#8212; Fetches your recent Zowe jobs via z/OSMF. Logs load automatically when you open this tab.</li>
+                <li><strong>Dataset (Manual)</strong> &#8212; Browse a specific PDS dataset for job output members.</li>
+                <li>Select a job or member to view its content.</li>
+                <li>Click <strong>Copy to Clipboard</strong> to export for troubleshooting.</li>
               </ol>
             </div>
           </div>
@@ -478,8 +514,8 @@
               <svg viewBox="0 0 16 16" width="20" height="20"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" fill="currentColor"/></svg>
             </div>
             <div class="tip-text">
-              <strong>Access Control:</strong> Only datasets your TSO user has RACF READ access to will be accessible.
-              Contact your security administrator if you receive a 403 error.
+              <strong>Access Control:</strong> JES mode shows only jobs owned by your user ID.
+              Dataset mode requires RACF READ access to the specified PDS.
             </div>
           </div>
         </div>
