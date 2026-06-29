@@ -379,29 +379,39 @@
       <div class="info-section diagnostics-section">
         <h3 class="section-title">
           <svg viewBox="0 0 16 16" class="section-icon"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" fill="currentColor"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z" fill="currentColor"/></svg>
-          Installation Job Log
+          Zowe Diagnostic Logs
         </h3>
         <p class="diagnostics-description">
-          View recent Zowe installation and runtime job logs for diagnostics.
-          Jobs are auto-detected for the logged-in user ({{ loggedInUser || 'unknown' }}).
+          Fetch Zowe installation and runtime logs. JES Spool shows active/recent jobs.
+          USS Logs shows persisted log files (survives JES purge).
         </p>
 
-        <!-- Mode selector -->
-        <div class="joblog-mode-selector">
-          <button class="mode-btn" [class.active]="jobLogMode === 'jes'" (click)="setJobLogMode('jes')">
-            <svg viewBox="0 0 16 16" width="12" height="12"><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z" fill="currentColor"/></svg>
-            JES Jobs (Auto)
+        <!-- Source selector -->
+        <div class="joblog-source-selector">
+          <button class="source-btn" [class.active]="jobLogSource === 'jes'" (click)="setJobLogSource('jes')">
+            JES Spool
           </button>
-          <button class="mode-btn" [class.active]="jobLogMode === 'dataset'" (click)="setJobLogMode('dataset')">
-            <svg viewBox="0 0 16 16" width="12" height="12"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9z" fill="currentColor"/></svg>
-            Dataset (Manual)
+          <button class="source-btn" [class.active]="jobLogSource === 'uss'" (click)="setJobLogSource('uss')">
+            USS Logs
           </button>
         </div>
 
-        <!-- JES Mode Input -->
-        <div class="joblog-input-row" *ngIf="jobLogMode === 'jes'">
+        <!-- JES Mode: Owner + Prefix inputs -->
+        <div class="joblog-input-row" *ngIf="jobLogSource === 'jes'">
           <div class="joblog-input-group">
-            <label class="joblog-label" for="joblog-prefix">Job Name Prefix</label>
+            <label class="joblog-label" for="joblog-owner">Job Owner</label>
+            <input
+              id="joblog-owner"
+              class="joblog-input"
+              type="text"
+              [(ngModel)]="jobLogOwner"
+              placeholder="*"
+              (keydown.enter)="fetchJobLog()"
+              maxlength="8"
+            />
+          </div>
+          <div class="joblog-input-group">
+            <label class="joblog-label" for="joblog-prefix">Job Prefix</label>
             <input
               id="joblog-prefix"
               class="joblog-input"
@@ -419,45 +429,60 @@
           </button>
         </div>
 
-        <!-- Dataset Mode Input -->
-        <div class="joblog-input-row" *ngIf="jobLogMode === 'dataset'">
-          <div class="joblog-input-group">
-            <label class="joblog-label" for="joblog-dataset">Dataset Name (PDS)</label>
+        <!-- USS Mode: Path input -->
+        <div class="joblog-input-row" *ngIf="jobLogSource === 'uss'">
+          <div class="joblog-input-group" style="flex:2">
+            <label class="joblog-label" for="joblog-usspath">Logs Directory (USS)</label>
             <input
-              id="joblog-dataset"
+              id="joblog-usspath"
               class="joblog-input"
               type="text"
-              [(ngModel)]="jobLogDataset"
-              placeholder="HLQ.JOBLOG"
-              [class.input-error]="jobLogValidationError"
+              [(ngModel)]="jobLogUssPath"
+              placeholder="/global/zowe/logs"
               (keydown.enter)="fetchJobLog()"
-              maxlength="44"
             />
-            <span class="joblog-validation-error" *ngIf="jobLogValidationError">{{ jobLogValidationError }}</span>
           </div>
           <button class="joblog-fetch-btn" (click)="fetchJobLog()" [disabled]="jobLogLoading">
             <svg viewBox="0 0 16 16" width="14" height="14" *ngIf="!jobLogLoading"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="currentColor"/></svg>
             <span class="loading-spinner-sm" *ngIf="jobLogLoading"></span>
-            {{ jobLogLoading ? 'Loading...' : 'Fetch Log' }}
+            {{ jobLogLoading ? 'Loading...' : 'List Logs' }}
           </button>
         </div>
 
-        <!-- Entry list (horizontal scroll) -->
-        <div class="joblog-members" *ngIf="jobLogEntries.length > 0">
+        <!-- JES Job list -->
+        <div class="joblog-members" *ngIf="jobLogSource === 'jes' && jobLogEntries.length > 0">
           <span class="joblog-members-label">
-            {{ jobLogMode === 'jes' ? 'Jobs' : 'Members' }} ({{ jobLogEntries.length }}) &#8212; most recent first:
+            Jobs ({{ jobLogEntries.length }}) &#8212; most recent first:
           </span>
           <div class="joblog-member-list">
             <button
               *ngFor="let entry of jobLogEntries"
               class="joblog-member-btn"
-              [class.active]="jobLogSelectedMember === entry.memberName"
-              (click)="selectJobLogMember(entry)"
-              [title]="entry.fullPath"
+              [class.active]="jobLogSelected === entry.label"
+              (click)="selectJob(entry)"
+              [title]="entry.owner + ' | ' + entry.jobname + '(' + entry.jobid + ')'"
             >
-              <span class="member-name">{{ entry.memberName }}</span>
+              <span class="member-name">{{ entry.label }}</span>
               <span class="member-status" *ngIf="entry.retcode">{{ entry.retcode }}</span>
               <span class="member-status running" *ngIf="!entry.retcode && entry.status === 'ACTIVE'">ACTIVE</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- USS file list -->
+        <div class="joblog-members" *ngIf="jobLogSource === 'uss' && jobLogUssFiles.length > 0">
+          <span class="joblog-members-label">
+            Log files ({{ jobLogUssFiles.length }}) &#8212; most recent first:
+          </span>
+          <div class="joblog-member-list">
+            <button
+              *ngFor="let file of jobLogUssFiles"
+              class="joblog-member-btn"
+              [class.active]="jobLogSelected === file.name"
+              (click)="selectUssFile(file)"
+              [title]="file.path"
+            >
+              <span class="member-name">{{ file.name }}</span>
             </button>
           </div>
         </div>
@@ -472,8 +497,8 @@
         <div class="joblog-viewer" *ngIf="jobLogContent && !isJobLogError()">
           <div class="joblog-toolbar">
             <span class="joblog-meta">
-              <span class="joblog-meta-item" *ngIf="jobLogSelectedMember">
-                <strong>{{ jobLogMode === 'jes' ? 'Job' : 'Member' }}:</strong> {{ jobLogSelectedMember }}
+              <span class="joblog-meta-item" *ngIf="jobLogSelected">
+                <strong>{{ jobLogSource === 'jes' ? 'Job' : 'File' }}:</strong> {{ jobLogSelected }}
               </span>
               <span class="joblog-meta-item">
                 <strong>Lines:</strong> {{ getJobLogLineCount() }}
@@ -493,19 +518,17 @@
           <pre class="joblog-content error-content">{{ jobLogContent }}</pre>
         </div>
 
-        <!-- Helpful tips -->
+        <!-- Tips -->
         <div class="diagnostics-tips" *ngIf="!jobLogContent && !jobLogLoading && !jobLogError">
           <div class="tip-card">
             <div class="tip-icon">
               <svg viewBox="0 0 16 16" width="20" height="20"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.502.002.071-.332 2.351-.386zm-.154-2.173a.9.9 0 1 1 0-1.798.9.9 0 0 1 0 1.798z" fill="currentColor"/></svg>
             </div>
             <div class="tip-text">
-              <strong>How it works:</strong>
+              <strong>Two log sources:</strong>
               <ol>
-                <li><strong>JES Jobs (Auto)</strong> &#8212; Fetches your recent Zowe jobs via z/OSMF. Logs load automatically when you open this tab.</li>
-                <li><strong>Dataset (Manual)</strong> &#8212; Browse a specific PDS dataset for job output members.</li>
-                <li>Select a job or member to view its content.</li>
-                <li>Click <strong>Copy to Clipboard</strong> to export for troubleshooting.</li>
+                <li><strong>JES Spool</strong> &#8212; Active/recent jobs via z/OSMF (owner=* finds all Zowe STCs).</li>
+                <li><strong>USS Logs</strong> &#8212; Persisted log files at the Zowe workspace directory. Survives JES purge.</li>
               </ol>
             </div>
           </div>
@@ -514,8 +537,8 @@
               <svg viewBox="0 0 16 16" width="20" height="20"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" fill="currentColor"/></svg>
             </div>
             <div class="tip-text">
-              <strong>Access Control:</strong> JES mode shows only jobs owned by your user ID.
-              Dataset mode requires RACF READ access to the specified PDS.
+              <strong>If JES shows nothing:</strong> Zowe jobs are owned by service accounts (ZWESISTC), not your user ID.
+              Use owner=* to see them. If purged, switch to USS Logs.
             </div>
           </div>
         </div>

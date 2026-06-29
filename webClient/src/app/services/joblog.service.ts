@@ -13,26 +13,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 
 /**
- * Production-grade Job Log Service for Zowe Desktop.
+ * Job Log Service — fetches Zowe job spool output and USS log files.
  *
- * Two modes of operation:
+ * Two sources:
+ *   1. JES Spool (z/OSMF REST Jobs API) — for active/recent jobs
+ *   2. USS Log Files (ZSS unixFile API) — for persisted logs after JES purge
  *
- * 1. JES Mode (default, automatic):
- *    Uses z/OSMF REST Jobs API to list the current user's recent jobs
- *    and fetch their spool output. Same API that zlux-editor uses for
- *    JCL submission at: /ibmzosmf/api/v1/zosmf/restjobs/jobs
- *
- * 2. Dataset Mode (manual fallback):
- *    Uses ZSS dataset APIs (same as zlux-editor) to read PDS members.
- *
- * Security:
- *   - z/OSMF handles auth via the session cookie (same session as Desktop)
- *   - ZSS handles SAF/RACF authorization for dataset access
- *   - No credentials stored or transmitted by this service
- *   - Job listings respect z/OSMF RBAC (user sees only their own jobs)
+ * Key design decisions:
+ *   - owner defaults to '*' (wildcard) because Zowe STCs are owned by a
+ *     service account (ZWESISTC), NOT the logged-in user.
+ *   - prefix defaults to 'ZWE*' to target all Zowe-related jobs.
+ *   - USS logs path defaults to common Zowe workspace log directory.
+ *   - When JES spool is purged (404), the fallback is USS log files.
  */
 
 // ═══════════ Interfaces ═══════════
@@ -45,6 +40,7 @@ export interface ZosmfJob {
   status: string;
   type: string;
   retcode: string | null;
+  'class': string;
   'files-url': string;
   url: string;
 }
@@ -60,28 +56,44 @@ export interface ZosmfSpoolFile {
   'records-url': string;
 }
 
-/** Dataset metadata response from ZSS */
-export interface DatasetMetadataResponse {
-  datasets: Array<{
-    name: string;
-    members?: Array<{ name: string }>;
-  }>;
-}
-
-/** Dataset contents response from ZSS */
-export interface DatasetContentsResponse {
-  records: string[];
-  etag?: string;
-}
-
-/** Unified job entry for UI display */
+/** Job entry for UI display */
 export interface JobLogEntry {
-  memberName: string;
-  datasetName: string;
-  fullPath: string;
-  mode: 'jes' | 'dataset';
-  retcode?: string;
-  status?: string;
+  label: string;
+  jobname: string;
+  jobid: string;
+  owner: string;
+  status: string;
+  retcode: string | null;
+  jobUrl: string;
+}
+
+/** Result of fetching jobs + auto-selecting most recent spool */
+export interface JobLogResult {
+  entries: JobLogEntry[];
+  content: string;
+  selectedLabel: string | null;
+}
+
+/** USS log file entry */
+export interface UssLogFile {
+  name: string;
+  path: string;
+  size: number;
+  lastModified: string;
+}
+
+/** USS directory listing response from ZSS */
+export interface UssDirectoryResponse {
+  entries: Array<{
+    name: string;
+    path: string;
+    directory: boolean;
+    size: number;
+    mode: number;
+    ccsid: number;
+    lastModified?: string;
+    createdAt?: string;
+  }>;
 }
 
 // ═══════════ Service ═══════════
@@ -90,329 +102,233 @@ export interface JobLogEntry {
 export class JobLogService {
 
   private static readonly ZOSMF_JOBS_URI = '/ibmzosmf/api/v1/zosmf/restjobs/jobs';
-  private static readonly DEFAULT_JOB_PREFIX = 'ZWE*';
-  private static readonly MAX_JOBS = 20;
+  private static readonly DEFAULT_OWNER = '*';
+  private static readonly DEFAULT_PREFIX = 'ZWE*';
+  private static readonly MAX_JOBS = 25;
 
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  // ─── z/OSMF Headers ───
+  // ─── Configuration ───
 
-  private getZosmfHeaders(): HttpHeaders {
+  getDefaultOwner(): string { return JobLogService.DEFAULT_OWNER; }
+  getDefaultPrefix(): string { return JobLogService.DEFAULT_PREFIX; }
+
+  // ─── z/OSMF Headers (CSRF protection required) ───
+
+  private headers(): HttpHeaders {
     return new HttpHeaders({
       'Accept': 'application/json',
       'X-CSRF-ZOSMF-HEADER': 'true'
     });
   }
 
-  // ═══════════ JES MODE (Primary - Auto-detect) ═══════════
+  // ─── Public API ───
 
   /**
-   * List recent jobs for the given owner/prefix using z/OSMF REST Jobs API.
-   * Same API as zlux-editor menu-bar.config.ts line 72:
-   *   /ibmzosmf/api/v1/zosmf/restjobs/jobs?owner=USER&prefix=ZWE*
+   * List recent jobs matching owner + prefix.
+   * owner='*' returns jobs from ALL owners (necessary for Zowe STCs).
    */
   listJobs(owner: string, prefix: string): Observable<JobLogEntry[]> {
-    const ownerParam = owner ? owner.toUpperCase() : '*';
-    const prefixParam = prefix ? prefix.toUpperCase() : JobLogService.DEFAULT_JOB_PREFIX;
+    var ownerParam = (owner && owner.trim()) ? owner.trim().toUpperCase() : JobLogService.DEFAULT_OWNER;
+    var prefixParam = (prefix && prefix.trim()) ? prefix.trim().toUpperCase() : JobLogService.DEFAULT_PREFIX;
 
-    const url = JobLogService.ZOSMF_JOBS_URI +
+    var url = JobLogService.ZOSMF_JOBS_URI +
       '?owner=' + encodeURIComponent(ownerParam) +
       '&prefix=' + encodeURIComponent(prefixParam) +
       '&max-jobs=' + JobLogService.MAX_JOBS;
 
-    return this.http.get<ZosmfJob[]>(url, { headers: this.getZosmfHeaders() }).pipe(
-      map((jobs: any) => {
-        // z/OSMF may return an object with an error message instead of an array
+    return this.http.get<ZosmfJob[]>(url, { headers: this.headers() }).pipe(
+      map(function(jobs: any) {
         if (!jobs || !Array.isArray(jobs) || jobs.length === 0) {
           return [];
         }
-
-        // Sort by jobid descending (higher JOB IDs = more recent)
-        const sorted = jobs.slice().sort(function(a: ZosmfJob, b: ZosmfJob) {
+        // Sort by jobid descending — higher JOB IDs are more recent
+        var sorted = jobs.slice().sort(function(a: ZosmfJob, b: ZosmfJob) {
           if (a.jobid > b.jobid) return -1;
           if (a.jobid < b.jobid) return 1;
           return 0;
         });
-
-        return sorted.map(function(job: ZosmfJob) {
+        return sorted.map(function(job: ZosmfJob): JobLogEntry {
           return {
-            memberName: job.jobname + '(' + job.jobid + ')',
-            datasetName: (job.retcode || job.status || 'UNKNOWN'),
-            fullPath: job.url || (JobLogService.ZOSMF_JOBS_URI + '/' + job.jobname + '/' + job.jobid),
-            mode: 'jes' as 'jes',
-            retcode: job.retcode || undefined,
-            status: job.status || undefined
+            label: job.jobname + '(' + job.jobid + ')',
+            jobname: job.jobname,
+            jobid: job.jobid,
+            owner: job.owner,
+            status: job.status || '',
+            retcode: job.retcode || null,
+            jobUrl: job.url || (JobLogService.ZOSMF_JOBS_URI + '/' + job.jobname + '/' + job.jobid)
           };
         });
       }),
-      catchError(function(err) {
-        console.error('JobLog: z/OSMF Jobs API error', err);
+      catchError(function(err: any) {
+        console.error('[JobLogService] listJobs failed:', err.status, err.message || '');
         return of([]);
       })
     );
   }
 
   /**
-   * Get spool content for a specific job.
-   * Fetches the JESMSGLG DD (main system messages) by default.
+   * Fetch spool file content for a job. Reads JESMSGLG by default
+   * (main system messages log), falling back to the first available DD.
    */
-  getJobSpoolContent(jobUrl: string): Observable<string> {
-    if (!jobUrl) return of('');
+  getSpoolContent(jobUrl: string): Observable<string> {
+    if (!jobUrl) { return of(''); }
 
-    const filesUrl = jobUrl + '/files';
-    const headers = this.getZosmfHeaders();
-    const httpRef = this.http;
+    var filesUrl = jobUrl + '/files';
+    var headers = this.headers();
+    var httpRef = this.http;
 
-    return new Observable(function(observer) {
-      httpRef.get<ZosmfSpoolFile[]>(filesUrl, { headers: headers }).subscribe(
-        function(spoolFiles) {
-          if (!spoolFiles || !Array.isArray(spoolFiles) || spoolFiles.length === 0) {
-            observer.next('No spool files found for this job.');
-            observer.complete();
-            return;
-          }
-
-          // Pick JESMSGLG (system messages) as default, fallback to first
-          var targetSpool = spoolFiles[0];
-          for (var i = 0; i < spoolFiles.length; i++) {
-            if (spoolFiles[i].ddname === 'JESMSGLG') {
-              targetSpool = spoolFiles[i];
-              break;
-            }
-          }
-
-          var recordsUrl = targetSpool['records-url'] ||
-            (jobUrl + '/files/' + targetSpool.id + '/records');
-
-          httpRef.get(recordsUrl, {
-            headers: headers,
-            responseType: 'text'
-          }).subscribe(
-            function(text) {
-              observer.next(text || '');
-              observer.complete();
-            },
-            function(err) {
-              var status = err.status || 0;
-              observer.next('Error (' + status + '): Failed to fetch spool content.');
-              observer.complete();
-            }
-          );
-        },
-        function(err) {
-          var status = err.status || 0;
-          if (status === 403) {
-            observer.next('Error: Access denied (403). You may not have permission to view this job.');
-          } else if (status === 404) {
-            observer.next('Error: Job not found (404). It may have been purged from the system.');
-          } else {
-            observer.next('Error (' + status + '): Failed to list spool files.');
-          }
-          observer.complete();
-        }
-      );
-    });
-  }
-
-  // ═══════════ DATASET MODE (Manual Fallback) ═══════════
-
-  /**
-   * List members of a PDS dataset via ZSS (same as zlux-editor).
-   */
-  listDatasetMembers(datasetName: string): Observable<JobLogEntry[]> {
-    if (!datasetName || !datasetName.trim()) {
-      return of([]);
-    }
-
-    var dsName = datasetName.trim().toUpperCase();
-    var requestUrl: string;
-
-    try {
-      requestUrl = ZoweZLUX.uriBroker.datasetMetadataUri(
-        encodeURIComponent(dsName), undefined, undefined, true
-      );
-    } catch (e) {
-      return of([]);
-    }
-
-    return this.http.get<DatasetMetadataResponse>(requestUrl).pipe(
-      map(function(response: DatasetMetadataResponse) {
-        if (!response || !response.datasets || response.datasets.length === 0) {
-          return [];
+    return httpRef.get<ZosmfSpoolFile[]>(filesUrl, { headers: headers }).pipe(
+      switchMap(function(spoolFiles: any) {
+        if (!spoolFiles || !Array.isArray(spoolFiles) || spoolFiles.length === 0) {
+          return of('No spool files found for this job.');
         }
 
-        var ds = response.datasets[0];
-        if (!ds.members || ds.members.length === 0) {
-          return [];
+        // Prefer JESMSGLG > JESYSMSG > first available
+        var target = spoolFiles[0];
+        for (var i = 0; i < spoolFiles.length; i++) {
+          if (spoolFiles[i].ddname === 'JESMSGLG') { target = spoolFiles[i]; break; }
+        }
+        if (target === spoolFiles[0]) {
+          for (var j = 0; j < spoolFiles.length; j++) {
+            if (spoolFiles[j].ddname === 'JESYSMSG') { target = spoolFiles[j]; break; }
+          }
         }
 
-        var entries: JobLogEntry[] = ds.members.map(function(m) {
-          return {
-            memberName: m.name.trim(),
-            datasetName: ds.name.trim(),
-            fullPath: ds.name.trim() + '(' + m.name.trim() + ')',
-            mode: 'dataset' as 'dataset'
-          };
-        });
+        var recordsUrl = target['records-url'] ||
+          (jobUrl + '/files/' + target.id + '/records');
 
-        entries.sort(function(a, b) {
-          if (a.memberName > b.memberName) return -1;
-          if (a.memberName < b.memberName) return 1;
-          return 0;
-        });
-
-        return entries;
+        return httpRef.get(recordsUrl, { headers: headers, responseType: 'text' }).pipe(
+          catchError(function(err: any) {
+            return of('Error (' + (err.status || 0) + '): Failed to read spool DD ' + target.ddname + '.');
+          })
+        );
       }),
-      catchError(function(err) {
-        console.error('JobLog: Failed to list dataset members', err);
-        return of([]);
-      })
-    );
-  }
-
-  /**
-   * Fetch content of a specific PDS member via ZSS.
-   */
-  getDatasetMemberContent(fullPath: string): Observable<string> {
-    if (!fullPath || !fullPath.trim()) {
-      return of('');
-    }
-
-    var requestUrl: string;
-    try {
-      requestUrl = ZoweZLUX.uriBroker.datasetContentsUri(fullPath.trim());
-    } catch (e) {
-      return of('Error: Unable to construct dataset URI. ZSS agent may not be available.');
-    }
-
-    return this.http.get<DatasetContentsResponse>(requestUrl).pipe(
-      map(function(response: DatasetContentsResponse) {
-        if (!response || !response.records) {
-          return '';
-        }
-        return response.records
-          .map(function(record) { return record.replace(/\s+$/, ''); })
-          .join('\n');
-      }),
-      catchError(function(err) {
+      catchError(function(err: any) {
         var status = err.status || 0;
         if (status === 403) {
-          return of('Error: Access denied. You do not have READ access to this dataset.');
+          return of('Error (403): Access denied. You may lack JESSPOOL authority for this job.');
         }
         if (status === 404) {
-          return of('Error: Dataset or member not found.');
+          return of('Error (404): Job not found. It may have been purged from JES.');
         }
-        return of('Error (' + status + '): Failed to fetch dataset content.');
+        return of('Error (' + status + '): Failed to retrieve spool files.');
       })
     );
   }
 
-  // ═══════════ UNIFIED API ═══════════
-
   /**
-   * Primary entry: Auto-fetch the logged-in user's recent Zowe jobs.
+   * Convenience: list jobs + auto-fetch the most recent job's spool.
    */
-  getMostRecentJobLog(owner: string, prefix: string): Observable<{ entries: JobLogEntry[]; content: string; selectedMember: string | null; mode: string }> {
+  fetchMostRecent(owner: string, prefix: string): Observable<JobLogResult> {
     var self = this;
-    return new Observable(function(observer) {
-      self.listJobs(owner, prefix).subscribe(
-        function(entries) {
-          if (entries.length === 0) {
-            observer.next({ entries: [], content: '', selectedMember: null, mode: 'jes' });
-            observer.complete();
-            return;
-          }
-
-          var mostRecent = entries[0];
-          self.getJobSpoolContent(mostRecent.fullPath).subscribe(
-            function(content) {
-              observer.next({ entries: entries, content: content, selectedMember: mostRecent.memberName, mode: 'jes' });
-              observer.complete();
-            },
-            function() {
-              observer.next({ entries: entries, content: 'Error fetching spool content', selectedMember: mostRecent.memberName, mode: 'jes' });
-              observer.complete();
-            }
-          );
-        },
-        function() {
-          observer.next({ entries: [], content: '', selectedMember: null, mode: 'jes' });
-          observer.complete();
+    return self.listJobs(owner, prefix).pipe(
+      switchMap(function(entries: JobLogEntry[]) {
+        if (entries.length === 0) {
+          return of({ entries: [], content: '', selectedLabel: null } as JobLogResult);
         }
-      );
-    });
+        var first = entries[0];
+        return self.getSpoolContent(first.jobUrl).pipe(
+          map(function(content: string): JobLogResult {
+            return { entries: entries, content: content, selectedLabel: first.label };
+          }),
+          catchError(function(): Observable<JobLogResult> {
+            return of({ entries: entries, content: 'Error reading spool output.', selectedLabel: first.label });
+          })
+        );
+      })
+    );
   }
 
-  /**
-   * Dataset mode entry: list PDS members and fetch most recent.
-   */
-  getMostRecentDatasetLog(datasetName: string): Observable<{ entries: JobLogEntry[]; content: string; selectedMember: string | null; mode: string }> {
-    var self = this;
-    return new Observable(function(observer) {
-      self.listDatasetMembers(datasetName).subscribe(
-        function(entries) {
-          if (entries.length === 0) {
-            observer.next({ entries: [], content: '', selectedMember: null, mode: 'dataset' });
-            observer.complete();
-            return;
-          }
+  // ═══════════ USS LOG FILES (Fallback for purged jobs) ═══════════
 
-          var mostRecent = entries[0];
-          self.getDatasetMemberContent(mostRecent.fullPath).subscribe(
-            function(content) {
-              observer.next({ entries: entries, content: content, selectedMember: mostRecent.memberName, mode: 'dataset' });
-              observer.complete();
-            },
-            function() {
-              observer.next({ entries: entries, content: 'Error fetching content', selectedMember: mostRecent.memberName, mode: 'dataset' });
-              observer.complete();
-            }
-          );
-        },
-        function() {
-          observer.next({ entries: [], content: '', selectedMember: null, mode: 'dataset' });
-          observer.complete();
+  /**
+   * List log files in the Zowe workspace logs directory via ZSS unixFile API.
+   * USS logs persist even after JES spool is purged.
+   * Filters to *.log files and sorts by name descending (most recent first).
+   */
+  listUssLogs(logsPath: string): Observable<UssLogFile[]> {
+    if (!logsPath || !logsPath.trim()) { return of([]); }
+
+    var cleanPath = logsPath.trim();
+    if (!cleanPath.startsWith('/')) { cleanPath = '/' + cleanPath; }
+
+    var requestUrl: string;
+    try {
+      requestUrl = ZoweZLUX.uriBroker.unixFileUri('contents', cleanPath + '?respondType=3');
+    } catch (e) {
+      // Fallback: construct manually if uriBroker not available
+      requestUrl = '/unixfile/contents' + cleanPath + '?respondType=3';
+    }
+
+    return this.http.get<UssDirectoryResponse>(requestUrl).pipe(
+      map(function(response: any) {
+        if (!response || !response.entries || !Array.isArray(response.entries)) {
+          return [];
         }
-      );
-    });
+        // Filter to log files only, exclude directories
+        var logFiles: UssLogFile[] = [];
+        for (var i = 0; i < response.entries.length; i++) {
+          var entry = response.entries[i];
+          if (entry.directory) { continue; }
+          var name = entry.name || '';
+          if (name.indexOf('.log') > -1 || name.indexOf('.out') > -1 || name.indexOf('install') > -1) {
+            logFiles.push({
+              name: name,
+              path: cleanPath + '/' + name,
+              size: entry.size || 0,
+              lastModified: entry.lastModified || entry.createdAt || ''
+            });
+          }
+        }
+        // Sort by name descending (log files typically have timestamps in names)
+        logFiles.sort(function(a, b) {
+          if (a.name > b.name) return -1;
+          if (a.name < b.name) return 1;
+          return 0;
+        });
+        return logFiles;
+      }),
+      catchError(function(err: any) {
+        console.error('[JobLogService] listUssLogs failed:', err.status || 0);
+        return of([]);
+      })
+    );
   }
 
   /**
-   * Fetch content for a selected entry (works for both modes).
+   * Read a USS log file's content via ZSS.
    */
-  getEntryContent(entry: JobLogEntry): Observable<string> {
-    if (entry.mode === 'jes') {
-      return this.getJobSpoolContent(entry.fullPath);
-    } else {
-      return this.getDatasetMemberContent(entry.fullPath);
+  getUssFileContent(filePath: string): Observable<string> {
+    if (!filePath || !filePath.trim()) { return of(''); }
+
+    var requestUrl: string;
+    try {
+      requestUrl = ZoweZLUX.uriBroker.unixFileUri('contents', filePath.trim());
+    } catch (e) {
+      requestUrl = '/unixfile/contents' + filePath.trim();
     }
+
+    return this.http.get(requestUrl, { responseType: 'text' }).pipe(
+      catchError(function(err: any) {
+        var status = err.status || 0;
+        if (status === 403) {
+          return of('Error (403): Access denied. You lack READ permission to this USS path.');
+        }
+        if (status === 404) {
+          return of('Error (404): File not found at ' + filePath + '.');
+        }
+        return of('Error (' + status + '): Failed to read USS file.');
+      })
+    );
   }
 
   /**
-   * Get the default job prefix.
+   * Get the default Zowe log directory path.
+   * This is typically set from the server's environment info.
    */
-  getDefaultJobPrefix(): string {
-    return JobLogService.DEFAULT_JOB_PREFIX;
-  }
-
-  /**
-   * Validate a dataset name per MVS naming rules.
-   */
-  validateDatasetName(name: string): string | null {
-    if (!name || !name.trim()) {
-      return 'Dataset name cannot be empty';
-    }
-    var trimmed = name.trim().toUpperCase();
-    if (trimmed.length > 44) {
-      return 'Dataset name cannot exceed 44 characters';
-    }
-    var pattern = /^[A-Z#@$][A-Z0-9#@$\-]{0,7}(\.[A-Z#@$][A-Z0-9#@$\-]{0,7})*$/;
-    if (!pattern.test(trimmed)) {
-      return 'Invalid MVS dataset name format';
-    }
-    return null;
+  getDefaultLogPath(): string {
+    return '/global/zowe/logs';
   }
 }
 

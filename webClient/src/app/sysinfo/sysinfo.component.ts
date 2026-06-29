@@ -22,7 +22,7 @@ import {
   ZoweAuthStatus,
   ZowePluginDef
 } from '../services/sysinfo.service';
-import { JobLogService, JobLogEntry } from '../services/joblog.service';
+import { JobLogService, JobLogEntry, JobLogResult, UssLogFile } from '../services/joblog.service';
 
 @Component({
   selector: 'app-sysinfo',
@@ -73,20 +73,23 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   private uptimeBaseTimestamp: number = 0;
 
   // ─── Diagnostics / Job Log state ───
-  jobLogMode: 'jes' | 'dataset' = 'jes';
+  jobLogSource: 'jes' | 'uss' = 'jes';
+  jobLogOwner: string = '*';
   jobLogPrefix: string = 'ZWE*';
-  jobLogDataset: string = '';
+  jobLogUssPath: string = '';
   jobLogEntries: JobLogEntry[] = [];
+  jobLogUssFiles: UssLogFile[] = [];
   jobLogContent: string = '';
-  jobLogSelectedMember: string | null = null;
+  jobLogSelected: string | null = null;
   jobLogLoading: boolean = false;
   jobLogError: string | null = null;
   jobLogCopied: boolean = false;
-  jobLogValidationError: string | null = null;
   jobLogAutoFetched: boolean = false;
 
   constructor(private sysInfoService: SysInfoService, private jobLogService: JobLogService) {
-    this.jobLogPrefix = this.jobLogService.getDefaultJobPrefix();
+    this.jobLogOwner = this.jobLogService.getDefaultOwner();
+    this.jobLogPrefix = this.jobLogService.getDefaultPrefix();
+    this.jobLogUssPath = this.jobLogService.getDefaultLogPath();
   }
 
   ngOnInit(): void {
@@ -292,108 +295,134 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   // ─── Diagnostics / Job Log Methods ───
 
   /**
-   * Switch between JES (automatic) and Dataset (manual) modes.
+   * Switch between JES spool and USS log file sources.
    */
-  setJobLogMode(mode: 'jes' | 'dataset'): void {
-    this.jobLogMode = mode;
-    this.jobLogEntries = [];
+  setJobLogSource(source: 'jes' | 'uss'): void {
+    if (this.jobLogSource === source) return;
+    this.jobLogSource = source;
     this.jobLogContent = '';
-    this.jobLogSelectedMember = null;
+    this.jobLogSelected = null;
     this.jobLogError = null;
-    this.jobLogValidationError = null;
-    this.jobLogAutoFetched = false;
+    this.jobLogEntries = [];
+    this.jobLogUssFiles = [];
   }
 
   /**
    * Auto-fetch job logs when Diagnostics tab is selected.
-   * Uses JES mode by default (auto-detect user's jobs).
    */
   onDiagnosticsTabActivated(): void {
-    if (!this.jobLogAutoFetched && this.loggedInUser) {
+    if (!this.jobLogAutoFetched) {
       this.jobLogAutoFetched = true;
       this.fetchJobLog();
     }
   }
 
   /**
-   * Fetch job log entries.
-   * JES mode: auto-detects user's recent jobs via z/OSMF.
-   * Dataset mode: reads members of specified PDS.
+   * Fetch logs based on current source (JES or USS).
    */
   fetchJobLog(): void {
     this.jobLogLoading = true;
     this.jobLogError = null;
     this.jobLogContent = '';
     this.jobLogEntries = [];
-    this.jobLogSelectedMember = null;
+    this.jobLogUssFiles = [];
+    this.jobLogSelected = null;
     this.jobLogCopied = false;
-    this.jobLogValidationError = null;
 
-    if (this.jobLogMode === 'jes') {
-      // JES Mode: Use z/OSMF REST Jobs API (auto-detect)
-      const owner = this.loggedInUser || '*';
-      const prefix = this.jobLogPrefix || 'ZWE*';
-
-      this.jobLogService.getMostRecentJobLog(owner, prefix).subscribe(
-        (result) => {
-          this.jobLogEntries = result.entries;
-          this.jobLogContent = result.content;
-          this.jobLogSelectedMember = result.selectedMember;
-          this.jobLogLoading = false;
-          if (result.entries.length === 0) {
-            this.jobLogError = 'No jobs found for owner ' + owner.toUpperCase() +
-              ' with prefix ' + prefix + '. Try a different prefix or switch to Dataset mode.';
-          }
-        },
-        () => {
-          this.jobLogLoading = false;
-          this.jobLogError = 'Failed to fetch jobs from z/OSMF. Ensure z/OSMF is running and accessible.';
-        }
-      );
+    if (this.jobLogSource === 'jes') {
+      this.fetchJesJobs();
     } else {
-      // Dataset Mode: Use ZSS dataset API (manual)
-      const validationErr = this.jobLogService.validateDatasetName(this.jobLogDataset);
-      if (validationErr) {
-        this.jobLogValidationError = validationErr;
-        this.jobLogLoading = false;
-        return;
-      }
-
-      this.jobLogService.getMostRecentDatasetLog(this.jobLogDataset).subscribe(
-        (result) => {
-          this.jobLogEntries = result.entries;
-          this.jobLogContent = result.content;
-          this.jobLogSelectedMember = result.selectedMember;
-          this.jobLogLoading = false;
-          if (result.entries.length === 0) {
-            this.jobLogError = 'No members found in dataset ' + this.jobLogDataset.toUpperCase() +
-              '. Verify the dataset name and ensure you have READ access.';
-          }
-        },
-        () => {
-          this.jobLogLoading = false;
-          this.jobLogError = 'Failed to fetch dataset. Ensure the ZSS agent is running and you have access.';
-        }
-      );
+      this.fetchUssLogs();
     }
   }
 
   /**
-   * Load a specific entry's content (works for both JES and Dataset mode).
+   * JES mode: fetch via z/OSMF REST Jobs API.
    */
-  selectJobLogMember(entry: JobLogEntry): void {
-    if (this.jobLogSelectedMember === entry.memberName) return;
-    this.jobLogSelectedMember = entry.memberName;
+  private fetchJesJobs(): void {
+    const owner = this.jobLogOwner || '*';
+    const prefix = this.jobLogPrefix || 'ZWE*';
+
+    this.jobLogService.fetchMostRecent(owner, prefix).subscribe(
+      (result: JobLogResult) => {
+        this.jobLogEntries = result.entries;
+        this.jobLogContent = result.content;
+        this.jobLogSelected = result.selectedLabel;
+        this.jobLogLoading = false;
+        if (result.entries.length === 0) {
+          this.jobLogError = 'No jobs found for owner=' + owner + ' prefix=' + prefix +
+            '. Try USS Logs mode if jobs have been purged from JES.';
+        }
+      },
+      () => {
+        this.jobLogLoading = false;
+        this.jobLogError = 'Failed to reach z/OSMF REST Jobs API. Verify the API Mediation Layer is routing /ibmzosmf correctly.';
+      }
+    );
+  }
+
+  /**
+   * USS mode: list log files from the Zowe workspace logs directory.
+   */
+  private fetchUssLogs(): void {
+    const path = this.jobLogUssPath || this.jobLogService.getDefaultLogPath();
+
+    this.jobLogService.listUssLogs(path).subscribe(
+      (files: UssLogFile[]) => {
+        this.jobLogUssFiles = files;
+        this.jobLogLoading = false;
+        if (files.length === 0) {
+          this.jobLogError = 'No log files found at ' + path +
+            '. Verify the path exists and you have READ access.';
+        } else {
+          // Auto-load the most recent log file
+          this.selectUssFile(files[0]);
+        }
+      },
+      () => {
+        this.jobLogLoading = false;
+        this.jobLogError = 'Failed to read USS directory. Verify ZSS agent is running and path is correct.';
+      }
+    );
+  }
+
+  /**
+   * Load a specific job's spool content.
+   */
+  selectJob(entry: JobLogEntry): void {
+    if (this.jobLogSelected === entry.label) return;
+    this.jobLogSelected = entry.label;
     this.jobLogLoading = true;
     this.jobLogCopied = false;
 
-    this.jobLogService.getEntryContent(entry).subscribe(
+    this.jobLogService.getSpoolContent(entry.jobUrl).subscribe(
       (content) => {
         this.jobLogContent = content;
         this.jobLogLoading = false;
       },
       () => {
-        this.jobLogContent = 'Error loading content.';
+        this.jobLogContent = 'Error loading spool content.';
+        this.jobLogLoading = false;
+      }
+    );
+  }
+
+  /**
+   * Load a specific USS log file's content.
+   */
+  selectUssFile(file: UssLogFile): void {
+    if (this.jobLogSelected === file.name) return;
+    this.jobLogSelected = file.name;
+    this.jobLogLoading = true;
+    this.jobLogCopied = false;
+
+    this.jobLogService.getUssFileContent(file.path).subscribe(
+      (content) => {
+        this.jobLogContent = content;
+        this.jobLogLoading = false;
+      },
+      () => {
+        this.jobLogContent = 'Error reading file ' + file.path;
         this.jobLogLoading = false;
       }
     );
@@ -422,14 +451,14 @@ export class SysInfoComponent implements OnInit, OnDestroy {
    * Build a structured clipboard output with metadata header.
    */
   private buildClipboardContent(): string {
-    const source = this.jobLogMode === 'jes'
-      ? ' Source: JES (' + (this.loggedInUser || 'Unknown') + ', prefix: ' + this.jobLogPrefix + ')'
-      : ' Dataset: ' + (this.jobLogDataset || '').toUpperCase();
+    const source = this.jobLogSource === 'jes'
+      ? ' Source: JES Spool (owner=' + this.jobLogOwner + ' prefix=' + this.jobLogPrefix + ')'
+      : ' Source: USS Logs (' + this.jobLogUssPath + ')';
     const header = [
       '═══════════════════════════════════════════════════════════',
-      ' Zowe Installation Diagnostic Log',
+      ' Zowe Diagnostic Log',
       source,
-      ' Entry: ' + (this.jobLogSelectedMember || 'N/A'),
+      ' Entry: ' + (this.jobLogSelected || 'N/A'),
       ' Exported: ' + new Date().toISOString(),
       ' User: ' + (this.loggedInUser || 'Unknown'),
       ' Server: ' + (this.serverInfo ? this.serverInfo.hostname : 'Unknown'),
@@ -464,7 +493,7 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get line count of current content (for display).
+   * Get line count of current content.
    */
   getJobLogLineCount(): number {
     if (!this.jobLogContent) return 0;
@@ -472,7 +501,7 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Check if the job log content is an error message.
+   * Check if job log content is an error message (starts with 'Error').
    */
   isJobLogError(): boolean {
     return !!this.jobLogContent && this.jobLogContent.indexOf('Error') === 0;
