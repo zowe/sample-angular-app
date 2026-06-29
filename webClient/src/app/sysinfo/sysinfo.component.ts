@@ -22,7 +22,7 @@ import {
   ZoweAuthStatus,
   ZowePluginDef
 } from '../services/sysinfo.service';
-import { JobLogService, JobLogEntry, JobLogResult, UssLogFile } from '../services/joblog.service';
+import { JobLogService, JobLogEntry, JobLogResult } from '../services/joblog.service';
 
 @Component({
   selector: 'app-sysinfo',
@@ -73,12 +73,7 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   private uptimeBaseTimestamp: number = 0;
 
   // ─── Diagnostics / Job Log state ───
-  jobLogSource: 'jes' | 'uss' = 'jes';
-  jobLogOwner: string = '*';
-  jobLogPrefix: string = 'ZWE*';
-  jobLogUssPath: string = '';
   jobLogEntries: JobLogEntry[] = [];
-  jobLogUssFiles: UssLogFile[] = [];
   jobLogContent: string = '';
   jobLogSelected: string | null = null;
   jobLogLoading: boolean = false;
@@ -86,11 +81,7 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   jobLogCopied: boolean = false;
   jobLogAutoFetched: boolean = false;
 
-  constructor(private sysInfoService: SysInfoService, private jobLogService: JobLogService) {
-    this.jobLogOwner = this.jobLogService.getDefaultOwner();
-    this.jobLogPrefix = this.jobLogService.getDefaultPrefix();
-    this.jobLogUssPath = this.jobLogService.getDefaultLogPath();
-  }
+  constructor(private sysInfoService: SysInfoService, private jobLogService: JobLogService) {}
 
   ngOnInit(): void {
     this.loadClientInfo();
@@ -295,93 +286,42 @@ export class SysInfoComponent implements OnInit, OnDestroy {
   // ─── Diagnostics / Job Log Methods ───
 
   /**
-   * Switch between JES spool and USS log file sources.
-   */
-  setJobLogSource(source: 'jes' | 'uss'): void {
-    if (this.jobLogSource === source) return;
-    this.jobLogSource = source;
-    this.jobLogContent = '';
-    this.jobLogSelected = null;
-    this.jobLogError = null;
-    this.jobLogEntries = [];
-    this.jobLogUssFiles = [];
-  }
-
-  /**
-   * Auto-fetch job logs when Diagnostics tab is selected.
+   * Auto-fetch when Diagnostics tab is selected.
    */
   onDiagnosticsTabActivated(): void {
-    if (!this.jobLogAutoFetched) {
+    if (!this.jobLogAutoFetched && this.loggedInUser) {
       this.jobLogAutoFetched = true;
       this.fetchJobLog();
     }
   }
 
   /**
-   * Fetch logs based on current source (JES or USS).
+   * Fetch the logged-in user's recent jobs via z/OSMF.
    */
   fetchJobLog(): void {
     this.jobLogLoading = true;
     this.jobLogError = null;
     this.jobLogContent = '';
     this.jobLogEntries = [];
-    this.jobLogUssFiles = [];
     this.jobLogSelected = null;
     this.jobLogCopied = false;
 
-    if (this.jobLogSource === 'jes') {
-      this.fetchJesJobs();
-    } else {
-      this.fetchUssLogs();
-    }
-  }
+    const owner = this.loggedInUser || '*';
 
-  /**
-   * JES mode: fetch via z/OSMF REST Jobs API.
-   */
-  private fetchJesJobs(): void {
-    const owner = this.jobLogOwner || '*';
-    const prefix = this.jobLogPrefix || 'ZWE*';
-
-    this.jobLogService.fetchMostRecent(owner, prefix).subscribe(
+    this.jobLogService.fetchUserJobs(owner).subscribe(
       (result: JobLogResult) => {
         this.jobLogEntries = result.entries;
         this.jobLogContent = result.content;
         this.jobLogSelected = result.selectedLabel;
         this.jobLogLoading = false;
         if (result.entries.length === 0) {
-          this.jobLogError = 'No jobs found for owner=' + owner + ' prefix=' + prefix +
-            '. Try USS Logs mode if jobs have been purged from JES.';
+          this.jobLogError = 'No jobs found for user ' + owner +
+            '. You may not have submitted any jobs recently, or they may have been purged from JES.';
         }
       },
       () => {
         this.jobLogLoading = false;
-        this.jobLogError = 'Failed to reach z/OSMF REST Jobs API. Verify the API Mediation Layer is routing /ibmzosmf correctly.';
-      }
-    );
-  }
-
-  /**
-   * USS mode: list log files from the Zowe workspace logs directory.
-   */
-  private fetchUssLogs(): void {
-    const path = this.jobLogUssPath || this.jobLogService.getDefaultLogPath();
-
-    this.jobLogService.listUssLogs(path).subscribe(
-      (files: UssLogFile[]) => {
-        this.jobLogUssFiles = files;
-        this.jobLogLoading = false;
-        if (files.length === 0) {
-          this.jobLogError = 'No log files found at ' + path +
-            '. Verify the path exists and you have READ access.';
-        } else {
-          // Auto-load the most recent log file
-          this.selectUssFile(files[0]);
-        }
-      },
-      () => {
-        this.jobLogLoading = false;
-        this.jobLogError = 'Failed to read USS directory. Verify ZSS agent is running and path is correct.';
+        this.jobLogError = 'Failed to reach z/OSMF. Verify the API Mediation Layer is accessible.';
       }
     );
   }
@@ -402,27 +342,6 @@ export class SysInfoComponent implements OnInit, OnDestroy {
       },
       () => {
         this.jobLogContent = 'Error loading spool content.';
-        this.jobLogLoading = false;
-      }
-    );
-  }
-
-  /**
-   * Load a specific USS log file's content.
-   */
-  selectUssFile(file: UssLogFile): void {
-    if (this.jobLogSelected === file.name) return;
-    this.jobLogSelected = file.name;
-    this.jobLogLoading = true;
-    this.jobLogCopied = false;
-
-    this.jobLogService.getUssFileContent(file.path).subscribe(
-      (content) => {
-        this.jobLogContent = content;
-        this.jobLogLoading = false;
-      },
-      () => {
-        this.jobLogContent = 'Error reading file ' + file.path;
         this.jobLogLoading = false;
       }
     );
@@ -451,13 +370,10 @@ export class SysInfoComponent implements OnInit, OnDestroy {
    * Build a structured clipboard output with metadata header.
    */
   private buildClipboardContent(): string {
-    const source = this.jobLogSource === 'jes'
-      ? ' Source: JES Spool (owner=' + this.jobLogOwner + ' prefix=' + this.jobLogPrefix + ')'
-      : ' Source: USS Logs (' + this.jobLogUssPath + ')';
     const header = [
       '═══════════════════════════════════════════════════════════',
       ' Zowe Diagnostic Log',
-      source,
+      ' Source: JES Spool (owner=' + (this.loggedInUser || '*') + ')',
       ' Entry: ' + (this.jobLogSelected || 'N/A'),
       ' Exported: ' + new Date().toISOString(),
       ' User: ' + (this.loggedInUser || 'Unknown'),
