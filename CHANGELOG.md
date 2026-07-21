@@ -2,6 +2,10 @@
 
 All notable changes to the sample angular app will be documented in this file.
 
+## 3.6.0
+
+- Bugfix: Change app2app example to tn3270 with a TLS connection to foster responsible use ([#134](https://github.com/zowe/sample-angular-app/pull/134))
+
 ## 3.0.0
 
 - Enhancement: i18n support aligned with Zowe v3 Desktop (zlux-app-manager PR #709).
