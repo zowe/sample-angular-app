@@ -10,7 +10,7 @@
 ################################################################################
 export _C89_ACCEPTABLE_RC=0
 WORKDIR=$(dirname "$0")
-TMP="${WORKDIR}/tmp"
+TMP="${WORKDIR}/tmp-sample-angular"
 mkdir "${TMP}" 2>/dev/null
 cd "${TMP}" || exit 8
 
@@ -42,6 +42,7 @@ then
   echo "${TARGET_ABS} - build failed"
   RC=8
 else
+  rm -rf "${TMP}"
   echo "${TARGET_ABS} - build successful"
   extattr +p "${TARGET}"
   RC=0

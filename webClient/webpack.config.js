@@ -14,6 +14,7 @@ var path = require('path');
 var webpackConfig = require('webpack-config');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const { AngularWebpackPlugin } = require('@ngtools/webpack');
 
 if (process.env.MVD_DESKTOP_DIR == null) {
@@ -46,11 +47,24 @@ var config = {
     }),
     new CompressionPlugin({
       threshold: 100000,
-      minRatio: 0.8
+      minRatio: 0.8,
+      deleteOriginalAssets: true
     }),
     new AngularWebpackPlugin({
       tsConfigPath: './tsconfig.json',
       entryModule: './src/app/app.module.ts#AppModule'
+    })
+  ]
+};
+
+config.optimization = {
+  minimizer: [
+    new TerserPlugin({
+      extractComments: {
+        condition: /^\**!|@preserve|@license|@cc_on/i,
+        filename: 'ATTRIBUTION.txt',
+        banner: false
+      }
     })
   ]
 };
