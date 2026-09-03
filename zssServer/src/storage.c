@@ -108,6 +108,9 @@ static Storage *getStorage(HttpService *service, const char *storageType) {
 
 static char *getValue(HttpRequest *request) {
   char *inPtr = request->contentBody;
+  if (inPtr == NULL) {
+    return NULL;
+  }
   char *nativeBody = copyStringToNative(request->slh, inPtr, strlen(inPtr));
   int inLen = nativeBody == NULL ? 0 : strlen(nativeBody);
   char errBuf[512];
