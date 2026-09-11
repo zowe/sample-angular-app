@@ -84,6 +84,19 @@ static char* getKey(HttpRequest *request) {
   return cleanURLParamValue(request->slh, encodedKey);
 }
 
+static char *getNamespacedKey(HttpRequest *request, const char *key) {
+  const char *username = request->username;
+  if (username == NULL || key == NULL) {
+    return NULL;
+  }
+  int len = strlen(username) + 1 /* ':' */ + strlen(key) + 1 /* '\0' */;
+  char *namespacedKey = SLHAlloc(request->slh, len);
+  if (namespacedKey != NULL) {
+    snprintf(namespacedKey, len, "%s:%s", username, key);
+  }
+  return namespacedKey;
+}
+
 static inline char *getStorageType(HttpRequest *request) {
   return getQueryParam(request, "storageType");
 }
@@ -128,8 +141,13 @@ static char *getValue(HttpRequest *request) {
 
 static void handleGet(Storage *storage, HttpResponse *response) {
   char *key = getKey(response->request);
+  char *namespacedKey = getNamespacedKey(response->request, key);
+  if (!namespacedKey) {
+    respondWithBadRequestError(response, "No authenticated user for storage request");
+    return;
+  }
   int status = 0;
-  const char *value = storageGetString(storage, key, &status);
+  const char *value = storageGetString(storage, namespacedKey, &status);
   if (status != STORAGE_STATUS_OK && status != STORAGE_STATUS_KEY_NOT_FOUND) {
     respondWithStorageError(response, storageGetStrStatus(storage, status));
     return;
@@ -151,13 +169,18 @@ static void handleGet(Storage *storage, HttpResponse *response) {
 
 static void handleSet(Storage *storage, HttpResponse *response) {
   char *key = getKey(response->request);
+  char *namespacedKey = getNamespacedKey(response->request, key);
+  if (!namespacedKey) {
+    respondWithBadRequestError(response, "No authenticated user for storage request");
+    return;
+  }
   char *value = getValue(response->request);
   int status = 0;
   if (!value) {
     respondWithBadRequestError(response, "value wasn't found in request body");
     return;
   }
-  storageSetString(storage, key, value, &status);
+  storageSetString(storage, namespacedKey, value, &status);
   if (status != STORAGE_STATUS_OK) {
     respondWithStorageError(response, storageGetStrStatus(storage, status));
     return;
@@ -169,8 +192,13 @@ static void handleSet(Storage *storage, HttpResponse *response) {
 
 static void handleDelete(Storage *storage, HttpResponse *response) {
   char *key = getKey(response->request);
+  char *namespacedKey = getNamespacedKey(response->request, key);
+  if (!namespacedKey) {
+    respondWithBadRequestError(response, "No authenticated user for storage request");
+    return;
+  }
   int status = 0;
-  storageRemove(storage, key, &status);
+  storageRemove(storage, namespacedKey, &status);
   if (status != STORAGE_STATUS_OK && status != STORAGE_STATUS_KEY_NOT_FOUND) {
     respondWithStorageError(response, storageGetStrStatus(storage, status));
     return;
