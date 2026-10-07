@@ -83,14 +83,14 @@
     </div>
     <div class="test-storage">
       <div class="bigger-bold-text" i18n="storageTest@@storageTestLabel">Storage Test</div>
-      <div class="row">
+      <div class="storage-row">
         <span i18n="server@@server">Server</span>
-        <select [(ngModel)]="storageServer" (change)="storageServerChanged($event.target.value)">
+        <select [(ngModel)]="storageServer" (change)="storageServerChanged($any($event.target).value)">
           <option value='zss'>ZSS</option>
           <option value='app-server'>App Server</option>
         </select>
       </div>
-      <div class="row">
+      <div class="storage-row">
         <span i18n="storage@@storage">Storage</span>
         <select [(ngModel)]="storageType">
           <option [ngValue]="undefined">Default</option>
@@ -99,10 +99,10 @@
           <option value="local">Local</option>
         </select>
       </div>
-      <div class="row">
+      <div class="storage-row">
         <span i18n="key@@keyLabel">Key</span><input [(ngModel)]="storageKey">
       </div>
-      <div class="row">
+      <div class="storage-row">
         <span i18n="value@@valueLabel">Value</span><input [(ngModel)]="storageValue">
       </div>
       <div><ng-container i18n="status@@stoargeStatusLabel">Status:</ng-container> {{storageStatus}}</div>

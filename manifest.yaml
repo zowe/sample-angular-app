@@ -2,7 +2,7 @@
 name: angular-sample
 id: org.zowe.zlux.sample.angular
 # Without the v
-version: 3.0.0
+version: 3.6.0
 # Human readable component name
 title: Angular Sample
 # Human readable component description
@@ -19,6 +19,8 @@ repository:
   type: git
   url: https://github.com/zowe/sample-angular-app.git
 # we do not specify encoding here because its already tagged ascii
+commands:
+  validate: bin/validate.sh
 appfwPlugins:
   - path: .
 schemas:

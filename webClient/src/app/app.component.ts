@@ -39,13 +39,13 @@ export class AppComponent {
 `{"type":"connect",
   "connectionSettings":{
     "host":"localhost",
-    "port":23,
+    "port":992,
     "deviceType":5,
     "alternateHeight":60,
     "alternateWidth":132,
     "oiaEnabled": true,
     "security": {
-      "type":0
+      "type":"tls"
     }
 }}`;
 
