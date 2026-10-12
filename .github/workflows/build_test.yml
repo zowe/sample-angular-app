@@ -124,7 +124,10 @@ jobs:
       - name: '[Prep 1] Checkout'
         uses: actions/checkout@v2
 
-      - name: '[Prep 2] Cache node modules'
+      - name: '[Prep 2] Validate package.json'
+        uses: zowe-actions/shared-actions/validate-package-json@main
+
+      - name: '[Prep 3] Cache node modules'
         uses: actions/cache@v4
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
@@ -135,17 +138,17 @@ jobs:
           key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-cache-node-modules-
-      - name: '[Prep 3] Setup Node'
+      - name: '[Prep 4] Setup Node'
         uses: actions/setup-node@v2
         with:
           node-version: 22
 
-      - name: '[Prep 4] Setup jFrog CLI'
+      - name: '[Prep 5] Setup jFrog CLI'
         uses: jfrog/setup-jfrog-cli@v2
         env:
           JF_ARTIFACTORY_1: ${{ secrets.JF_ARTIFACTORY_TOKEN }}
 
-      - name: '[Prep 5] Prepare Workflow'
+      - name: '[Prep 6] Prepare Workflow'
         uses: zowe-actions/zlux-builds/plugins/prepare-workflow@v3.x/main
         with:
           github-user: ${{ secrets.ZOWE_ROBOT_USER }}
@@ -155,28 +158,28 @@ jobs:
           release: ${{ github.event.inputs.PERFORM_RELEASE }}
           plugin-version: ${{ github.event.inputs.BUILD_VERSION }}
 
-      - name: '[Prep 6] Build'
+      - name: '[Prep 7] Build'
         uses: zowe-actions/zlux-builds/plugins/zlux-plugins@v3.x/main
         with:
           build-zss: true
 
-      - name: '[Prep 7] Packaging'
+      - name: '[Prep 8] Packaging'
         uses: zowe-actions/zlux-builds/plugins/make-pax@v3.x/main
         with:
           pax-ssh-username: ${{ secrets.SSH_MARIST_USERNAME }}
           pax-ssh-password: ${{ secrets.SSH_MARIST_RACF_PASSWORD }}
           pax-name: sample-angular-app
 
-      - name: '[Prep 8] Deploy '
+      - name: '[Prep 9] Deploy '
         uses: zowe-actions/zlux-builds/plugins/deploy-pax@v3.x/main
 
-      - name: '[Prep 9] Bump Staging Version '
+      - name: '[Prep 10] Bump Staging Version '
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/bump-version@v3.x/main
         env:
          GITHUB_TOKEN: ${{ secrets.ZOWE_ROBOT_TOKEN }}
 
-      - name: '[Prep 10] NodeJS project setup'
+      - name: '[Prep 11] NodeJS project setup'
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/npm-setup@v3.x/main
         with:
@@ -189,6 +192,6 @@ jobs:
           publish-registry-username: ${{ secrets.NPM_PRIVATE_REGISTRY_USERNAME }}
           publish-registry-password: ${{ secrets.NPM_PRIVATE_REGISTRY_PASSWORD }}
 
-      - name: '[Prep 11] Publish NPM Package  '
+      - name: '[Prep 12] Publish NPM Package  '
         if: ${{ github.event.inputs.PERFORM_RELEASE == 'true' && env.RELEASE == 'true' }}
         uses: zowe-actions/zlux-builds/plugins/npm-publish@v3.x/main
