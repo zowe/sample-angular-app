@@ -30,11 +30,17 @@ class CallService{
     context.addBodyParseMiddleware(router);
     router.post('/',function(req: Request,res: Response) {
       (req as any).zluxData.plugin.callService('hello', '', {method:'POST', body: req.body, contentType:req.get('content-type')}).then((callRes)=> {
+        const body = callRes && callRes.body;
         context.logger.info('callService Returned: statusCode=%s, statusMessage=%s, body length=%s',
-                            callRes.statusCode,
-                            callRes.statusMessage,
-                            callRes.body.length);
-        res.status(200).json({'callService Returned':callRes.body});
+                            callRes && callRes.statusCode,
+                            callRes && callRes.statusMessage,
+                            body ? body.length : 0);
+        res.status(200).json({'callService Returned':body});
+      }).catch((err)=> {
+        context.logger.warn('callService to hello failed: %s', err && err.message ? err.message : err);
+        if (!res.headersSent) {
+          res.status(500).json({'error':'Call to hello service failed'});
+        }
       });
     });
     this.router = router;
